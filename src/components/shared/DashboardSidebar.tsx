@@ -171,11 +171,11 @@ const DashboardSidebar = ({
   // Navigation items configuration
   const navigationItems = [
     { href: "/dashboard", label: labelText, icon: House },
-    { href: "/dashboard/mantlepiece", label: "Profile", icon: Award },
-    { href: "/dashboard/geo-drops", label: "Map Nearest", icon: Flame },
-    { href: "/dashboard/search", label: "Find Drops", icon: Search, degree: 90,},
-    { href: "/dashboard/searchworlds", label: "Find Dropsites", icon: Search, degree: 90,},
-    { href: "/dashboard/my-activity", label: "My Tickets & Rewards", icon: Trophy },
+    { href: "/dashboard/ins-policy", label: "Policies", icon: Award },
+    { href: "/dashboard/ins-claim", label: "Claims", icon: Flame },
+    { href: "/dashboard/ins-policy/new", label: "New Policy", icon: Search, degree: 90,},
+    { href: "/dashboard/ins-claim/new", label: "New Claim", icon: Search, degree: 90,},
+    // { href: "/dashboard/my-activity", label: "My Tickets & Rewards", icon: Trophy },
   ];
 
   const bottomNavigationItems = [
@@ -286,57 +286,7 @@ const DashboardSidebar = ({
         >
           <div className="px-4 py-4 flex flex-col gap-1.5">
 
-            {(adminStatus && Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 1) && (
-              <NavigationLink
-                href='/dashboard/list-music'
-                label='View Catalogue'
-                icon={House}
-                showLabel={!isCollapsed}
-              />
-            )}
-
-            {(adminStatus && Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 1) && (
-              <NavigationLink
-                href='/dashboard/add-music'
-                label='Add Music'
-                icon={CirclePlus}
-                showLabel={!isCollapsed}
-              />
-            )}
-
-            {(adminStatus && Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 1) && (
-              <NavigationLink
-                  href="/dashboard/streaming_pie"
-                  label="Streams Pie Chart"
-                icon={ChartPie}
-                showLabel={!isCollapsed}
-              />
-            )}
-
-            {(adminStatus && Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 1) && (
-              <NavigationLink
-                  href="/dashboard/streaming_line"
-                  label="Streams Line Chart"
-                icon={BarChart2}
-                showLabel={!isCollapsed}
-              />
-            )}
-
-            {/* Admin only - Chatbot */}
-            {(adminStatus && Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 1) && (
-              <NavigationLink
-                href="/dashboard/chatbot"
-                label="ChatBot"
-                icon={BotMessageSquare}
-              showLabel={!isCollapsed}
-              />
-            )}
-
-            {(adminStatus && Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 1) && (
-              <><hr /></>
-            )}
-
-            {Number(process.env.NEXT_PUBLIC_REWARDS) === 1 && Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 0 && navigationItems.map((item) => (
+            {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && navigationItems.map((item) => (
               <NavigationLink
                 key={item.href}
                 href={item.href}
@@ -346,53 +296,8 @@ const DashboardSidebar = ({
               />
             ))}
 
-            {(adminStatus && Number(process.env.NEXT_PUBLIC_REWARDS) === 1) && (
+            {(adminStatus && Number(process.env.NEXT_PUBLIC_INSURANCE) === 1) && (
               <><hr /></>
-            )}
-
-            {/* Admin only - Geo-Drop Management */}
-            {(adminStatus && Number(process.env.NEXT_PUBLIC_REWARDS) === 1) && (
-              <NavigationLink
-                href="/dashboard/my-geo-drops"
-                label="My Drops"
-                icon={Trophy}
-              />
-            )}
-
-            {/* Admin only - Geo-Drop Management */}
-            {(adminStatus && Number(process.env.NEXT_PUBLIC_REWARDS) === 1) && (
-              <NavigationLink
-                href="/dashboard/add-award"
-                label="Add Drop"
-                icon={CirclePlus}
-              />
-            )}
-
-            {/* Admin only - Dropsite Management */}
-            {(adminStatus && Number(process.env.NEXT_PUBLIC_REWARDS) === 1 && Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 0) && (
-              <NavigationLink
-                href="/dashboard/dropsites"
-                label="Manage Dropsites"
-                icon={Globe}
-              />
-            )}
-
-            {/* Admin only - Email Management */}
-            {(adminStatus && Number(process.env.NEXT_PUBLIC_REWARDS) === 1) && (
-              <NavigationLink
-                href="/dashboard/email-broadcasts"
-                label="Send Updates"
-                icon={Mail}
-              />
-            )}
-
-            {/* Admin only - Link Management */}
-            {(adminStatus && Number(process.env.NEXT_PUBLIC_REWARDS) === 1) && (
-              <NavigationLink
-                href="/dashboard/list-urls"
-                label="Manage Links"
-                icon={Link2}
-              />
             )}
 
             <div className="border-t border-t-[#F7F8F9] dark:border-t-[#191C24] mt-2 pt-2">
@@ -473,57 +378,7 @@ const DashboardSidebar = ({
 
             <div className="mt-10 flex flex-col gap-1.5">
 
-              {(adminStatus && Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 1) && (
-                <NavigationLink
-                  href='/dashboard/list-music'
-                  label='View Catalogue'
-                  icon={House}
-                  showLabel={!isCollapsed}
-                />
-              )}
-
-              {(adminStatus && Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 1) && (
-                <NavigationLink
-                  href='/dashboard/add-music'
-                  label='Add Music'
-                  icon={CirclePlus}
-                  showLabel={!isCollapsed}
-                />
-              )}
-
-              {(adminStatus && Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 1) && (
-                <NavigationLink
-                    href="/dashboard/streaming_pie"
-                    label="Streams Pie Chart"
-                  icon={ChartPie}
-                  showLabel={!isCollapsed}
-                />
-              )}
-
-              {(adminStatus && Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 1) && (
-                <NavigationLink
-                    href="/dashboard/streaming_line"
-                    label="Streams Line Chart"
-                  icon={BarChart2}
-                  showLabel={!isCollapsed}
-                />
-              )}
-
-              {/* Admin only - Chatbot */}
-              {(adminStatus && Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 1) && (
-                <NavigationLink
-                  href="/dashboard/chatbot"
-                  label="ChatBot"
-                  icon={BotMessageSquare}
-                  showLabel={!isCollapsed}
-                />
-              )}
-
-            {(adminStatus && Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 1) && (
-              <><hr /></>
-            )}
-
-              {Number(process.env.NEXT_PUBLIC_REWARDS) === 1 && Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 0 && navigationItems.map((item) => (
+              {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && navigationItems.map((item) => (
                 <NavigationLink
                   key={item.href}
                   href={item.href}
@@ -533,60 +388,6 @@ const DashboardSidebar = ({
                   showLabel={!isCollapsed}
                 />
               ))}
-
-              {(adminStatus && Number(process.env.NEXT_PUBLIC_REWARDS) === 1) && (
-                <><hr /></>
-              )}
-
-              {/* Admin only - Geo-Drop Management */}
-              {(adminStatus && Number(process.env.NEXT_PUBLIC_REWARDS) === 1) && (
-                <NavigationLink
-                  href="/dashboard/my-geo-drops"
-                  label="My Drops"
-                  icon={Trophy}
-                  showLabel={!isCollapsed}
-                />
-              )}
-
-              {/* Admin only - Geo-Drop Management */}
-              {(adminStatus && Number(process.env.NEXT_PUBLIC_REWARDS) === 1) && (
-                <NavigationLink
-                  href="/dashboard/add-award"
-                  label="Add Drop"
-                  icon={CirclePlus}
-                  showLabel={!isCollapsed}
-                />
-              )}
-
-              {/* Admin only - Dropsite Management */}
-              {(adminStatus && Number(process.env.NEXT_PUBLIC_REWARDS) === 1 && Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 0) && (
-                <NavigationLink
-                  href="/dashboard/dropsites"
-                  label="Manage Dropsites"
-                  icon={Globe}
-                  showLabel={!isCollapsed}
-                />
-              )}
-
-              {/* Admin only - Email Management */}
-              {(adminStatus && Number(process.env.NEXT_PUBLIC_REWARDS) === 1) && (
-                <NavigationLink
-                  href="/dashboard/email-broadcasts"
-                  label="Send Updates"
-                  icon={Mail}
-                  showLabel={!isCollapsed}
-                />
-              )}
-
-              {/* Admin only - Link Management */}
-              {(adminStatus && Number(process.env.NEXT_PUBLIC_REWARDS) === 1) && (
-                <NavigationLink
-                  href="/dashboard/list-urls"
-                  label="Manage Links"
-                  icon={Link2}
-                  showLabel={!isCollapsed}
-                />
-              )}
             </div>
           </div>
 
