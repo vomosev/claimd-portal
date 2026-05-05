@@ -166,16 +166,16 @@ const DashboardSidebar = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isMobile, isMobileMenuOpen]);
 
-  const labelText = process.env.NEXT_PUBLIC_DISTRIBUTION === "1" ? "Latest Drops" : "Home";
+  const labelText = process.env.NEXT_PUBLIC_DISTRIBUTION === "1" ? "Latest Info" : "Home";
 
   // Navigation items configuration
   const navigationItems = [
-    { href: "/dashboard", label: labelText, icon: House },
+    // { href: "/dashboard", label: labelText, icon: House },
     { href: "/dashboard/ins-policy", label: "Policies", icon: Award },
     { href: "/dashboard/ins-claim", label: "Claims", icon: Flame },
-    { href: "/dashboard/ins-policy/new", label: "New Policy", icon: Search, degree: 90,},
-    { href: "/dashboard/ins-claim/new", label: "New Claim", icon: Search, degree: 90,},
-    // { href: "/dashboard/my-activity", label: "My Tickets & Rewards", icon: Trophy },
+    { href: "/dashboard/ins-policy/new", label: "New Policy", icon: Award },
+    { href: "/dashboard/ins-claim/new", label: "New Claim", icon: Trophy },
+    // { href: "/dashboard/my-activity", label: "My Tickets & Rewards", icon: Search, degree: 90 },
   ];
 
   const bottomNavigationItems = [
