@@ -1,0 +1,25 @@
+  const [isBadgeExpanded, setIsBadgeExpanded] = useState(false);
+                <div 
+                  className='flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1A2235] transition-colors'
+                  onClick={() => setIsBadgeExpanded(!isBadgeExpanded)}
+                >
+                  <h3 className='text-lg font-semibold'>{/* CONTENT */}</h3>
+                  <button
+                    className='p-2 hover:bg-gray-200 dark:hover:bg-[#2D385B] rounded-lg transition-colors'
+                    aria-label={isBadgeExpanded ? 'Collapse' : 'Expand'}
+                  >
+                    {isBadgeExpanded ? <X className='h-5 w-5' /> : <Menu className='h-5 w-5' />}
+                  </button>
+                </div>
+
+                <div 
+                  className={`transition-all duration-300 ease-in-out ${
+                    isBadgeExpanded 
+                      ? 'max-h-[2000px] opacity-100' 
+                      : 'max-h-0 opacity-0'
+                  } overflow-hidden`}
+                >
+                  {/* CONTENT */}
+                </div>
+                      <div className="flex justify-center">
+                      </div>

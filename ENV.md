@@ -1,0 +1,21 @@
+# Vercel Environment Variables for $CUSTOMER Geo-Drops
+NEXT_PUBLIC_REWARDS=0
+NEXT_PUBLIC_DISTRIBUTION=1
+NEXT_PUBLIC_CUSTOMER=blacklabel
+NEXT_PUBLIC_DNSPREFIX=blacklabel
+NEXT_PUBLIC_SUB_URL=https://blacklabel.geo-drops.com/subscription
+NEXT_PUBLIC_SALES_URL=https://blacklabel.geo-drops.com/subscription
+NEXT_PUBLIC_WALLET_URL=https://nodejs.gridiron-app.com/images/wallet_yellow.jpg
+NEXT_PUBLIC_DROPSITE_NAME=
+NEXT_PUBLIC_GEO_URL=https://blacklabel.geo-drops.com
+NEXT_PUBLIC_INDEX_HTML=For rewards, collectibles and other goodies for brand, lifestyle, sport and culture superfans like you.
+NEXT_PUBLIC_ALTERNATIVE_PATH=https://test.arx-ai.com/images/arxlogo.png
+NODE_TLS_REJECT_UNAUTHORIZED=0
+NEXT_PUBLIC_WORLDID=
+NEXT_PUBLIC_LOGO_PATH=https://nodejs.gridiron-app.com/images/geodrops_logo.png
+NEXT_PUBLIC_LOGO_PATH_LIGHT=https://nodejs.gridiron-app.com/images/geodrops_logo.png
+NEXT_PUBLIC_DEFAULT_VIDEO_URL=https://nodejs.gridiron-app.com/images/certifygeneric.mp4
+NEXT_PUBLIC_API_URL=https://nodejs.gridiron-app.com
+NEXT_PUBLIC_DEFAULT_PAGE=/signup
+NEXT_PUBLIC_DEFAULT_HOME=/dashboard
+NEXT_PUBLIC_SIGNUP_DETAILS=0

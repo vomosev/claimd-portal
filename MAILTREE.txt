@@ -1,0 +1,9 @@
+/dashboard/email-broadcasts/
+├── page.tsx                    (Table View - paginated list)
+├── new/page.tsx               (New Email)
+├── edit/[id]/page.tsx         (Edit Email)
+├── components/
+│   ├── EmailBroadcastTable.tsx
+│   ├── EmailBroadcastForm.tsx
+│   ├── AwardSearchBox.tsx
+│   └── UserIdList.tsx

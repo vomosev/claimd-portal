@@ -1,0 +1,207 @@
+// dashboard/email-broadcasts/components/MailingListSearchBox.tsx
+"use client";
+
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Search, X, Globe, Loader2 } from "lucide-react";
+import { MailingListSearchResult } from "./EmailMailingListBroadcastForm";
+
+interface MailingListSearchBoxProps {
+  value: string;
+  onSelect: (world: MailingListSearchResult) => void;
+  placeholder?: string;
+  disabled?: boolean;
+}
+
+export default function MailingListSearchBox({
+  value,
+  onSelect,
+  placeholder = "Type a Dropsite ID or name to search...",
+  disabled = false,
+}: MailingListSearchBoxProps) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<MailingListSearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [selectedLabel, setSelectedLabel] = useState("");
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── Close dropdown on outside click ─────────────────────────────────────────
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // ── Sync label when value is set externally (edit mode) ──────────────────────
+  useEffect(() => {
+    if (value && !selectedLabel) {
+      setSelectedLabel(value);
+    }
+  }, [value, selectedLabel]);
+
+  // ── Debounced search ─────────────────────────────────────────────────────────
+  const search = useCallback(async (q: string) => {
+    if (!q.trim()) {
+      setResults([]);
+      setOpen(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const username = localStorage.getItem("username") ?? "";
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/searchworldsbycriteria?q=${encodeURIComponent(q)}&search=${encodeURIComponent(q)}&userid=${encodeURIComponent(username)}`
+      );
+      if (!response.ok) throw new Error("Search failed");
+      const data = await response.json();
+      const worlds: MailingListSearchResult[] = Array.isArray(data)
+        ? data
+        : data.worlds || data.results || [];
+      setResults(worlds);
+      setOpen(worlds.length > 0);
+    } catch (err) {
+      console.error("Dropsite search error:", err);
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const q = e.target.value;
+    setQuery(q);
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => search(q), 300);
+  };
+
+  const handleSelect = (world: MailingListSearchResult) => {
+    onSelect(world);
+    setSelectedLabel(world.worldname || world.worldid);
+    setQuery("");
+    setOpen(false);
+  };
+
+  const handleClear = () => {
+    setSelectedLabel("");
+    setQuery("");
+    setResults([]);
+    setOpen(false);
+    onSelect({ worldid: "" } as MailingListSearchResult);
+  };
+
+  return (
+    <div ref={containerRef} className="relative w-full">
+      {/* Input */}
+      <div className="relative flex items-center">
+        {loading ? (
+          <Loader2
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-[#5871A7] animate-spin pointer-events-none"
+          />
+        ) : (
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-[#5871A7] pointer-events-none"
+          />
+        )}
+
+        <input
+          type="text"
+          value={selectedLabel ? "" : query}
+          placeholder={selectedLabel ? `Selected: ${selectedLabel}` : placeholder}
+          onChange={handleInputChange}
+          onFocus={() => {
+            if (results.length > 0) setOpen(true);
+          }}
+          disabled={disabled}
+          className={`
+            w-full pl-9 pr-9 py-2 text-sm rounded-md border
+            border-input bg-background
+            focus:outline-none focus:ring-2 focus:ring-[#5871A7]/40
+            disabled:opacity-50 disabled:cursor-not-allowed
+            ${selectedLabel ? "placeholder:text-[#5871A7] placeholder:font-medium" : ""}
+          `}
+        />
+
+        {/* Clear button */}
+        {(selectedLabel || query) && !disabled && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          >
+            <X size={14} />
+          </button>
+        )}
+      </div>
+
+      {/* Dropdown */}
+      {open && results.length > 0 && (
+        <div className="absolute z-50 mt-1 w-full rounded-md border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 shadow-lg max-h-72 overflow-y-auto">
+          {results.map((world) => (
+            <button
+              key={world.worldid}
+              type="button"
+              onClick={() => handleSelect(world)}
+              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors border-b border-gray-100 dark:border-gray-800 last:border-0"
+            >
+              {/* Dropsite image or fallback icon */}
+              {world.worldimg ? (
+                <img
+                  src={
+                    world.worldimg.startsWith("http")
+                      ? world.worldimg
+                      : `${process.env.NEXT_PUBLIC_API_URL}${world.worldimg}`
+                  }
+                  alt={world.worldname}
+                  className="w-10 h-10 rounded object-cover flex-shrink-0 border border-gray-200"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
+                />
+              ) : (
+                <div className="w-10 h-10 rounded bg-[#5871A7]/10 flex items-center justify-center flex-shrink-0">
+                  <Globe size={18} className="text-[#5871A7]" />
+                </div>
+              )}
+
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium truncate">
+                  {world.worldname || world.worldid}
+                </p>
+                <p className="text-xs text-gray-500 font-mono truncate">
+                  ID: {world.worldid}
+                </p>
+                {world.description && (
+                  <p className="text-xs text-gray-400 truncate mt-0.5">
+                    {world.description}
+                  </p>
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* No results */}
+      {open && !loading && results.length === 0 && query.trim() && (
+        <div className="absolute z-50 mt-1 w-full rounded-md border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 shadow-lg">
+          <div className="px-4 py-3 text-sm text-gray-500 text-center">
+            No worlds found for &quot;{query}&quot;
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
