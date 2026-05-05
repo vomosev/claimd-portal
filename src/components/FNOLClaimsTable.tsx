@@ -34,7 +34,7 @@ interface FNOLClaim {
   status:                 ClaimStatus;
   policy_number:          string;
   policyholder_name:      string;
-  policyholder_email:     string;
+  userid:                 string;
   policyholder_phone:     string | null;
   incident_date:          string;
   incident_time:          string | null;
@@ -177,7 +177,7 @@ export default function FNOLClaimsTable() {
         c.claim_reference?.toLowerCase().includes(q)       ||
         c.policy_number?.toLowerCase().includes(q)         ||
         c.policyholder_name?.toLowerCase().includes(q)     ||
-        c.policyholder_email?.toLowerCase().includes(q)    ||
+        c.userid?.toLowerCase().includes(q)    ||
         c.vehicle_registration?.toLowerCase().includes(q)  ||
         c.incident_type?.toLowerCase().includes(q)         ||
         c.incident_address?.toLowerCase().includes(q)
@@ -406,7 +406,7 @@ export default function FNOLClaimsTable() {
                         {claim.policyholder_name}
                       </p>
                       <p className="text-xs text-gray-400 truncate">
-                        {claim.policyholder_email}
+                        {claim.userid}
                       </p>
                     </td>
 
