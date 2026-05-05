@@ -348,7 +348,7 @@ export default function FNOLForm({ mode, claimId }: FNOLFormProps) {
         form.reset({
           policyNumber:               c.policy_number             || "",
           policyholderName:           c.policyholder_name         || "",
-          policyholderEmail:          c.userid        || "",
+          policyholderEmail:          c.userid                    || "",
           policyholderPhone:          c.policyholder_phone        || "",
           policyholderDOB:            c.policyholder_dob
                                       ? moment(c.policyholder_dob).format("YYYY-MM-DD")
