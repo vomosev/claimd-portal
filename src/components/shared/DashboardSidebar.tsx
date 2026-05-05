@@ -170,11 +170,11 @@ const DashboardSidebar = ({
 
   // Navigation items configuration
   const navigationItems = [
-    // { href: "/dashboard", label: labelText, icon: House },
-    { href: "/dashboard/ins-policy", label: "Policies", icon: Award },
-    { href: "/dashboard/ins-claim", label: "Claims", icon: Flame },
-    { href: "/dashboard/ins-policy/new", label: "New Policy", icon: Award },
-    { href: "/dashboard/ins-claim/new", label: "New Claim", icon: Trophy },
+    // { href: "/dashboard", label: labelText, icon: House, degree: 0 },
+    { href: "/dashboard/ins-policy", label: "Policies", icon: Award, degree: 0 },
+    { href: "/dashboard/ins-claim", label: "Claims", icon: Flame, degree: 0 },
+    { href: "/dashboard/ins-policy/new", label: "New Policy", icon: Award, degree: 0 },
+    { href: "/dashboard/ins-claim/new", label: "New Claim", icon: Trophy, degree: 0 },
     // { href: "/dashboard/my-activity", label: "My Tickets & Rewards", icon: Search, degree: 90 },
   ];
 
