@@ -7,8 +7,7 @@ import polyline from "@mapbox/polyline";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// ── Fix default Leaflet marker icons in Next.js ────────────────────────────────
-// Leaflet's default icon URLs break in bundlers — override them manually
+// ── Fix Leaflet default icons ─────────────────────────────────────────────────
 const defaultIcon = L.icon({
   iconUrl:       "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
@@ -17,14 +16,13 @@ const defaultIcon = L.icon({
   iconAnchor:    [12, 41],
   popupAnchor:   [1, -34],
 });
-
 L.Marker.prototype.options.icon = defaultIcon;
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface Stop {
-  id:        string | number;
-  latitude:  number;
-  longitude: number;
+  id?:       string | number;
+  latitude:  number | string | null;
+  longitude: number | string | null;
   label?:    string;
 }
 
@@ -34,6 +32,18 @@ interface Route {
 
 interface LogisticsDriverRouteMapProps {
   shipmentId: string | number;
+}
+
+// ── Coordinate validator ───────────────────────────────────────────────────────
+function isValidCoord(lat: any, lng: any): boolean {
+  const la = Number(lat);
+  const ln = Number(lng);
+  return (
+    lat != null && lng != null &&
+    !isNaN(la) && !isNaN(ln) &&
+    la >= -90  && la <= 90 &&
+    ln >= -180 && ln <= 180
+  );
 }
 
 // ── Component ──────────────────────────────────────────────────────────────────
@@ -58,16 +68,29 @@ export default function LogisticsDriverRouteMap({
         ]);
 
         if (stopsRes.ok) {
-          const stopsData = await stopsRes.json();
-          setStops(Array.isArray(stopsData) ? stopsData : stopsData.stops ?? []);
+          const data = await stopsRes.json();
+          const raw: Stop[] = Array.isArray(data) ? data : data.stops ?? [];
+
+          // ── Filter to only valid coords before storing ─────────────────────
+          const valid = raw.filter((s) => isValidCoord(s.latitude, s.longitude));
+
+          if (valid.length < raw.length) {
+            console.warn(
+              `[RouteMap] ${raw.length - valid.length} stop(s) skipped — invalid coordinates:`,
+              raw.filter((s) => !isValidCoord(s.latitude, s.longitude))
+            );
+          }
+
+          setStops(valid);
         }
 
         if (routeRes.ok) {
-          const routeData = await routeRes.json();
-          setRoute(routeData);
+          const data = await routeRes.json();
+          setRoute(data);
         }
+
       } catch (err) {
-        console.error("Error fetching route data:", err);
+        console.error("[RouteMap] Fetch error:", err);
         setError("Failed to load route data.");
       } finally {
         setLoading(false);
@@ -77,18 +100,29 @@ export default function LogisticsDriverRouteMap({
     fetchData();
   }, [shipmentId]);
 
-  // Decode the encoded polyline into Leaflet LatLng pairs
-  const coords: [number, number][] = route?.polyline
-    ? polyline.decode(route.polyline).map(([lat, lng]) => [lat, lng])
-    : [];
+  // ── Decode polyline safely ────────────────────────────────────────────────────
+  const coords: [number, number][] = (() => {
+    if (!route?.polyline) return [];
+    try {
+      return polyline
+        .decode(route.polyline)
+        .filter(([lat, lng]) => isValidCoord(lat, lng))
+        .map(([lat, lng]) => [lat, lng] as [number, number]);
+    } catch (err) {
+      console.error("[RouteMap] Polyline decode error:", err);
+      return [];
+    }
+  })();
 
-  // Default map centre — use first stop or fallback to London
-  const centre: [number, number] =
-    stops.length > 0
-      ? [stops[0].latitude, stops[0].longitude]
+  // ── Safe map centre ───────────────────────────────────────────────────────────
+  const centre: [number, number] = (() => {
+    const first = stops.find((s) => isValidCoord(s.latitude, s.longitude));
+    return first
+      ? [Number(first.latitude), Number(first.longitude)]
       : [51.505, -0.09];
+  })();
 
-  // ── Loading / error states ─────────────────────────────────────────────────
+  // ── States ────────────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[500px] rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
@@ -108,6 +142,14 @@ export default function LogisticsDriverRouteMap({
     );
   }
 
+  if (stops.length === 0 && coords.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-[500px] rounded-xl border border-dashed border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+        <p className="text-sm text-gray-400">No route data available for this shipment.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
       <MapContainer
@@ -116,25 +158,26 @@ export default function LogisticsDriverRouteMap({
         style={{ height: "500px", width: "100%" }}
         scrollWheelZoom
       >
-        {/* OpenStreetMap tiles — free, no API key ────────────────────────── */}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {/* Stop markers ────────────────────────────────────────────────────── */}
-        {stops.map((stop, i) => (
-          <Marker
-            key={stop.id ?? i}
-            position={[stop.latitude, stop.longitude]}
-          >
-            {stop.label && (
-              <Popup>{stop.label}</Popup>
-            )}
-          </Marker>
-        ))}
+        {/* Stop markers */}
+        {stops.map((stop, i) => {
+          // Extra guard inside render — belt and braces
+          if (!isValidCoord(stop.latitude, stop.longitude)) return null;
+          return (
+            <Marker
+              key={stop.id ?? i}
+              position={[Number(stop.latitude), Number(stop.longitude)]}
+            >
+              {stop.label && <Popup>{stop.label}</Popup>}
+            </Marker>
+          );
+        })}
 
-        {/* Route polyline ──────────────────────────────────────────────────── */}
+        {/* Route polyline */}
         {coords.length > 0 && (
           <Polyline
             positions={coords}
