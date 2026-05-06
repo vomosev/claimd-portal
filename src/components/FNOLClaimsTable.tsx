@@ -120,10 +120,6 @@ export default function FNOLClaimsTable() {
           String(data.role).includes("superuser");
         setAdminStatus(isAdmin);
         setAccessChecked(true);
-        if (!isAdmin) {
-          toast.error("Access denied. Admin privileges required.");
-          router.push("/dashboard/settings");
-        }
       })
       .catch(() => {
         setAdminStatus(false);
@@ -156,8 +152,8 @@ export default function FNOLClaimsTable() {
   }, [currentUsername]);
 
   useEffect(() => {
-    if (accessChecked && adminStatus) loadClaims();
-  }, [accessChecked, adminStatus, loadClaims]);
+    if (accessChecked) loadClaims();
+  }, [accessChecked, loadClaims]);
 
   // ── Filter logic ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -219,14 +215,6 @@ export default function FNOLClaimsTable() {
       </div>
     );
   }
-
-  // if (!adminStatus) {
-  //   return (
-  //     <div className="flex items-center justify-center min-h-[400px]">
-  //       <p className="text-gray-500">Redirecting…</p>
-  //     </div>
-  //   );
-  // }
 
   // ── Main render ───────────────────────────────────────────────────────────────
   return (

@@ -124,10 +124,6 @@ export default function PoliciesTable() {
           String(data.role).includes("superuser");
         setAdminStatus(isAdmin);
         setAccessChecked(true);
-        if (!isAdmin) {
-          toast.error("Access denied. Admin privileges required.");
-          router.push("/dashboard/settings");
-        }
       })
       .catch(() => {
         setAdminStatus(false);
@@ -160,8 +156,8 @@ export default function PoliciesTable() {
   }, []);
 
   useEffect(() => {
-    if (accessChecked && adminStatus) loadPolicies();
-  }, [accessChecked, adminStatus, loadPolicies]);
+    if (accessChecked) loadPolicies();
+  }, [accessChecked, loadPolicies]);
 
   // ── Filter logic ─────────────────────────────────────────────────────────────
   useEffect(() => {
