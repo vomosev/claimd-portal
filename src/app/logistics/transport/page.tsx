@@ -1,7 +1,17 @@
-import SettingsPage from '@/components/pages/SettingsPage';
+// app/logistics/page.tsx
+import LogisticsRoutePlanner from '@/components/LogisticsRoutePlanner';
 
-const page = () => {
-  return <SettingsPage />;
+// ── Next.js 15: params is a Promise ───────────────────────────────────────────
+interface PageProps {
+  params: Promise<{ shipmentId: string }>;
+}
+
+const LinksPage = async ({ params }: PageProps) => {
+  const { shipmentId } = await params;
+
+  return (
+      <LogisticsRoutePlanner shipmentId={shipmentId} />
+  );
 };
 
-export default page;
+export default LinksPage;
