@@ -430,14 +430,6 @@ export default function PolicyForm({ mode, policyId }: PolicyFormProps) {
     );
   }
 
-  // if (!adminStatus) {
-  //   return (
-  //     <div className="flex items-center justify-center min-h-[400px]">
-  //       <p className="text-gray-500">Redirecting…</p>
-  //     </div>
-  //   );
-  // }
-
   // ── Main render ────────────────────────────────────────────────────────────────
   return (
     <div className="lg:w-[85%] space-y-6">
