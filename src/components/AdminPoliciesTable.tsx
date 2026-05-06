@@ -126,13 +126,13 @@ export default function PoliciesTable() {
         setAccessChecked(true);
         if (!isAdmin) {
           toast.error("Access denied. Admin privileges required.");
-          router.push("/dashboard/settings");
+          router.push("/dashboard");
         }
       })
       .catch(() => {
         setAdminStatus(false);
         setAccessChecked(true);
-        router.push("/dashboard/settings");
+        router.push("/dashboard");
       });
   }, [currentUsername, router]);
 
@@ -229,13 +229,13 @@ export default function PoliciesTable() {
     );
   }
 
-  // if (!adminStatus) {
-  //   return (
-  //     <div className="flex items-center justify-center min-h-[400px]">
-  //       <p className="text-gray-500">Redirecting…</p>
-  //     </div>
-  //   );
-  // }
+  if (!adminStatus) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <p className="text-gray-500">Redirecting…</p>
+      </div>
+    );
+  }
 
   // ── Main render ───────────────────────────────────────────────────────────────
   return (

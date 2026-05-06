@@ -339,7 +339,7 @@ export default function FNOLForm({ mode, claimId }: FNOLFormProps) {
         );
         if (!res.ok) {
           toast.error("Claim not found.");
-          router.push("/dashboard/settings");
+          router.push("/dashboard");
           return;
         }
         const data = await res.json();
@@ -540,8 +540,8 @@ export default function FNOLForm({ mode, claimId }: FNOLFormProps) {
           </p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={() => router.push("/dashboard/settings")}>
-            Back to Settings
+          <Button variant="outline" onClick={() => router.push("/dashboard")}>
+            Back to Dashboard
           </Button>
           <Button
             className="bg-[#5871A7] hover:bg-[#4560A0] text-white"
