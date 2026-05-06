@@ -195,7 +195,7 @@ function SignInForm() {
     } else {
       setIsAuthenticated(false);
     }
-  }, []);
+  }, [adminStatus]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
