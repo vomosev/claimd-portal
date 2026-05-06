@@ -130,6 +130,33 @@ const SignUpForm = () => {
   const publicAwardID = searchParams.get("id");
   const apiUrl        = process.env.NEXT_PUBLIC_API_URL || "https://nodejs.gridiron-app.com";
   const worldId       = WORLD_ID;
+  const [currentUsername, setCurrentUsername] = useState("");
+  const [adminStatus,     setAdminStatus]     = useState(false);
+  const [accessChecked,   setAccessChecked]   = useState(false);
+
+  // ── Read username ────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const username = localStorage.getItem("username") ?? "";
+    setCurrentUsername(username);
+  }, []);
+
+  // ── Check admin access ───────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!currentUsername) return;
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/getuserrole/${currentUsername}`)
+      .then((r) => r.json())
+      .then((data) => {
+        const isAdmin =
+          String(data.role).includes("admin") ||
+          String(data.role).includes("superuser");
+        setAdminStatus(isAdmin);
+        setAccessChecked(true);
+      })
+      .catch(() => {
+        setAdminStatus(false);
+        setAccessChecked(true);
+      });
+  }, [currentUsername]);
 
   // ── CSS injection ───────────────────────────────────────────────────────────
   const injectCSS = (cssText: string) => {
@@ -152,8 +179,8 @@ const SignUpForm = () => {
 
   // ── Redirect helper ─────────────────────────────────────────────────────────
   const redirectAfterAuth = () => {
-    if (publicAwardID) {
-      window.location.href = `/dashboard/award-details/${publicAwardID}`;
+    if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus) {
+      window.location.href = "/admin/ins-policy";
     } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1) {
       window.location.href = "/dashboard/ins-policy";
     }
