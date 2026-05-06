@@ -264,13 +264,13 @@ export default function PoliciesTable() {
             />
             {refreshing ? "Refreshing…" : "Refresh"}
           </Button>
-          <Button
+          {/* <Button
             onClick={() => router.push("/dashboard/ins-policy/new")}
             className="bg-[#5871A7] hover:bg-[#4560A0] text-white"
           >
             <Plus size={15} className="mr-1.5" />
             New Policy
-          </Button>
+          </Button> */}
         </div>
       </div>
 

@@ -252,13 +252,13 @@ export default function FNOLClaimsTable() {
             <RefreshCw size={14} className={`mr-1.5 ${refreshing ? "animate-spin" : ""}`} />
             {refreshing ? "Refreshing…" : "Refresh"}
           </Button>
-          <Button
+          {/* <Button
             onClick={() => router.push("/dashboard/ins-claim/new")}
             className="bg-[#5871A7] hover:bg-[#4560A0] text-white"
           >
             <Plus size={15} className="mr-1.5" />
             New Claim
-          </Button>
+          </Button> */}
         </div>
       </div>
 
