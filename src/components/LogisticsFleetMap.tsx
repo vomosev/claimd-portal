@@ -48,21 +48,24 @@ const vehicleIcon = L.divIcon({
 });
 
 // ── Types ──────────────────────────────────────────────────────────────────────
+// lat/lng are typed as number | string because MySQL DECIMAL/FLOAT columns
+// are returned as strings by the Node.js mysql2 driver.
+// We coerce them to numbers at both fetch time and render time.
 interface Vehicle {
   vehicle_id: string | number;
-  lat:        number;   // always coerced to number before storing in state
-  lng:        number;   // always coerced to number before storing in state
-  speed?:     number;
+  lat:        number | string;
+  lng:        number | string;
+  speed?:     number | string;
   heading?:   number;
   status?:    string;
   driver?:    string;
   last_seen?: string;
 }
 
-// ── Constants ─────────────────────────────────────────────────────────────────
-const POLL_INTERVAL                  = 3000;
+// ── Config ────────────────────────────────────────────────────────────────────
+const POLL_INTERVAL                   = 3000;
 const DEFAULT_CENTRE: [number, number] = [51.505, -0.09];
-const DEFAULT_ZOOM                   = 11;
+const DEFAULT_ZOOM                    = 11;
 
 // ── Component ──────────────────────────────────────────────────────────────────
 export default function FleetMap() {
@@ -81,20 +84,18 @@ export default function FleetMap() {
       );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-      const data    = await res.json();
+      const data  = await res.json();
       const raw: any[] = Array.isArray(data) ? data : data.vehicles ?? [];
 
-      // ── Coerce lat/lng to numbers ─────────────────────────────────────────
-      // MySQL DECIMAL/FLOAT columns arrive as strings from most Node.js
-      // drivers. Number("51.505") is safe; Number(undefined) = NaN which
-      // the filter below catches and discards.
+      // ── Coerce lat/lng to numbers at fetch time and drop invalid rows ─────
+      // MySQL DECIMAL/FLOAT columns arrive as strings — Number() normalises them.
       const list: Vehicle[] = raw
         .map((v) => ({
           ...v,
           lat: Number(v.lat),
           lng: Number(v.lng),
         }))
-        .filter((v) => !isNaN(v.lat) && !isNaN(v.lng));
+        .filter((v) => !isNaN(v.lat as number) && !isNaN(v.lng as number));
 
       setVehicles(list);
       setLastUpdated(new Date());
@@ -108,29 +109,29 @@ export default function FleetMap() {
   };
 
   useEffect(() => {
-    // Fetch immediately on mount then poll every POLL_INTERVAL ms
     fetchVehicles();
 
     intervalRef.current = setInterval(fetchVehicles, POLL_INTERVAL);
 
-    // ── Cleanup: clear the interval when the component unmounts ──────────────
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Centre the map on the first valid vehicle position ────────────────────
-  const centre: [number, number] =
-    vehicles.length > 0 && !isNaN(vehicles[0].lat) && !isNaN(vehicles[0].lng)
-      ? [vehicles[0].lat, vehicles[0].lng]
-      : DEFAULT_CENTRE;
+  // ── Map centre — coerce here too as a safety net ───────────────────────────
+  const centre: [number, number] = (() => {
+    if (vehicles.length > 0) {
+      const lat = Number(vehicles[0].lat);
+      const lng = Number(vehicles[0].lng);
+      if (!isNaN(lat) && !isNaN(lng)) return [lat, lng];
+    }
+    return DEFAULT_CENTRE;
+  })();
 
-  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="flex flex-col gap-2">
 
-      {/* ── Status bar ────────────────────────────────────────────────────── */}
+      {/* ── Status bar ──────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <span className={`
@@ -159,14 +160,14 @@ export default function FleetMap() {
         )}
       </div>
 
-      {/* ── Error banner ──────────────────────────────────────────────────── */}
+      {/* ── Error banner ────────────────────────────────────────────────── */}
       {error && (
         <div className="rounded-lg border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/20 px-4 py-2.5 text-sm text-red-600 dark:text-red-400">
           {error} — retrying every {POLL_INTERVAL / 1000}s…
         </div>
       )}
 
-      {/* ── Map ───────────────────────────────────────────────────────────── */}
+      {/* ── Map ─────────────────────────────────────────────────────────── */}
       <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
         <MapContainer
           center={centre}
@@ -179,43 +180,55 @@ export default function FleetMap() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          {vehicles.map((v, i) => (
-            <Marker
-              key={v.vehicle_id ?? i}
-              // lat and lng are guaranteed to be valid numbers at this point
-              // because the filter in fetchVehicles removed any NaN rows
-              position={[v.lat, v.lng]}
-              icon={vehicleIcon}
-            >
-              <Popup>
-                <div className="text-sm space-y-1 min-w-[140px]">
-                  <p className="font-bold text-gray-800">
-                    Vehicle {v.vehicle_id}
-                  </p>
-                  {v.driver && (
-                    <p className="text-gray-600">Driver: {v.driver}</p>
-                  )}
-                  {v.speed != null && (
-                    <p className="text-gray-600">Speed: {v.speed} km/h</p>
-                  )}
-                  {v.status && (
-                    <p className="text-gray-600 capitalize">
-                      Status: {v.status}
+          {vehicles.map((v, i) => {
+            // ── Coerce at render time — belt-and-braces against string values ──
+            // Even if fetchVehicles coerced them, a re-render from stale state
+            // or a racing poll cycle can still carry string lat/lng through.
+            const lat = Number(v.lat);
+            const lng = Number(v.lng);
+
+            // Skip any vehicle with invalid coordinates — don't crash the map
+            if (isNaN(lat) || isNaN(lng)) return null;
+
+            return (
+              <Marker
+                key={v.vehicle_id ?? i}
+                position={[lat, lng]}
+                icon={vehicleIcon}
+              >
+                <Popup>
+                  <div className="text-sm space-y-1 min-w-[140px]">
+                    <p className="font-bold text-gray-800">
+                      Vehicle {v.vehicle_id}
                     </p>
-                  )}
-                  {v.last_seen && (
-                    <p className="text-gray-400 text-xs">
-                      Last seen: {new Date(v.last_seen).toLocaleTimeString()}
+                    {v.driver && (
+                      <p className="text-gray-600">Driver: {v.driver}</p>
+                    )}
+                    {v.speed != null && (
+                      <p className="text-gray-600">
+                        Speed: {Number(v.speed)} km/h
+                      </p>
+                    )}
+                    {v.status && (
+                      <p className="text-gray-600 capitalize">
+                        Status: {v.status}
+                      </p>
+                    )}
+                    {v.last_seen && (
+                      <p className="text-gray-400 text-xs">
+                        Last seen:{" "}
+                        {new Date(v.last_seen).toLocaleTimeString()}
+                      </p>
+                    )}
+                    {/* ── toFixed is safe — lat and lng are Numbers here ── */}
+                    <p className="text-gray-400 text-xs font-mono">
+                      {lat.toFixed(5)}, {lng.toFixed(5)}
                     </p>
-                  )}
-                  {/* toFixed is safe because lat/lng are coerced to Number above */}
-                  <p className="text-gray-400 text-xs font-mono">
-                    {v.lat.toFixed(5)}, {v.lng.toFixed(5)}
-                  </p>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
 
         </MapContainer>
       </div>
