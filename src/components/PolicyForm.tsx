@@ -10,6 +10,7 @@ import {
   Shield, User, Mail, MapPin, DollarSign,
   FileText, Building, ChevronRight, CheckCircle,
   Loader2, AlertTriangle, Info, RefreshCw,
+  PoundSterling,
 } from "lucide-react";
 import {
   Form,
@@ -81,7 +82,7 @@ function PremiumPreview({
   if (!pricing) {
     return (
       <div className="rounded-xl border border-dashed border-[#D4D8EA] dark:border-[#2E4066] p-5 text-center">
-        <DollarSign size={24} className="mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+        <PoundSterling size={24} className="mx-auto mb-2 text-gray-300 dark:text-gray-600" />
         <p className="text-sm text-gray-400">
           Fill in the product type, postcode and asset value to see a premium estimate.
         </p>
