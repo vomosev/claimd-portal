@@ -154,10 +154,8 @@ const SignUpForm = () => {
   const redirectAfterAuth = () => {
     if (publicAwardID) {
       window.location.href = `/dashboard/award-details/${publicAwardID}`;
-    } else if (Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 1) {
-      window.location.href = "/dashboard/list-music";
-    } else {
-      window.location.href = "/dashboard";
+    } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1) {
+      window.location.href = "/dashboard/ins-policy";
     }
   };
 

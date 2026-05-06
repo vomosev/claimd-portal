@@ -162,15 +162,11 @@ function SignInForm() {
       setCurrentUser(sessionInfo.username);
       if (publicAwardID) {
         window.location.href = `/dashboard/award-details/${publicAwardID}`;
-      } else if (Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 1) {
-        window.location.href = "/dashboard/list-music";
-      } else {
-        window.location.href = "/dashboard";
+      } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1) {
+        window.location.href = "/dashboard/ins-policy";
       }
     } else {
       setIsAuthenticated(false);
-      // Optionally redirect to login
-      // window.location.href = '/signin';
     }
   }, []);
 
@@ -207,10 +203,8 @@ function SignInForm() {
         } else {
           if (publicAwardID) {
             window.location.href = `/dashboard/award-details/${publicAwardID}`;
-          } else if (Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 1) {
-            window.location.href = "/dashboard/list-music";
-          } else {
-            window.location.href = "/dashboard";
+          } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1) {
+            window.location.href = "/dashboard/ins-policy";
           }
         }
       } else if (
@@ -236,10 +230,8 @@ function SignInForm() {
     // Check if publicAwardID exists and redirect accordingly
     if (publicAwardID) {
       window.location.href = `/dashboard/award-details/${publicAwardID}`;
-    } else if (Number(process.env.NEXT_PUBLIC_DISTRIBUTION) === 1) {
-      window.location.href = "/dashboard/list-music";
-    } else {
-      window.location.href = "/dashboard";
+    } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1) {
+      window.location.href = "/dashboard/ins-policy";
     }
   };
 
