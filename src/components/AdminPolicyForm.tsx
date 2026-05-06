@@ -451,7 +451,7 @@ export default function PolicyForm({ mode, policyId }: PolicyFormProps) {
         <div>
           <h1 className="text-3xl font-semibold flex items-center gap-2.5">
             <Shield className="text-[#5871A7]" size={28} />
-            {mode === "new" ? "Create New Policy" : `Edit Policy — POL-${String(policyId).padStart(6, "0")}`}
+            {mode === "new" ? "New Policy" : `Edit Policy — POL-${String(policyId).padStart(6, "0")}`}
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             {mode === "new"
