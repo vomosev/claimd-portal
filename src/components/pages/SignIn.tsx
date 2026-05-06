@@ -257,9 +257,9 @@ function SignInForm() {
   const handlePinSuccess = () => {
     // Redirect to dashboard after successful PIN verification
     // Check if publicAwardID exists and redirect accordingly
-    if (publicAwardID) {
-      window.location.href = `/dashboard/award-details/${publicAwardID}`;
-    } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1) {
+    if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus) {
+      window.location.href = "/admin/ins-policy";
+    } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && !adminStatus) {
       window.location.href = "/dashboard/ins-policy";
     }
   };
