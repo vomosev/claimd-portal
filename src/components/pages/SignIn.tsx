@@ -187,7 +187,20 @@ function SignInForm() {
     if (sessionInfo.isValid) {
       setIsAuthenticated(true);
       setCurrentUser(sessionInfo.username);
-      if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus) {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/getuserrole/${sessionInfo.username}`)
+        .then((r) => r.json())
+        .then((data) => {
+          const isAdmin =
+            String(data.role).includes("admin") ||
+            String(data.role).includes("superuser");
+          setAdminStatus(isAdmin);
+          setAccessChecked(true);
+        })
+        .catch(() => {
+          setAdminStatus(false);
+          setAccessChecked(true);
+        });
+        if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus) {
         window.location.href = "/admin/ins-policy";
       } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && !adminStatus) {
         window.location.href = "/dashboard/ins-policy";
