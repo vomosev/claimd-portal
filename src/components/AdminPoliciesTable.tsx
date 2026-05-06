@@ -248,7 +248,7 @@ export default function PoliciesTable() {
             Policies Admin
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            All issued policies — create, view and manage
+            All issued policies — view and manage
           </p>
         </div>
         <div className="flex items-center gap-2">

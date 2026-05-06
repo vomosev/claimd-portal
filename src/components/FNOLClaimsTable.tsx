@@ -228,7 +228,7 @@ export default function FNOLClaimsTable() {
             Claims
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            First Notice of Loss — all submitted insurance claims
+            All submitted insurance claims
           </p>
         </div>
         <div className="flex items-center gap-2">
