@@ -138,10 +138,9 @@ export default function FNOLClaimsTable() {
     else           setLoading(true);
 
     try {
-      const username = localStorage.getItem("username") ?? "";
-      console.log(`running ${process.env.NEXT_PUBLIC_API_URL}/ins_fnol/claimslist/${username}/admin`);
+      console.log(`running ${process.env.NEXT_PUBLIC_API_URL}/ins_fnol/adminclaimslist`);
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/ins_fnol/claimslist/${username}/admin`,
+        `${process.env.NEXT_PUBLIC_API_URL}/ins_fnol/adminclaimslist`,
       );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
