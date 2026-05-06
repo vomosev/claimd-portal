@@ -229,6 +229,7 @@ function SignInForm() {
           setAttemptedEmail(username);
           setShowPinVerification(true);
         } else {
+          console.log("adminStatus", adminStatus);
           if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus) {
             window.location.href = "/admin/ins-policy";
           } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && !adminStatus) {
