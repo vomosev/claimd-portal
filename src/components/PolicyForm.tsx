@@ -733,9 +733,9 @@ export default function PolicyForm({ mode, policyId }: PolicyFormProps) {
                   <FileText size={13} /> What happens on submission
                 </p>
                 <ul className="space-y-1 list-disc list-inside">
-                  <li>A new row is created in <code className="font-mono">policies</code></li>
-                  <li>A premium ledger entry is recorded in <code className="font-mono">ledger</code></li>
-                  <li>The policy number is returned and displayed</li>
+                  <li>A claims advisor is assigned to the policy</li>
+                  <li>They will contact you to discuss the policy details</li>
+                  <li>Take note of the policy number for future reference</li>
                 </ul>
               </div>
             </div>
