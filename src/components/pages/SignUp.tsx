@@ -181,7 +181,7 @@ const SignUpForm = () => {
   const redirectAfterAuth = () => {
     if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus) {
       window.location.href = "/admin/ins-policy";
-    } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1) {
+    } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && !adminStatus) {
       window.location.href = "/dashboard/ins-policy";
     }
   };
