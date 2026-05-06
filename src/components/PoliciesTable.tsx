@@ -124,8 +124,8 @@ export default function PoliciesTable() {
           String(data.role).includes("superuser");
         setAdminStatus(isAdmin);
         setAccessChecked(true);
-        console.log("adminStatus", adminStatus);
-        if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus) {
+        console.log("isAdmin", isAdmin);
+        if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && isAdmin) {
           window.location.href = "/admin/ins-policy";
         }
       })
