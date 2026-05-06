@@ -236,7 +236,7 @@ export default function FNOLClaimsTable() {
         <div>
           <h1 className="text-3xl font-semibold flex items-center gap-2.5">
             <FileText className="text-[#5871A7]" size={28} />
-            FNOL Claims Admin
+            Claims Admin
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             First Notice of Loss — all submitted insurance claims
@@ -384,7 +384,7 @@ export default function FNOLClaimsTable() {
                 <tr>
                   <td colSpan={10} className="text-center py-16 text-gray-400">
                     {claims.length === 0
-                      ? "No FNOL claims yet. Submit your first claim to get started."
+                      ? "No claims yet. Submit your first claim to get started."
                       : "No claims match your current filters."
                     }
                   </td>
