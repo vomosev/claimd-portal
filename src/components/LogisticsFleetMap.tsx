@@ -1,4 +1,4 @@
-// components/FleetMap.tsx
+// components/LogisticsFleetMap.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -19,7 +19,6 @@ const defaultIcon = L.icon({
 L.Marker.prototype.options.icon = defaultIcon;
 
 // ── Custom vehicle icon ───────────────────────────────────────────────────────
-// Uses an SVG truck icon so active vehicles are visually distinct from stops
 const vehicleIcon = L.divIcon({
   className: "",
   html: `
@@ -51,8 +50,8 @@ const vehicleIcon = L.divIcon({
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface Vehicle {
   vehicle_id: string | number;
-  lat:        number;
-  lng:        number;
+  lat:        number;   // always coerced to number before storing in state
+  lng:        number;   // always coerced to number before storing in state
   speed?:     number;
   heading?:   number;
   status?:    string;
@@ -60,12 +59,10 @@ interface Vehicle {
   last_seen?: string;
 }
 
-// ── Poll interval in ms ───────────────────────────────────────────────────────
-const POLL_INTERVAL = 3000;
-
-// ── Default map centre (London) — adjust to your fleet's region ───────────────
+// ── Constants ─────────────────────────────────────────────────────────────────
+const POLL_INTERVAL                  = 3000;
 const DEFAULT_CENTRE: [number, number] = [51.505, -0.09];
-const DEFAULT_ZOOM   = 11;
+const DEFAULT_ZOOM                   = 11;
 
 // ── Component ──────────────────────────────────────────────────────────────────
 export default function FleetMap() {
@@ -74,7 +71,6 @@ export default function FleetMap() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [online,      setOnline]      = useState(true);
 
-  // Keep a ref to the interval so we can clear it on unmount
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ── Fetch live vehicle positions ──────────────────────────────────────────
@@ -85,10 +81,20 @@ export default function FleetMap() {
       );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-      const data = await res.json();
-      const list: Vehicle[] = Array.isArray(data)
-        ? data
-        : data.vehicles ?? [];
+      const data    = await res.json();
+      const raw: any[] = Array.isArray(data) ? data : data.vehicles ?? [];
+
+      // ── Coerce lat/lng to numbers ─────────────────────────────────────────
+      // MySQL DECIMAL/FLOAT columns arrive as strings from most Node.js
+      // drivers. Number("51.505") is safe; Number(undefined) = NaN which
+      // the filter below catches and discards.
+      const list: Vehicle[] = raw
+        .map((v) => ({
+          ...v,
+          lat: Number(v.lat),
+          lng: Number(v.lng),
+        }))
+        .filter((v) => !isNaN(v.lat) && !isNaN(v.lng));
 
       setVehicles(list);
       setLastUpdated(new Date());
@@ -102,35 +108,31 @@ export default function FleetMap() {
   };
 
   useEffect(() => {
-    // Fetch immediately on mount
+    // Fetch immediately on mount then poll every POLL_INTERVAL ms
     fetchVehicles();
 
-    // ── Poll every 3 seconds ──────────────────────────────────────────────────
-    // Store the interval id in a ref so the cleanup below can clear it.
-    // The original code used setInterval inside useEffect without returning a
-    // cleanup — this caused the interval to keep running after the component
-    // unmounted, leading to state updates on an unmounted component.
     intervalRef.current = setInterval(fetchVehicles, POLL_INTERVAL);
 
+    // ── Cleanup: clear the interval when the component unmounts ──────────────
     return () => {
-      // ── Cleanup on unmount ────────────────────────────────────────────────
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Centre the map on the first vehicle if we have positions ─────────────────
+  // ── Centre the map on the first valid vehicle position ────────────────────
   const centre: [number, number] =
-    vehicles.length > 0
+    vehicles.length > 0 && !isNaN(vehicles[0].lat) && !isNaN(vehicles[0].lng)
       ? [vehicles[0].lat, vehicles[0].lng]
       : DEFAULT_CENTRE;
 
+  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="flex flex-col gap-2">
 
       {/* ── Status bar ────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
-          {/* Live indicator */}
           <span className={`
             inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full
             ${online
@@ -180,6 +182,8 @@ export default function FleetMap() {
           {vehicles.map((v, i) => (
             <Marker
               key={v.vehicle_id ?? i}
+              // lat and lng are guaranteed to be valid numbers at this point
+              // because the filter in fetchVehicles removed any NaN rows
               position={[v.lat, v.lng]}
               icon={vehicleIcon}
             >
@@ -204,6 +208,7 @@ export default function FleetMap() {
                       Last seen: {new Date(v.last_seen).toLocaleTimeString()}
                     </p>
                   )}
+                  {/* toFixed is safe because lat/lng are coerced to Number above */}
                   <p className="text-gray-400 text-xs font-mono">
                     {v.lat.toFixed(5)}, {v.lng.toFixed(5)}
                   </p>
@@ -211,6 +216,7 @@ export default function FleetMap() {
               </Popup>
             </Marker>
           ))}
+
         </MapContainer>
       </div>
 
