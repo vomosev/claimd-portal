@@ -142,6 +142,7 @@ export default function PoliciesTable() {
     else           setLoading(true);
 
     try {
+      console.log(`running ${process.env.NEXT_PUBLIC_API_URL}/ins_policy/list/${currentUsername}`);
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/ins_policy/list/${currentUsername}`
       );
