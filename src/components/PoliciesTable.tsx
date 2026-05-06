@@ -225,14 +225,6 @@ export default function PoliciesTable() {
     );
   }
 
-  // if (!adminStatus) {
-  //   return (
-  //     <div className="flex items-center justify-center min-h-[400px]">
-  //       <p className="text-gray-500">Redirecting…</p>
-  //     </div>
-  //   );
-  // }
-
   // ── Main render ───────────────────────────────────────────────────────────────
   return (
     <div className="space-y-6">
