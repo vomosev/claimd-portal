@@ -494,7 +494,7 @@ export default function FNOLClaimsTable() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
                         {/* View */}
-                        <Button
+                        {/* <Button
                           size="sm"
                           variant="ghost"
                           onClick={() => router.push(`/dashboard/ins-claim/${claim.id}`)}
@@ -503,7 +503,7 @@ export default function FNOLClaimsTable() {
                         >
                           <Eye size={12} className="mr-1" />
                           View
-                        </Button>
+                        </Button> */}
 
                         {/* Edit — only for open claims */}
                         {(claim.status === "submitted" || claim.status === "under_review") && (

@@ -755,6 +755,35 @@ export default function PolicyForm({ mode, policyId }: PolicyFormProps) {
 
           <hr className="border-[#D4D8EA] dark:border-[#2E4066]" />
 
+          {/* ── Actions ─────────────────────────────────────────────────── */}
+          <div className="flex flex-col md:flex-row md:justify-end gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              className="md:w-[10%] order-1 md:order-none"
+              onClick={() => router.push("/dashboard/ins-policy")}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="md:w-[40%] bg-[#5871A7] hover:bg-[#4560A0] text-white"
+              disabled={saving}
+            >
+              {saving ? (
+                <>
+                  <Loader2 size={16} className="mr-2 animate-spin" />
+                  {mode === "new" ? "Creating Policy…" : "Updating Policy…"}
+                </>
+              ) : (
+                <>
+                  <ChevronRight size={16} className="mr-2" />
+                  {mode === "new" ? "Create Policy" : "Update Policy"}
+                </>
+              )}
+            </Button>
+          </div>
+
           {mode === "edit" && (
             <div className="flex flex-col md:flex-row md:justify-end gap-4">
               <Button
@@ -791,35 +820,6 @@ export default function PolicyForm({ mode, policyId }: PolicyFormProps) {
               </Button>
             </div>
           )}
-
-          {/* ── Actions ─────────────────────────────────────────────────── */}
-          <div className="flex flex-col md:flex-row md:justify-end gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              className="md:w-[10%] order-1 md:order-none"
-              onClick={() => router.push("/dashboard/ins-policy")}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              className="md:w-[40%] bg-[#5871A7] hover:bg-[#4560A0] text-white"
-              disabled={saving}
-            >
-              {saving ? (
-                <>
-                  <Loader2 size={16} className="mr-2 animate-spin" />
-                  {mode === "new" ? "Creating Policy…" : "Updating Policy…"}
-                </>
-              ) : (
-                <>
-                  <ChevronRight size={16} className="mr-2" />
-                  {mode === "new" ? "Create Policy" : "Update Policy"}
-                </>
-              )}
-            </Button>
-          </div>
 
         </form>
       </Form>
