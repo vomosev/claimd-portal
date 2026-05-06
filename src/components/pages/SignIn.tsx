@@ -187,21 +187,10 @@ function SignInForm() {
     if (sessionInfo.isValid) {
       setIsAuthenticated(true);
       setCurrentUser(sessionInfo.username);
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/getuserrole/${sessionInfo.username}`)
-        .then((r) => r.json())
-        .then((data) => {
-          const isAdmin =
-            String(data.role).includes("admin") ||
-            String(data.role).includes("superuser");
-          setAdminStatus(isAdmin);
-          setAccessChecked(true);
-        })
-        .catch(() => {
-          setAdminStatus(false);
-          setAccessChecked(true);
-        });
-        if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus) {
+      if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus) {
         window.location.href = "/admin/ins-policy";
+      } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && !adminStatus) {
+        window.location.href = "/dashboard/ins-policy";
       }
     } else {
       setIsAuthenticated(false);
@@ -242,6 +231,8 @@ function SignInForm() {
           console.log("adminStatus", adminStatus);
           if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus) {
             window.location.href = "/admin/ins-policy";
+          } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && !adminStatus) {
+            window.location.href = "/dashboard/ins-policy";
           }
         }
       } else if (
@@ -265,9 +256,10 @@ function SignInForm() {
   const handlePinSuccess = () => {
     // Redirect to dashboard after successful PIN verification
     // Check if publicAwardID exists and redirect accordingly
-    console.log("adminStatus", adminStatus);
     if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus) {
       window.location.href = "/admin/ins-policy";
+    } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && !adminStatus) {
+      window.location.href = "/dashboard/ins-policy";
     }
   };
 
