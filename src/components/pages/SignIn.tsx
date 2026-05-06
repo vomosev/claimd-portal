@@ -187,8 +187,12 @@ function SignInForm() {
     if (sessionInfo.isValid) {
       setIsAuthenticated(true);
       setCurrentUser(sessionInfo.username);
-      // Redirect
-      window.location.href = "/dashboard/ins-policy";
+      console.log("adminStatus", adminStatus);
+      if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus) {
+        window.location.href = "/admin/ins-policy";
+      } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && !adminStatus) {
+        window.location.href = "/dashboard/ins-policy";
+      }
     } else {
       setIsAuthenticated(false);
     }
@@ -226,7 +230,11 @@ function SignInForm() {
           setShowPinVerification(true);
         } else {
           console.log("adminStatus", adminStatus);
-          window.location.href = "/dashboard/ins-policy";
+          if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus) {
+            window.location.href = "/admin/ins-policy";
+          } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && !adminStatus) {
+            window.location.href = "/dashboard/ins-policy";
+          }
         }
       } else if (
         data.requiresPin ||
@@ -248,7 +256,12 @@ function SignInForm() {
 
   const handlePinSuccess = () => {
     // Redirect to dashboard after successful PIN verification
-    window.location.href = "/dashboard/ins-policy";
+    // Check if publicAwardID exists and redirect accordingly
+    if (publicAwardID) {
+      window.location.href = `/dashboard/award-details/${publicAwardID}`;
+    } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1) {
+      window.location.href = "/dashboard/ins-policy";
+    }
   };
 
   const handlePinCancel = () => {
