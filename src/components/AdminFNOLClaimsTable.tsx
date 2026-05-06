@@ -236,7 +236,7 @@ export default function FNOLClaimsTable() {
         <div>
           <h1 className="text-3xl font-semibold flex items-center gap-2.5">
             <FileText className="text-[#5871A7]" size={28} />
-            FNOL Claims
+            FNOL Claims Admin
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             First Notice of Loss — all submitted insurance claims
