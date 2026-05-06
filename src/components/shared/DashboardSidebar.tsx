@@ -169,13 +169,21 @@ const DashboardSidebar = ({
   const labelText = process.env.NEXT_PUBLIC_DISTRIBUTION === "1" ? "Latest Info" : "Home";
 
   // Navigation items configuration
-  const navigationItems = [
+  const navigationItems = [ 
     // { href: "/dashboard", label: labelText, icon: House, degree: 0 },
     { href: "/dashboard/ins-policy", label: "Policies", icon: Award, degree: 0 },
     { href: "/dashboard/ins-claim", label: "Claims", icon: Flame, degree: 0 },
     { href: "/dashboard/ins-policy/new", label: "New Policy", icon: Award, degree: 0 },
     { href: "/dashboard/ins-claim/new", label: "New Claim", icon: Trophy, degree: 0 },
     // { href: "/dashboard/my-activity", label: "My Tickets & Rewards", icon: Search, degree: 90 },
+  ];
+
+  // Admin Navigation items configuration
+  const navigationItemsAdmin = [ 
+    { href: "/admin/ins-policy", label: "Policies Admin", icon: Award, degree: 0 },
+    { href: "/admin/ins-claim", label: "Claims Admin", icon: Flame, degree: 0 },
+    { href: "/admin/ins-policy/new", label: "New Policy Admin", icon: Award, degree: 0 },
+    { href: "/admin/ins-claim/new", label: "New Claim Admin", icon: Trophy, degree: 0 },
   ];
 
   const bottomNavigationItems = [
@@ -300,6 +308,16 @@ const DashboardSidebar = ({
               <><hr /></>
             )}
 
+            {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus && navigationItemsAdmin.map((item) => (
+              <NavigationLink
+                key={item.href}
+                href={item.href}
+                label={item.label}
+                icon={item.icon}
+                degree={item.degree}
+              />
+            ))}
+
             <div className="border-t border-t-[#F7F8F9] dark:border-t-[#191C24] mt-2 pt-2">
               {bottomNavigationItems.map((item) => (
                 <NavigationLink
@@ -388,6 +406,17 @@ const DashboardSidebar = ({
                   showLabel={!isCollapsed}
                 />
               ))}
+
+              {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus && navigationItemsAdmin.map((item) => (
+                <NavigationLink
+                  key={item.href}
+                  href={item.href}
+                  label={item.label}
+                  icon={item.icon}
+                  degree={item.degree}
+                />
+              ))}
+
             </div>
           </div>
 
