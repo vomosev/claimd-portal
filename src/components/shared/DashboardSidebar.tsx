@@ -170,11 +170,11 @@ const DashboardSidebar = ({
 
   // Navigation items configuration
   const navigationItems = [ 
-    // { href: "/dashboard", label: labelText, icon: House, degree: 0 },
     { href: "/dashboard/ins-policy", label: "Policies", icon: Award, degree: 0 },
     { href: "/dashboard/ins-claim", label: "Claims", icon: Flame, degree: 0 },
     { href: "/dashboard/ins-policy/new", label: "New Policy", icon: Award, degree: 0 },
     { href: "/dashboard/ins-claim/new", label: "New Claim", icon: Trophy, degree: 0 },
+    // { href: "/dashboard", label: labelText, icon: House, degree: 0 },
     // { href: "/dashboard/my-activity", label: "My Tickets & Rewards", icon: Search, degree: 90 },
   ];
 
@@ -182,8 +182,8 @@ const DashboardSidebar = ({
   const navigationItemsAdmin = [ 
     { href: "/admin/ins-policy", label: "Policies Admin", icon: Award, degree: 0 },
     { href: "/admin/ins-claim", label: "Claims Admin", icon: Flame, degree: 0 },
-    { href: "/admin/ins-policy/new", label: "New Policy Admin", icon: Award, degree: 0 },
-    { href: "/admin/ins-claim/new", label: "New Claim Admin", icon: Trophy, degree: 0 },
+    // { href: "/admin/ins-policy/new", label: "New Policy Admin", icon: Award, degree: 0 },
+    // { href: "/admin/ins-claim/new", label: "New Claim Admin", icon: Trophy, degree: 0 },
   ];
 
   const bottomNavigationItems = [
