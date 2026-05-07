@@ -6,6 +6,37 @@ declare global {
   interface Window { google: any }
 }
 
+// ── Types ──────────────────────────────────────────────────────────────────────
+interface Stop {
+  id?:       string | number;
+  latitude:  number | string | null;
+  longitude: number | string | null;
+  label?:    string;
+  address?:  string;
+  sequence?: number;
+}
+
+// ── Numbered stop marker icon ──────────────────────────────────────────────────
+// Returns a coloured SVG pin with the stop sequence number inside
+function makeStopIcon(sequence: number, isFirst: boolean, isLast: boolean) {
+  const fill = isFirst ? "#10B981" : isLast ? "#EF4444" : "#5871A7";
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40">
+      <path d="M16 0C7.16 0 0 7.16 0 16c0 10 16 24 16 24s16-14 16-24C32 7.16 24.84 0 16 0z"
+        fill="${fill}" />
+      <circle cx="16" cy="16" r="10" fill="white" opacity="0.9" />
+      <text x="16" y="21" text-anchor="middle"
+        font-family="Arial,sans-serif" font-size="11" font-weight="bold"
+        fill="${fill}">${sequence}</text>
+    </svg>
+  `;
+  return {
+    url:       "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
+    scaledSize: null, // set after google loads
+    anchor:     null,
+  };
+}
+
 export default function LogisticsRoutePlanner({ shipmentId }: any) {
 
   const mapRef = useRef<HTMLDivElement>(null);
@@ -65,6 +96,40 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
     return () => clearInterval(i);
   }, [fetchData]);
 
+  // ── Info window content for a stop ──────────────────────────────────────────
+  const createStopInfoContent = (stop: Stop, index: number): string => {
+    const isFirst = index === 0;
+    const isLast  = index === stops.length - 1;
+    const badge   = isFirst ? "Pickup" : isLast ? "Delivery" : `Stop ${index + 1}`;
+    const colour  = isFirst ? "#10B981" : isLast ? "#EF4444" : "#5871A7";
+
+    return `
+      <div style="font-family:Arial,sans-serif;max-width:220px;line-height:1.5;">
+        <div style="font-weight:bold;font-size:14px;color:${colour};margin-bottom:6px;">
+          ${badge}
+        </div>
+        ${stop.label
+          ? `<p style="margin:0 0 4px;font-size:13px;font-weight:600;">${stop.label}</p>`
+          : ""
+        }
+        ${stop.address
+          ? `<p style="margin:0 0 4px;font-size:12px;color:#555;">${stop.address}</p>`
+          : ""
+        }
+        <p style="margin:0;font-size:11px;color:#999;font-family:monospace;">
+          ${Number(stop.latitude).toFixed(5)}, ${Number(stop.longitude).toFixed(5)}
+        </p>
+        <div style="margin-top:8px;">
+          <a href="https://www.google.com/maps?q=${stop.latitude},${stop.longitude}"
+             target="_blank"
+             style="font-size:11px;color:#4285F4;text-decoration:none;">
+            📍 Open in Google Maps
+          </a>
+        </div>
+      </div>
+    `;
+  };
+
   // ── Init Map ─────────────────────────────
   const initMap = useCallback(async () => {
 
@@ -119,8 +184,20 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
     stopMarkersRef.current.forEach(m => m.setMap(null));
     stopMarkersRef.current = [];
 
-    stops.forEach((s) => {
+    stops.forEach((s, i) => {
       if (!isValid(s.latitude, s.longitude)) return;
+
+      const isFirst = i === 0;
+      const isLast  = i === stops.length - 1;
+      const seq     = s.sequence ?? i + 1;
+
+      // Build the SVG icon
+      const iconDef = makeStopIcon(seq, isFirst, isLast);
+      const icon = {
+        url:        iconDef.url,
+        scaledSize: new window.google.maps.Size(32, 40),
+        anchor:     new window.google.maps.Point(16, 40),
+      };
 
       const marker = new window.google.maps.Marker({
         position: {
@@ -128,12 +205,15 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
           lng: Number(s.longitude),
         },
         map,
-      });
+        icon,
+        title: s.label || `Stop ${seq}`,
+        zIndex: isFirst || isLast ? 10 : 5,
+        });
 
       marker.addListener("click", () =>
         openInfo(map, marker, `
           <div>
-            ${s.address ? `<strong>Address: ${s.address}</strong>` : s.name || "Stop"}<br/>
+            ${s.sequence_order}. ${s.address ? `<strong>Address: ${s.address}</strong>` : s.name || "Stop"}<br/>
             ${s.eta ? `<br/>ETA: ${s.eta}` : ""}
           </div>
         `)
