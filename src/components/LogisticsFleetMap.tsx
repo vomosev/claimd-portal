@@ -379,6 +379,8 @@ export default function LogisticsFleetMap() {
             Current location of vehicles and their planned routes based on latest data. Click on stops or vehicles for details.
           </p>
         </div>
+      </div>
+      <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <span className={`
             inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full
