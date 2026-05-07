@@ -340,32 +340,34 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
             View Route
           </h2>
         </div>
-        <button
-          type="button"
-          onClick={() => router.push(`/logistics/transportlist/${shipmentId}`)}
-          disabled={stops.length === 0}
-          className="
-            inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
-            bg-[#5871A7] hover:bg-[#4560A0] text-white
-            disabled:opacity-40 disabled:cursor-not-allowed
-            transition-colors
-          "
-        >
-          Plan Route
-        </button>
-        <button
-          type="button"
-          onClick={handleRecentre}
-          disabled={stops.length === 0}
-          className="
-            inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
-            bg-[#5871A7] hover:bg-[#4560A0] text-white
-            disabled:opacity-40 disabled:cursor-not-allowed
-            transition-colors
-          "
-        >
-          Re-centre
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => router.push(`/logistics/transportlist/${shipmentId}`)}
+            disabled={stops.length === 0}
+            className="
+              inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
+              bg-[#5871A7] hover:bg-[#4560A0] text-white
+              disabled:opacity-40 disabled:cursor-not-allowed
+              transition-colors
+            "
+          >
+            Plan Route
+          </button>
+          <button
+            type="button"
+            onClick={handleRecentre}
+            disabled={stops.length === 0}
+            className="
+              inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
+              bg-[#5871A7] hover:bg-[#4560A0] text-white
+              disabled:opacity-40 disabled:cursor-not-allowed
+              transition-colors
+            "
+          >
+            Re-centre
+          </button>
+        </div>
       </div>
       <div>
         <p>
