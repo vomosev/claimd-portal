@@ -88,10 +88,10 @@ export default function LogisticsShipments() {
                     <div className="flex items-center gap-2 flex-shrink-0">
                         <button
                             type="button"
-                            onClick={() => router.push(`/logistics/transport/${s.id}`)}
+                            onClick={() => router.push(`/logistics/transportlist/${s.id}`)}
                             className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
                         >
-                            Route Planner
+                            Plan Route
                         </button>
 
                         <button
@@ -99,7 +99,7 @@ export default function LogisticsShipments() {
                             onClick={() => router.push(`/logistics/transportmap/${s.id}`)}
                             className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
                         >
-                            Vehicle Route
+                            View Route
                         </button>
                     </div>
 

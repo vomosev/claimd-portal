@@ -183,7 +183,7 @@ const DashboardSidebar = ({
   const navigationItemsAdmin = [ 
     { href: "/admin/ins-policy", label: "Policies Admin", icon: Award, degree: 0 },
     { href: "/admin/ins-claim", label: "Claims Admin", icon: Flame, degree: 0 },
-    { href: "/logistics/transport/fleet", label: "Fleet Management", icon: Globe, degree: 0 },
+    { href: "/logistics/transportlist/fleet", label: "Fleet Management", icon: Globe, degree: 0 },
     { href: "/logistics/transportmap/fleet", label: "Fleet Map", icon: Globe, degree: 0 },
     { href: "/logistics/shipment", label: "Vehicle Route", icon: Package, degree: 0 },
     { href: "/logistics/shipment/add", label: "Add Shipment", icon: Menu, degree: 0 },
