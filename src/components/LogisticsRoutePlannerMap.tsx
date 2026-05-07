@@ -351,6 +351,11 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
           Re-centre
         </button>
       </div>
+      <div>
+        <p>
+          Current location of vehicles and their planned routes based on latest data. Click on stops or vehicles for details.
+        </p>
+      </div>
 
       {/* Stop legend */}
       {stops.length > 0 && (
