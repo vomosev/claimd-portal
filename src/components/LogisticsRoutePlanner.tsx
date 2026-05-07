@@ -1,7 +1,8 @@
 // components/LogisticsRoutePlanner.tsx
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import polyline from "@mapbox/polyline";
 import {
   DndContext,
   closestCenter,
@@ -9,9 +10,6 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
-  DragStartEvent,
-  DragOverlay,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -21,312 +19,256 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, MapPin, Clock, Loader2, AlertTriangle } from "lucide-react";
+import {
+  GripVertical, MapPin, Clock, Loader2,
+  AlertTriangle, RefreshCw,
+} from "lucide-react";
 import toast from "react-hot-toast";
 
-// ── Types ──────────────────────────────────────────────────────────────────────
+declare global {
+  interface Window { google: any; }
+}
+
 interface Stop {
-  id:        string | number;
-  name?:     string;
-  eta?:      string;
-  address?:  string;
+  id: string | number;
+  name?: string;
+  label?: string;
+  eta?: string;
+  address?: string;
   sequence?: number;
+  latitude?: number | string | null;
+  longitude?: number | string | null;
 }
 
-interface RoutePlannerProps {
-  shipmentId: string | number;
+interface Route {
+  polyline?: string;
 }
 
-// ── Sortable stop item ─────────────────────────────────────────────────────────
-// Each stop must use useSortable to actually become draggable.
-// Without this the DndContext renders but nothing can be dragged.
-function SortableStop({
-  stop,
-  index,
-  isDragging,
-}: {
-  stop:       Stop;
-  index:      number;
-  isDragging: boolean;
-}) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging: isThisItemDragging,
-  } = useSortable({ id: stop.id });
+export default function LogisticsRoutePlanner({ shipmentId }: { shipmentId: string | number }) {
 
-  const style: React.CSSProperties = {
-    transform:  CSS.Transform.toString(transform),
-    transition,
-    opacity:    isThisItemDragging ? 0.4 : 1,
-    zIndex:     isThisItemDragging ? 1 : undefined,
-  };
+  const [stops, setStops] = useState<Stop[]>([]);
+  const [route, setRoute] = useState<Route | null>(null);
+  const [vehicles, setVehicles] = useState<any[]>([]);
+  const [selectedVehicleId, setSelectedVehicleId] = useState<any>("all");
 
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`
-        flex items-center gap-3 rounded-lg border px-4 py-3
-        bg-white dark:bg-[#151E3A]
-        transition-shadow
-        ${isThisItemDragging
-          ? "shadow-lg border-[#5871A7]/60"
-          : "border-gray-200 dark:border-[#2E4066] hover:border-[#5871A7]/40 hover:shadow-sm"
-        }
-      `}
-    >
-      {/* Sequence number */}
-      <div className="
-        w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0
-        bg-[#5871A7]/10 text-[#5871A7] text-xs font-bold
-      ">
-        {index + 1}
-      </div>
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-      {/* Stop details */}
-      <div className="flex-1 min-w-0">
-        <p className="font-semibold text-sm text-gray-800 dark:text-white truncate">
-          {stop.name || `Stop ${stop.id}`}
-        </p>
-        {stop.address && (
-          <p className="text-xs text-gray-400 truncate flex items-center gap-1 mt-0.5">
-            <MapPin size={10} className="flex-shrink-0" />
-            {stop.address}
-          </p>
-        )}
-      </div>
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
 
-      {/* ETA */}
-      {stop.eta && (
-        <div className="flex items-center gap-1 text-xs text-gray-500 flex-shrink-0">
-          <Clock size={12} />
-          {stop.eta}
-        </div>
-      )}
+  const stopMarkersRef = useRef<any[]>([]);
+  const vehicleMarkersRef = useRef<Map<any, any>>(new Map());
+  const etaLinesRef = useRef<Map<any, any>>(new Map());
+  const polylineRef = useRef<any>(null);
 
-      {/* Drag handle — listeners must be on the handle, not the whole row */}
-      <button
-        type="button"
-        className="
-          touch-none p-1 rounded text-gray-300 dark:text-gray-600
-          hover:text-[#5871A7] hover:bg-[#5871A7]/10
-          cursor-grab active:cursor-grabbing
-          focus:outline-none focus:ring-2 focus:ring-[#5871A7] flex-shrink-0
-          transition-colors
-        "
-        aria-label="Drag to reorder"
-        {...attributes}
-        {...listeners}
-      >
-        <GripVertical size={16} />
-      </button>
-    </div>
-  );
-}
+  // ── Helpers ─────────────────────────────────────
+  const isValidCoord = (lat: any, lng: any) =>
+    lat != null && lng != null && !isNaN(Number(lat)) && !isNaN(Number(lng));
 
-// ── Ghost item shown under the cursor while dragging ──────────────────────────
-function DragGhost({ stop }: { stop: Stop | null }) {
-  if (!stop) return null;
-  return (
-    <div className="
-      flex items-center gap-3 rounded-lg border border-[#5871A7] px-4 py-3
-      bg-white dark:bg-[#151E3A] shadow-2xl opacity-95 rotate-1
-    ">
-      <div className="w-7 h-7 rounded-full bg-[#5871A7] text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
-        ·
-      </div>
-      <p className="font-semibold text-sm text-gray-800 dark:text-white">
-        {stop.name || `Stop ${stop.id}`}
-      </p>
-      <GripVertical size={16} className="text-[#5871A7] ml-auto flex-shrink-0" />
-    </div>
-  );
-}
+  // ── Fetch data ─────────────────────────────────
+  const fetchData = useCallback(async () => {
+    try {
+      const [s, r] = await Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/planner/${shipmentId}`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/fleet/route/${shipmentId}`)
+      ]);
 
-// ── Main component ─────────────────────────────────────────────────────────────
-export default function RoutePlanner({ shipmentId }: RoutePlannerProps) {
-  const [stops,          setStops]          = useState<Stop[]>([]);
-  const [loading,        setLoading]        = useState(true);
-  const [saving,         setSaving]         = useState(false);
-  const [error,          setError]          = useState<string | null>(null);
-  const [activeStop,     setActiveStop]     = useState<Stop | null>(null);
-
-  // ── Configure sensors ──────────────────────────────────────────────────────
-  // PointerSensor for mouse/touch, KeyboardSensor for accessibility
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      // Require a small drag distance before activating
-      // so that click events on the row still fire normally
-      activationConstraint: { distance: 5 },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
-  // ── Fetch stops ────────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (!shipmentId) return;
-    setLoading(true);
-    setError(null);
-
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/planner/${shipmentId}`)
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
-      .then((data) => {
-        setStops(Array.isArray(data) ? data : data.stops ?? []);
-      })
-      .catch((err) => {
-        console.error("Failed to load stops:", err);
-        setError("Failed to load route stops.");
-      })
-      .finally(() => setLoading(false));
+      setStops(await s.json());
+      setRoute(await r.json());
+    } catch {
+      setError("Failed to load");
+    } finally {
+      setLoading(false);
+    }
   }, [shipmentId]);
 
-  // ── Persist reordered stops ────────────────────────────────────────────────
-  const persistOrder = useCallback(
-    async (orderedStops: Stop[]) => {
-      setSaving(true);
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/planner/reorder/${shipmentId}`,
-          {
-            method:  "POST",
-            headers: { "Content-Type": "application/json" },
-            body:    JSON.stringify({
-              orderedStopIds: orderedStops.map((s) => s.id),
-            }),
-          }
-        );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        toast.success("Route order saved.");
-      } catch (err) {
-        console.error("Failed to persist order:", err);
-        toast.error("Could not save route order. Please try again.");
-      } finally {
-        setSaving(false);
+  const fetchVehicles = useCallback(async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/fleet/live`);
+    const data = await res.json();
+    setVehicles(data);
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+    fetchVehicles();
+    const i = setInterval(fetchVehicles, 5000);
+    return () => clearInterval(i);
+  }, []);
+
+  // ── ETA path ───────────────────────────────────
+  const buildEtaPath = (v: any) => {
+    if (!stops.length) return [];
+
+    const vehiclePos = { lat: Number(v.lat), lng: Number(v.lng) };
+
+    let closest = 0;
+    let min = Infinity;
+
+    stops.forEach((s, i) => {
+      if (!isValidCoord(s.latitude, s.longitude)) return;
+      const dx = Number(s.latitude) - vehiclePos.lat;
+      const dy = Number(s.longitude) - vehiclePos.lng;
+      const d = dx * dx + dy * dy;
+      if (d < min) {
+        min = d;
+        closest = i;
       }
-    },
-    [shipmentId]
-  );
+    });
 
-  // ── Drag handlers ──────────────────────────────────────────────────────────
-  const handleDragStart = (event: DragStartEvent) => {
-    const dragged = stops.find((s) => s.id === event.active.id) ?? null;
-    setActiveStop(dragged);
+    return [
+      vehiclePos,
+      ...stops.slice(closest)
+        .filter(s => isValidCoord(s.latitude, s.longitude))
+        .map(s => ({
+          lat: Number(s.latitude),
+          lng: Number(s.longitude)
+        }))
+    ];
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    setActiveStop(null);
+  // ── Map init ───────────────────────────────────
+  const initMap = useCallback(async () => {
 
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
+    if (!window.google) {
+      await new Promise<void>((resolve) => {
+        const script = document.createElement("script");
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_MAPS_API_KEY}`;
+        script.onload = () => resolve();
+        document.body.appendChild(script);
+      });
+    }
 
-    const oldIndex = stops.findIndex((s) => s.id === active.id);
-    const newIndex = stops.findIndex((s) => s.id === over.id);
+    if (!mapInstanceRef.current) {
+      mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
+        center: { lat: 51.5, lng: -0.09 },
+        zoom: 12
+      });
+    }
 
-    if (oldIndex === -1 || newIndex === -1) return;
+    const map = mapInstanceRef.current;
 
-    const reordered = arrayMove(stops, oldIndex, newIndex);
-    setStops(reordered);
-    persistOrder(reordered);
-  };
+    // ── Clear stops ─────────────────────────────
+    stopMarkersRef.current.forEach(m => m.setMap(null));
+    stopMarkersRef.current = [];
 
-  const handleDragCancel = () => setActiveStop(null);
+    // ── Draw stops ─────────────────────────────
+    stops.forEach((s) => {
+      if (!isValidCoord(s.latitude, s.longitude)) return;
 
-  // ── Render guards ──────────────────────────────────────────────────────────
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center space-y-2">
-          <Loader2 className="animate-spin h-7 w-7 text-[#5871A7] mx-auto" />
-          <p className="text-sm text-gray-500">Loading route stops…</p>
-        </div>
-      </div>
-    );
-  }
+      const m = new window.google.maps.Marker({
+        position: {
+          lat: Number(s.latitude),
+          lng: Number(s.longitude)
+        },
+        map
+      });
 
-  if (error) {
-    return (
-      <div className="flex items-center gap-2.5 rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-700 px-4 py-3 text-sm text-red-700 dark:text-red-300">
-        <AlertTriangle size={15} className="flex-shrink-0" />
-        {error}
-      </div>
-    );
-  }
+      stopMarkersRef.current.push(m);
+    });
 
-  if (stops.length === 0) {
-    return (
-      <div className="rounded-lg border border-dashed border-gray-200 dark:border-gray-700 p-8 text-center">
-        <MapPin size={28} className="mx-auto mb-2 text-gray-300 dark:text-gray-600" />
-        <p className="text-sm text-gray-400">No stops found for this shipment.</p>
-      </div>
-    );
-  }
+    // ── Draw route ─────────────────────────────
+    if (route?.polyline) {
+      if (polylineRef.current) polylineRef.current.setMap(null);
 
-  // ── Main render ────────────────────────────────────────────────────────────
+      polylineRef.current = new window.google.maps.Polyline({
+        path: polyline.decode(route.polyline).map(([lat, lng]) => ({ lat, lng })),
+        map,
+        strokeColor: "#5871A7"
+      });
+    }
+
+    // ── Filter vehicles ─────────────────────────
+    const visible = selectedVehicleId === "all"
+      ? vehicles
+      : vehicles.filter(v => v.vehicle_id == selectedVehicleId);
+
+    const visibleIds = new Set(visible.map(v => v.vehicle_id));
+
+    // ── Vehicles ───────────────────────────────
+    visible.forEach(v => {
+
+      if (!isValidCoord(v.lat, v.lng)) return;
+
+      const id = v.vehicle_id;
+      let marker = vehicleMarkersRef.current.get(id);
+
+      if (!marker) {
+        marker = new window.google.maps.Marker({
+          position: { lat: Number(v.lat), lng: Number(v.lng) },
+          map,
+          zIndex: 999
+        });
+        vehicleMarkersRef.current.set(id, marker);
+      } else {
+        marker.setPosition({
+          lat: Number(v.lat),
+          lng: Number(v.lng)
+        });
+      }
+
+      // ETA line
+      const path = buildEtaPath(v);
+
+      if (path.length > 1) {
+        let line = etaLinesRef.current.get(id);
+
+        if (!line) {
+          line = new window.google.maps.Polyline({
+            path,
+            strokeColor: "#10B981",
+            strokeWeight: 4,
+            map
+          });
+          etaLinesRef.current.set(id, line);
+        } else {
+          line.setPath(path);
+        }
+      }
+    });
+
+    // ── CLEANUP ───────────────────────────────
+    vehicleMarkersRef.current.forEach((marker, id) => {
+      if (!visibleIds.has(id)) {
+        marker.setMap(null);
+        vehicleMarkersRef.current.delete(id);
+      }
+    });
+
+    etaLinesRef.current.forEach((line, id) => {
+      if (!visibleIds.has(id)) {
+        line.setMap(null);
+        etaLinesRef.current.delete(id);
+      }
+    });
+
+  }, [stops, route, vehicles, selectedVehicleId]);
+
+  useEffect(() => {
+    if (!loading) initMap();
+  }, [loading, initMap]);
+
+  // ── UI ───────────────────────────────────────
+  if (loading) return <div>Loading...</div>;
+
   return (
-    <div className="space-y-4">
+    <div>
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-            Route Planner
-          </h2>
-          <p className="text-xs text-gray-500 mt-0.5">
-            Drag the handle on the right to reorder stops.
-            Changes are saved automatically.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {saving && (
-            <span className="flex items-center gap-1.5 text-xs text-gray-400">
-              <Loader2 size={12} className="animate-spin" />
-              Saving…
-            </span>
-          )}
-          <span className="text-xs bg-[#5871A7]/10 text-[#5871A7] px-2.5 py-1 rounded-full font-medium">
-            {stops.length} stop{stops.length !== 1 ? "s" : ""}
-          </span>
-        </div>
-      </div>
-
-      {/* Sortable list */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        onDragCancel={handleDragCancel}
+      {/* FILTER */}
+      <select
+        value={selectedVehicleId}
+        onChange={(e) => setSelectedVehicleId(e.target.value)}
       >
-        <SortableContext
-          items={stops.map((s) => s.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <div className="space-y-2">
-            {stops.map((stop, i) => (
-              <SortableStop
-                key={stop.id}
-                stop={stop}
-                index={i}
-                isDragging={activeStop?.id === stop.id}
-              />
-            ))}
-          </div>
-        </SortableContext>
+        <option value="all">All Vehicles</option>
+        {vehicles.map(v => (
+          <option key={v.vehicle_id} value={v.vehicle_id}>
+            Vehicle {v.vehicle_id}
+          </option>
+        ))}
+      </select>
 
-        {/* DragOverlay renders a floating ghost under the cursor ────────────── */}
-        <DragOverlay>
-          <DragGhost stop={activeStop} />
-        </DragOverlay>
-      </DndContext>
+      {/* MAP */}
+      <div ref={mapRef} style={{ height: 500 }} />
 
     </div>
   );
