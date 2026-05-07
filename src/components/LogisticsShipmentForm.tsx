@@ -388,7 +388,7 @@ function ConfirmationScreen({
         </div>
       </div>
       <div className="flex gap-3">
-        <Button variant="outline" onClick={() => router.push("/dashboard/logistics")}>
+        <Button variant="outline" onClick={() => router.push("/logistics/shipment")}>
           View All Shipments
         </Button>
         <Button className="bg-[#5871A7] hover:bg-[#4560A0] text-white" onClick={onNew}>
@@ -492,7 +492,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
         toast.success("Shipment created successfully!");
       } else {
         toast.success("Shipment updated successfully!");
-        router.push("/dashboard/logistics");
+        router.push("/logistics/shipment");
       }
     } catch (err: any) {
       console.error("Shipment submit error:", err);
@@ -708,7 +708,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
               type="button"
               variant="outline"
               className="md:w-[10%] order-1 md:order-none"
-              onClick={() => router.push("/dashboard/logistics")}
+              onClick={() => router.push("/logistics/shipment")}
             >
               <ArrowLeft size={15} className="mr-1.5" />
               Cancel
