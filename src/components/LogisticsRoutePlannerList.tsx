@@ -583,19 +583,6 @@ export default function LogisticsRoutePlanner({
           >
             Re-centre
           </button>
-          {/* <button
-            type="button"
-            onClick={fetchData}
-            className="
-              inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm
-              border border-gray-200 dark:border-[#2E4066]
-              text-gray-500 hover:text-[#5871A7] hover:border-[#5871A7]/40
-              transition-colors
-            "
-          >
-            <RefreshCw size={13} />
-            Refresh
-          </button> */}
         </div>
       </div>
 
@@ -625,6 +612,20 @@ export default function LogisticsRoutePlanner({
               })}
             </div>
           )}
+
+          {/* <button
+            type="button"
+            onClick={fetchData}
+            className="
+              inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm
+              border border-gray-200 dark:border-[#2E4066]
+              text-gray-500 hover:text-[#5871A7] hover:border-[#5871A7]/40
+              transition-colors
+            "
+          >
+            <RefreshCw size={13} />
+            Refresh
+          </button> */}
 
           {/* Google Map container */}
           <div
