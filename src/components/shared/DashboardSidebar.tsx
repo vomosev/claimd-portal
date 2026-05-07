@@ -191,7 +191,7 @@ const DashboardSidebar = ({
     { href: "/logistics/transportmap/fleet", label: "Fleet Tracking", icon: Globe, degree: 0 },
     { href: "/logistics/shipment", label: "Vehicle Routes", icon: Route, degree: 0 },
     { href: "/logistics/shipment/add", label: "Add Shipment", icon: Car, degree: 0 },
-    { href: "/logistics/transportlist/fleet", label: "My Vehicles", icon: User, degree: 0 },
+    { href: "/logistics/vehicle", label: "My Vehicles", icon: User, degree: 0 },
     // { href: "/admin/ins-policy/new", label: "New Policy Admin", icon: Award, degree: 0 },
     // { href: "/admin/ins-claim/new", label: "New Claim Admin", icon: Trophy, degree: 0 },
   ];
