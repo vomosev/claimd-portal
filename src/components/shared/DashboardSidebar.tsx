@@ -182,6 +182,8 @@ const DashboardSidebar = ({
   const navigationItemsAdmin = [ 
     { href: "/admin/ins-policy", label: "Policies Admin", icon: Award, degree: 0 },
     { href: "/admin/ins-claim", label: "Claims Admin", icon: Flame, degree: 0 },
+    { href: "/logistics/transport/fleet", label: "Fleet Management", icon: Globe, degree: 0 },
+    { href: "/logistics/shipment/add", label: "Add Shipment", icon: Menu, degree: 0 },
     // { href: "/admin/ins-policy/new", label: "New Policy Admin", icon: Award, degree: 0 },
     // { href: "/admin/ins-claim/new", label: "New Claim Admin", icon: Trophy, degree: 0 },
   ];
