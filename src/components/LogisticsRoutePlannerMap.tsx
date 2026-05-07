@@ -344,6 +344,9 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
           <h2 className="text-xl font-semibold">
             View Route
           </h2>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Current location of vehicles and their planned routes based on latest data. Click on stops or vehicles for details.
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -386,11 +389,6 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
             Refresh
           </button>
         </div>
-      </div>
-      <div>
-        <p>
-          Current location of vehicles and their planned routes based on latest data. Click on stops or vehicles for details.
-        </p>
       </div>
 
       {/* Stop legend */}
