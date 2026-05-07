@@ -156,8 +156,6 @@ export default function LogisticsShipments() {
     {isGeneratingPass && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
             <div className="bg-white rounded-lg p-6 flex flex-col items-center gap-3 shadow-xl">
-                <br />
-                <br />
                 <h2>Generating your wallet pass...</h2>
                 <h2>Sending a copy by email</h2>
             </div>
@@ -178,7 +176,7 @@ export default function LogisticsShipments() {
             src={apiUrl + "/images/Add_to_Apple_Wallet_badge.svg.png"}
             alt="Add to Apple Wallet"
             style={{
-                height: "40px",
+                height: "25px",
                 verticalAlign: "middle",
             }}
             className="inline-block"
