@@ -63,7 +63,7 @@ interface Vehicle {
 }
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const POLL_INTERVAL                   = 3000;
+const POLL_INTERVAL                   = 5000;
 const DEFAULT_CENTRE: [number, number] = [51.505, -0.09];
 const DEFAULT_ZOOM                    = 11;
 
@@ -142,11 +142,13 @@ export default function FleetMap() {
   };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      updateVehicles();
-    }, 5000);
+    updateVehicles();
 
-    return () => clearInterval(interval);
+    intervalRef.current = setInterval(updateVehicles, POLL_INTERVAL);
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [coords]);
 
   // ── Fetch live vehicle positions ──────────────────────────────────────────
