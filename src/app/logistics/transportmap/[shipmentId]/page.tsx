@@ -1,5 +1,5 @@
-// app/transportmap/[shipmentId]/page.tsx
-import LogisticsRoutePlanner from '@/components/LogisticsRoutePlanner';
+// app/transport/[shipmentId]/page.tsx
+import LogisticsRoutePlannerMap from '@/components/LogisticsRoutePlannerMap';
 
 // ── Next.js 15: params is a Promise ───────────────────────────────────────────
 interface PageProps {
@@ -10,7 +10,7 @@ const LinksPage = async ({ params }: PageProps) => {
   const { shipmentId } = await params;
 
   return (
-      <LogisticsRoutePlanner shipmentId={shipmentId} />
+      <LogisticsRoutePlannerMap shipmentId={shipmentId} />
   );
 };
 

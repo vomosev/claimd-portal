@@ -1,4 +1,4 @@
-// app/logistics/transport/fleet/page.tsx
+// app/logistics/transportmap/fleet/page.tsx
 import LogisticsFleetMap from '@/components/LogisticsFleetMap';
 
 const LinksPage = () => {
