@@ -1,4 +1,4 @@
-// app/transport/[shipmentId]/page.tsx
+// app/logistics/transportmap/[shipmentId]/page.tsx
 import LogisticsRoutePlannerMap from '@/components/LogisticsRoutePlannerMap';
 
 // ── Next.js 15: params is a Promise ───────────────────────────────────────────
