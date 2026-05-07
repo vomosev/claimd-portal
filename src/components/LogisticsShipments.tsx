@@ -70,7 +70,6 @@ export default function LogisticsShipments() {
                 <div className="p-2 rounded-lg bg-[#5871A7]/10">
                     <Package size={18} />
                 </div>
-
                 <div>
                 <p className="font-semibold">
                     Shipment {s.id} • {s.reference} - {s.description}
@@ -79,12 +78,20 @@ export default function LogisticsShipments() {
                     {s.stop_count} stops • {s.status}
                 </p>
                 </div>
-                <div onClick={() => router.push(`/logistics/transport/${s.id}`)}>
+                <button
+                    type="button"
+                    onClick={() => router.push(`/logistics/transport/${s.id}`)}
+                    className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
+                >
                     Route Planner
-                </div>
-                <div onClick={() => router.push(`/logistics/transportmap/${s.id}`)}>
+                </button>
+                <button
+                    type="button"
+                    onClick={() => router.push(`/logistics/transportmap/${s.id}`)}
+                    className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
+                >
                     Journey Map
-                </div>
+                </button>
 
             </div>
           </div>
