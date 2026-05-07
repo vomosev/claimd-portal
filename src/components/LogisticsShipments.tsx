@@ -92,7 +92,7 @@ export default function LogisticsShipments() {
                             onClick={() => router.push(`/logistics/transportlist/${s.id}`)}
                             className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
                         >
-                            Plan Route
+                            Plan
                         </button>
 
                         <button
@@ -100,7 +100,7 @@ export default function LogisticsShipments() {
                             onClick={() => router.push(`/logistics/transportmap/${s.id}`)}
                             className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
                         >
-                            View Route
+                            View
                         </button>
                     </div>
 
