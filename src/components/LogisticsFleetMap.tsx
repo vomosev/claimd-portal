@@ -63,7 +63,7 @@ interface Vehicle {
 }
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const POLL_INTERVAL                   = 10000;
+const POLL_INTERVAL                   = 100000;
 const DEFAULT_CENTRE: [number, number] = [51.505, -0.09];
 const DEFAULT_ZOOM                    = 11;
 
