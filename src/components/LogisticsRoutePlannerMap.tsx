@@ -334,7 +334,7 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-xl font-semibold">
-            Shipment Route
+            Vehicle Route
           </h2>
         </div>
         <button
