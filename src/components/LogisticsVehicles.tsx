@@ -107,7 +107,7 @@ export default function LogisticsVehicles() {
             key={v.id}
             className="
               flex items-center justify-between
-              p-4 rounded-xl border
+              p-4 rounded-xl
               hover:shadow-md transition
               bg-white dark:bg-[#111827]
             "

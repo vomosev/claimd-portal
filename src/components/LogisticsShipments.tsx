@@ -61,7 +61,7 @@ export default function LogisticsShipments() {
             key={s.id}
             className="
                 flex items-center justify-between
-                p-4 rounded-xl border
+                p-4 rounded-xl
                 hover:shadow-md transition cursor-pointer
                 bg-white dark:bg-[#111827]
             "           
