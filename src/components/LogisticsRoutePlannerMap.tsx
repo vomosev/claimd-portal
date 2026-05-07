@@ -91,6 +91,28 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
       directionsRendererRef.current.setMap(mapRefInstance.current);
     }
 
+      // ── Custom truck SVG for vehicle markers ────────────────────────────────
+      const truckSvg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="18" fill="#5871A7"/>
+          <svg x="6" y="6" width="24" height="24" viewBox="0 0 24 24"
+            fill="none" stroke="white" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="3" width="15" height="13" rx="1"/>
+            <path d="M16 8h4l3 5v4h-7V8z"/>
+            <circle cx="5.5"  cy="18.5" r="2.5"/>
+            <circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+        </svg>
+      `;
+      const encodedTruck = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(truckSvg)}`;
+
+      const vehicleIcon = {
+        url:        encodedTruck,
+        scaledSize: new window.google.maps.Size(36, 36),
+        anchor:     new window.google.maps.Point(18, 18),
+      };
+
     const map = mapRefInstance.current;
 
     // ── Clear stop markers ─────────────────
@@ -111,8 +133,8 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
       marker.addListener("click", () =>
         openInfo(map, marker, `
           <div>
-            <strong>${s.name || "Stop"}</strong><br/>
-            ${s.address || ""}
+            ${s.address ? `<strong>Address: ${s.address}</strong>` : s.name || "Stop"}<br/>
+            ${s.eta ? `<br/>ETA: ${s.eta}` : ""}
           </div>
         `)
       );
@@ -142,6 +164,8 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
           position: pos,
           map,
           zIndex: 999,
+          title:    `Vehicle ${v.vehicle_id}`,
+          icon:     vehicleIcon,
         });
 
         marker.addListener("click", () =>
