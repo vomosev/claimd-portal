@@ -38,6 +38,7 @@
     "react-leaflet": "^5.0.0",
     "recharts": "^3.8.1",
     "tailwind-merge": "^3.3.0",
+    "ws": "^8.20.0",
     "zod": "^3.25.7"
   },
   "devDependencies": {
