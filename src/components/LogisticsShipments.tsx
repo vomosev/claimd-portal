@@ -65,7 +65,7 @@ export default function LogisticsShipments() {
               hover:shadow-md transition cursor-pointer
             "           
           >
-            <div className="flex items-center gap-3">
+            <div className="ml-auto flex items-center gap-3">
 
                 <div className="p-2 rounded-lg bg-[#5871A7]/10">
                     <Package size={18} />
