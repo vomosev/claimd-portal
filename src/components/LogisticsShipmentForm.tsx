@@ -38,14 +38,14 @@ interface ShipmentFormProps {
   shipmentId?: number;
 }
 
-// ── Stop type options ─────────────────────────────────────────────────────────
+// ── Stop type options ──────────────────────────────────────────────────────────
 const STOP_TYPES = [
-  { value: "pickup",    label: "Pickup",       icon: "📦" },
-  { value: "delivery",  label: "Delivery",     icon: "🏠" },
-  { value: "waypoint",  label: "Waypoint",     icon: "📍" },
-  { value: "depot",     label: "Depot",        icon: "🏭" },
-  { value: "rest",      label: "Rest Stop",    icon: "☕" },
-  { value: "fuel",      label: "Fuel Stop",    icon: "⛽" },
+  { value: "pickup",   label: "Pickup",    icon: "📦" },
+  { value: "delivery", label: "Delivery",  icon: "🏠" },
+  { value: "waypoint", label: "Waypoint",  icon: "📍" },
+  { value: "depot",    label: "Depot",     icon: "🏭" },
+  { value: "rest",     label: "Rest Stop", icon: "☕" },
+  { value: "fuel",     label: "Fuel Stop", icon: "⛽" },
 ];
 
 const STOP_STATUSES = [
@@ -57,34 +57,35 @@ const STOP_STATUSES = [
 ];
 
 // ── Zod schema ─────────────────────────────────────────────────────────────────
+// ✅ Use plain z.string() for all fields — no .default()
+// Defaults are supplied in defaultValues / emptyStop() instead.
 const stopSchema = z.object({
-  name:              z.string().min(1, "Stop name is required"),
-  type:              z.string().min(1, "Stop type is required"),
-  address:           z.string().optional(),
-  latitude:          z.string().optional(),
-  longitude:         z.string().optional(),
-  status:            z.string().default("pending"),
-  eta:               z.string().optional(),
-  actual_arrival:    z.string().optional(),
-  actual_departure:  z.string().optional(),
-  duration_sec:      z.string().optional(),
-  distance_m:        z.string().optional(),
+  name:             z.string().min(1, "Stop name is required"),
+  type:             z.string().min(1, "Stop type is required"),
+  address:          z.string().optional(),
+  latitude:         z.string().optional(),
+  longitude:        z.string().optional(),
+  status:           z.string(),           // ← was z.string().default("pending")
+  eta:              z.string().optional(),
+  actual_arrival:   z.string().optional(),
+  actual_departure: z.string().optional(),
+  duration_sec:     z.string().optional(),
+  distance_m:       z.string().optional(),
 });
 
 const schema = z.object({
-  // ── Shipment-level fields ─────────────────────────────────────────────────
-  reference:    z.string().min(1, "Shipment reference is required"),
-  description:  z.string().optional(),
-  driver:       z.string().optional(),
-  vehicle:      z.string().optional(),
-  // ── Stops ─────────────────────────────────────────────────────────────────
-  stops: z.array(stopSchema).min(1, "Add at least one stop"),
+  reference:   z.string().min(1, "Shipment reference is required"),
+  description: z.string().optional(),
+  driver:      z.string().optional(),
+  vehicle:     z.string().optional(),
+  stops:       z.array(stopSchema).min(1, "Add at least one stop"),
 });
 
 type FormValues    = z.infer<typeof schema>;
 type StopFormValue = z.infer<typeof stopSchema>;
 
-// ── Empty stop factory ────────────────────────────────────────────────────────
+// ── Empty stop factory ─────────────────────────────────────────────────────────
+// ✅ status: "pending" lives here — not in the schema's .default()
 const emptyStop = (): StopFormValue => ({
   name:             "",
   type:             "delivery",
@@ -100,7 +101,9 @@ const emptyStop = (): StopFormValue => ({
 });
 
 // ── Address geocoding helper ───────────────────────────────────────────────────
-async function geocodeAddress(address: string): Promise<{ lat: string; lng: string } | null> {
+async function geocodeAddress(
+  address: string
+): Promise<{ lat: string; lng: string } | null> {
   try {
     const res  = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`
@@ -127,14 +130,14 @@ function StopTypeBadge({ type }: { type: string }) {
 
 // ── Single stop card ───────────────────────────────────────────────────────────
 interface StopCardProps {
-  index:         number;
-  total:         number;
-  form:          any;
-  onRemove:      (i: number) => void;
-  onMoveUp:      (i: number) => void;
-  onMoveDown:    (i: number) => void;
-  onGeocode:     (i: number) => void;
-  geocoding:     boolean;
+  index:      number;
+  total:      number;
+  form:       any;
+  onRemove:   (i: number) => void;
+  onMoveUp:   (i: number) => void;
+  onMoveDown: (i: number) => void;
+  onGeocode:  (i: number) => void;
+  geocoding:  boolean;
 }
 
 function StopCard({
@@ -148,7 +151,6 @@ function StopCard({
       {/* Card header */}
       <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border-b border-[#D4D8EA] dark:border-[#2E4066]">
         <div className="flex items-center gap-3">
-          {/* Sequence number */}
           <div className="w-7 h-7 rounded-full bg-[#5871A7] text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
             {index + 1}
           </div>
@@ -159,24 +161,19 @@ function StopCard({
             </span>
           </div>
         </div>
-
-        {/* Card controls */}
         <div className="flex items-center gap-1">
           <button type="button" onClick={() => onMoveUp(index)}
             disabled={index === 0}
-            title="Move up"
             className="w-7 h-7 rounded flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
             <ChevronUp size={14} />
           </button>
           <button type="button" onClick={() => onMoveDown(index)}
             disabled={index === total - 1}
-            title="Move down"
             className="w-7 h-7 rounded flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
             <ChevronDown size={14} />
           </button>
           <button type="button" onClick={() => onRemove(index)}
             disabled={total <= 1}
-            title="Remove stop"
             className="w-7 h-7 rounded flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors ml-1">
             <Trash2 size={13} />
           </button>
@@ -203,7 +200,9 @@ function StopCard({
             <FormItem>
               <FormLabel>Type *</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl><SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger></FormControl>
+                <FormControl>
+                  <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+                </FormControl>
                 <SelectContent>
                   {STOP_TYPES.map((t) => (
                     <SelectItem key={t.value} value={t.value}>
@@ -219,8 +218,10 @@ function StopCard({
           <FormField name={`stops.${index}.status`} control={form.control} render={({ field }) => (
             <FormItem>
               <FormLabel>Status</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+              <Select onValueChange={field.onChange} value={field.value || "pending"}>
+                <FormControl>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                </FormControl>
                 <SelectContent>
                   {STOP_STATUSES.map((s) => (
                     <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
@@ -270,11 +271,7 @@ function StopCard({
             <FormItem>
               <FormLabel>Latitude</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="e.g. 51.50740"
-                  className="font-mono text-sm"
-                  {...field}
-                />
+                <Input placeholder="e.g. 51.50740" className="font-mono text-sm" {...field} />
               </FormControl>
             </FormItem>
           )} />
@@ -282,23 +279,18 @@ function StopCard({
             <FormItem>
               <FormLabel>Longitude</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="e.g. -0.12782"
-                  className="font-mono text-sm"
-                  {...field}
-                />
+                <Input placeholder="e.g. -0.12782" className="font-mono text-sm" {...field} />
               </FormControl>
             </FormItem>
           )} />
         </div>
 
-        {/* Row 4 — ETA + times */}
+        {/* Row 4 — ETA + arrival + departure */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormField name={`stops.${index}.eta`} control={form.control} render={({ field }) => (
             <FormItem>
               <FormLabel className="flex items-center gap-1.5">
-                <Clock size={13} className="text-[#5871A7]" />
-                ETA
+                <Clock size={13} className="text-[#5871A7]" /> ETA
               </FormLabel>
               <FormControl>
                 <Input type="datetime-local" className="dark:[color-scheme:dark]" {...field} />
@@ -308,8 +300,7 @@ function StopCard({
           <FormField name={`stops.${index}.actual_arrival`} control={form.control} render={({ field }) => (
             <FormItem>
               <FormLabel className="flex items-center gap-1.5">
-                <Navigation size={13} className="text-green-500" />
-                Actual Arrival
+                <Navigation size={13} className="text-green-500" /> Actual Arrival
               </FormLabel>
               <FormControl>
                 <Input type="datetime-local" className="dark:[color-scheme:dark]" {...field} />
@@ -335,12 +326,7 @@ function StopCard({
             <FormItem>
               <FormLabel>Duration at Stop (seconds)</FormLabel>
               <FormControl>
-                <Input
-                  type="number"
-                  min="0"
-                  placeholder="e.g. 900 (= 15 min)"
-                  {...field}
-                />
+                <Input type="number" min="0" placeholder="e.g. 900 (= 15 min)" {...field} />
               </FormControl>
               {field.value && (
                 <FormDescription>
@@ -353,12 +339,7 @@ function StopCard({
             <FormItem>
               <FormLabel>Distance to Next Stop (metres)</FormLabel>
               <FormControl>
-                <Input
-                  type="number"
-                  min="0"
-                  placeholder="e.g. 5000 (= 5 km)"
-                  {...field}
-                />
+                <Input type="number" min="0" placeholder="e.g. 5000 (= 5 km)" {...field} />
               </FormControl>
               {field.value && (
                 <FormDescription>
@@ -434,7 +415,8 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
       description: "",
       driver:      "",
       vehicle:     "",
-      stops:       [emptyStop()],
+      // ✅ status: "pending" is set here in emptyStop() — not in the schema
+      stops: [emptyStop()],
     },
   });
 
@@ -443,7 +425,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
     name:    "stops",
   });
 
-  // ── Geocode a single stop ─────────────────────────────────────────────────
+  // ── Geocode a single stop ──────────────────────────────────────────────────
   const handleGeocode = useCallback(async (index: number) => {
     const address = form.getValues(`stops.${index}.address`);
     if (!address) { toast.error("Enter an address first."); return; }
@@ -461,9 +443,9 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
     }
   }, [form]);
 
-  // ── Move stop up / down ───────────────────────────────────────────────────
-  const moveUp   = (i: number) => { if (i > 0)                    move(i, i - 1); };
-  const moveDown = (i: number) => { if (i < fields.length - 1)    move(i, i + 1); };
+  // ── Reorder helpers ────────────────────────────────────────────────────────
+  const moveUp   = (i: number) => { if (i > 0)                  move(i, i - 1); };
+  const moveDown = (i: number) => { if (i < fields.length - 1)  move(i, i + 1); };
 
   // ── Submit ─────────────────────────────────────────────────────────────────
   const onSubmit = async (values: FormValues) => {
@@ -474,19 +456,18 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
           ? `${process.env.NEXT_PUBLIC_API_URL}/logistics/shipments`
           : `${process.env.NEXT_PUBLIC_API_URL}/logistics/shipments/${shipmentId}`;
 
-      // ── Build the stops payload with sequence_order ─────────────────────
       const stopsPayload = values.stops.map((stop, i) => ({
         name:             stop.name,
         type:             stop.type,
         address:          stop.address          || null,
-        latitude:         stop.latitude         ? Number(stop.latitude)         : null,
-        longitude:        stop.longitude        ? Number(stop.longitude)        : null,
+        latitude:         stop.latitude         ? Number(stop.latitude)     : null,
+        longitude:        stop.longitude        ? Number(stop.longitude)    : null,
         status:           stop.status           || "pending",
         eta:              stop.eta              || null,
         actual_arrival:   stop.actual_arrival   || null,
         actual_departure: stop.actual_departure || null,
-        duration_sec:     stop.duration_sec     ? Number(stop.duration_sec)     : null,
-        distance_m:       stop.distance_m       ? Number(stop.distance_m)       : null,
+        duration_sec:     stop.duration_sec     ? Number(stop.duration_sec) : null,
+        distance_m:       stop.distance_m       ? Number(stop.distance_m)   : null,
         sequence_order:   i + 1,
       }));
 
@@ -521,7 +502,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
     }
   };
 
-  // ── Confirmation ────────────────────────────────────────────────────────────
+  // ── Confirmation screen ────────────────────────────────────────────────────
   if (confirmed && savedId) {
     return (
       <div className="lg:w-[85%]">
@@ -538,7 +519,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
     );
   }
 
-  // ── Main render ─────────────────────────────────────────────────────────────
+  // ── Main render ────────────────────────────────────────────────────────────
   return (
     <div className="lg:w-[85%] space-y-6">
 
@@ -547,7 +528,10 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
         <div>
           <h1 className="text-3xl font-semibold flex items-center gap-2.5">
             <Package className="text-[#5871A7]" size={28} />
-            {mode === "add" ? "New Shipment" : `Edit Shipment — SHP-${String(shipmentId).padStart(6, "0")}`}
+            {mode === "add"
+              ? "New Shipment"
+              : `Edit Shipment — SHP-${String(shipmentId).padStart(6, "0")}`
+            }
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             {mode === "add"
@@ -629,17 +613,14 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
                 </h2>
                 <p className="text-sm text-gray-500 mt-0.5">
                   Add stops in order — use the arrows to reorder them.
-                  Sequence order is set automatically on save.
                 </p>
               </div>
-
-              {/* Stop count badge */}
               <span className="text-xs font-semibold bg-[#5871A7]/10 text-[#5871A7] px-3 py-1.5 rounded-full">
                 {fields.length} stop{fields.length !== 1 ? "s" : ""}
               </span>
             </div>
 
-            {/* Validation error for stops array */}
+            {/* Array-level validation error */}
             {form.formState.errors.stops?.root && (
               <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 px-4 py-2.5 text-sm text-red-600 dark:text-red-400">
                 <AlertTriangle size={14} />
@@ -647,7 +628,6 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
               </div>
             )}
 
-            {/* Stop cards */}
             <div className="space-y-4">
               {fields.map((field, index) => (
                 <StopCard
@@ -664,10 +644,11 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
               ))}
             </div>
 
-            {/* Add stop button */}
+            {/* Add stop */}
             <Button
               type="button"
               variant="outline"
+              // ✅ append uses emptyStop() which supplies status: "pending" explicitly
               onClick={() => append(emptyStop())}
               className="w-full border-dashed border-[#5871A7] text-[#5871A7] hover:bg-[#5871A7]/10"
             >
@@ -703,13 +684,15 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
                   })}
                 </div>
 
-                {/* Total distance if filled in */}
+                {/* Total distance */}
                 {(() => {
-                  const total = form.getValues("stops")
+                  const total = form
+                    .getValues("stops")
                     .reduce((sum, s) => sum + (Number(s.distance_m) || 0), 0);
                   return total > 0 ? (
                     <p className="text-xs text-gray-400 mt-3 pt-3 border-t border-[#D4D8EA] dark:border-[#2E4066]">
-                      Total route distance: <strong>{(total / 1000).toFixed(1)} km</strong>
+                      Total route distance:{" "}
+                      <strong>{(total / 1000).toFixed(1)} km</strong>
                     </p>
                   ) : null;
                 })()}
