@@ -26,6 +26,7 @@ import {
   ChartPie,
   Package,
   Route,
+  Truck,
 } from "lucide-react";
 import Image from "next/image";
 import LinkComponent from "./LinkComponent";
@@ -187,7 +188,7 @@ const DashboardSidebar = ({
     { href: "/logistics/transportmap/fleet", label: "Fleet Tracking", icon: Globe, degree: 0 },
     { href: "/logistics/shipments", label: "Vehicle Routes", icon: Route, degree: 0 },
     { href: "/logistics/shipments/add", label: "Add Shipment", icon: Link2, degree: 0 },
-    { href: "/logistics/vehicles", label: "My Vehicles", icon: Menu, degree: 0 },
+    { href: "/logistics/vehicles", label: "My Vehicles", icon: Truck, degree: 0 },
     // { href: "/admin/ins-policy/new", label: "New Policy Admin", icon: Award, degree: 0 },
     // { href: "/admin/ins-claim/new", label: "New Claim Admin", icon: Trophy, degree: 0 },
   ];
