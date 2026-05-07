@@ -1,4 +1,4 @@
-// admin/shipment/edit/[shipmentId]/page.tsx
+// logistics/shipment/edit/[shipmentId]/page.tsx
 "use client";
 
 import { use } from "react";
@@ -8,7 +8,7 @@ interface PageProps {
   params: Promise<{ shipmentId: string }>;
 }
 
-export default function LogisticsShipmentPage({ params }: PageProps) {
+export default function LogisticsShipmentFormPage({ params }: PageProps) {
   const { shipmentId } = use(params);
 
   if (!shipmentId || shipmentId.trim() === "") {
