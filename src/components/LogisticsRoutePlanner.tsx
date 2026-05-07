@@ -10,6 +10,9 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -44,49 +47,67 @@ interface Route {
   polyline?: string;
 }
 
-export default function LogisticsRoutePlanner({ shipmentId }: { shipmentId: string | number }) {
+interface LogisticsRoutePlannerProps {
+  shipmentId: string | number;
+}
+
+function isValidCoord(lat: any, lng: any): boolean {
+  const la = Number(lat);
+  const ln = Number(lng);
+  return (
+    lat != null && lng != null &&
+    !isNaN(la) && !isNaN(ln) &&
+    la >= -90 && la <= 90 &&
+    ln >= -180 && ln <= 180
+  );
+}
+
+export default function LogisticsRoutePlanner({ shipmentId }: LogisticsRoutePlannerProps) {
 
   const [stops, setStops] = useState<Stop[]>([]);
   const [route, setRoute] = useState<Route | null>(null);
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [selectedVehicleId, setSelectedVehicleId] = useState<any>("all");
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
-
   const stopMarkersRef = useRef<any[]>([]);
   const vehicleMarkersRef = useRef<Map<any, any>>(new Map());
   const etaLinesRef = useRef<Map<any, any>>(new Map());
   const polylineRef = useRef<any>(null);
+  const infoWindowRef = useRef<any>(null);
 
-  // ── Helpers ─────────────────────────────────────
-  const isValidCoord = (lat: any, lng: any) =>
-    lat != null && lng != null && !isNaN(Number(lat)) && !isNaN(Number(lng));
+  const [loading, setLoading] = useState(true);
 
-  // ── Fetch data ─────────────────────────────────
+  // ── Fetch stops + route ─────────────────────────────
   const fetchData = useCallback(async () => {
-    try {
-      const [s, r] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/planner/${shipmentId}`),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/fleet/route/${shipmentId}`)
-      ]);
+    setLoading(true);
+    const [sRes, rRes] = await Promise.all([
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/planner/${shipmentId}`),
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/fleet/route/${shipmentId}`)
+    ]);
 
-      setStops(await s.json());
-      setRoute(await r.json());
-    } catch {
-      setError("Failed to load");
-    } finally {
-      setLoading(false);
-    }
+    const sData = await sRes.json();
+    const rData = await rRes.json();
+
+    setStops(Array.isArray(sData) ? sData : sData.stops ?? []);
+    setRoute(rData);
+    setLoading(false);
   }, [shipmentId]);
 
+  // ── Fetch vehicles ─────────────────────────────
   const fetchVehicles = useCallback(async () => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/fleet/live`);
     const data = await res.json();
-    setVehicles(data);
+    const raw = Array.isArray(data) ? data : data.vehicles ?? [];
+
+    setVehicles(
+      raw.map((v: any) => ({
+        ...v,
+        lat: Number(v.lat),
+        lng: Number(v.lng),
+      }))
+    );
   }, []);
 
   useEffect(() => {
@@ -94,21 +115,50 @@ export default function LogisticsRoutePlanner({ shipmentId }: { shipmentId: stri
     fetchVehicles();
     const i = setInterval(fetchVehicles, 5000);
     return () => clearInterval(i);
-  }, []);
+  }, [fetchData, fetchVehicles]);
 
-  // ── ETA path ───────────────────────────────────
+  // ── Info windows ─────────────────────────────
+  const openInfo = (map: any, marker: any, content: string) => {
+    if (infoWindowRef.current) infoWindowRef.current.close();
+
+    const iw = new window.google.maps.InfoWindow({ content });
+    iw.open(map, marker);
+    infoWindowRef.current = iw;
+  };
+
+  const stopCard = (s: Stop) => `
+    <div style="font-family:sans-serif;max-width:220px">
+      <strong>${s.name || s.label || "Stop"}</strong><br/>
+      ${s.address || ""}
+      ${s.eta ? `<br/>ETA: ${s.eta}` : ""}
+      <br/>
+      <a href="https://www.google.com/maps?q=${s.latitude},${s.longitude}" target="_blank">
+        Open in Maps
+      </a>
+    </div>
+  `;
+
+  const vehicleCard = (v: any) => `
+    <div style="font-family:sans-serif">
+      <strong>Vehicle ${v.vehicle_id}</strong><br/>
+      ${v.driver || ""}
+      <br/>Speed: ${v.speed || 0}
+      <br/>Status: ${v.status || ""}
+      <br/>
+      ${v.last_seen ? new Date(v.last_seen).toLocaleTimeString() : ""}
+    </div>
+  `;
+
+  // ── ETA path ─────────────────────────────
   const buildEtaPath = (v: any) => {
     if (!stops.length) return [];
-
-    const vehiclePos = { lat: Number(v.lat), lng: Number(v.lng) };
-
     let closest = 0;
     let min = Infinity;
 
     stops.forEach((s, i) => {
       if (!isValidCoord(s.latitude, s.longitude)) return;
-      const dx = Number(s.latitude) - vehiclePos.lat;
-      const dy = Number(s.longitude) - vehiclePos.lng;
+      const dx = Number(s.latitude) - v.lat;
+      const dy = Number(s.longitude) - v.lng;
       const d = dx * dx + dy * dy;
       if (d < min) {
         min = d;
@@ -117,128 +167,112 @@ export default function LogisticsRoutePlanner({ shipmentId }: { shipmentId: stri
     });
 
     return [
-      vehiclePos,
-      ...stops.slice(closest)
-        .filter(s => isValidCoord(s.latitude, s.longitude))
-        .map(s => ({
-          lat: Number(s.latitude),
-          lng: Number(s.longitude)
-        }))
+      { lat: v.lat, lng: v.lng },
+      ...stops.slice(closest).map(s => ({
+        lat: Number(s.latitude),
+        lng: Number(s.longitude)
+      }))
     ];
   };
 
-  // ── Map init ───────────────────────────────────
+  // ── Map init/update ─────────────────────────────
   const initMap = useCallback(async () => {
+    if (!mapRef.current) return;
 
     if (!window.google) {
       await new Promise<void>((resolve) => {
-        const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_MAPS_API_KEY}`;
-        script.onload = () => resolve();
-        document.body.appendChild(script);
+        const s = document.createElement("script");
+        s.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_MAPS_API_KEY}`;
+        s.onload = () => resolve();
+        document.body.appendChild(s);
       });
     }
 
     if (!mapInstanceRef.current) {
       mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
-        center: { lat: 51.5, lng: -0.09 },
-        zoom: 12
+        center: { lat: 51.5, lng: -0.1 },
+        zoom: 13,
       });
     }
 
     const map = mapInstanceRef.current;
 
-    // ── Clear stops ─────────────────────────────
-    stopMarkersRef.current.forEach(m => m.setMap(null));
+    // clear stops
+    stopMarkersRef.current.forEach((m: any) => m.setMap(null));
     stopMarkersRef.current = [];
 
-    // ── Draw stops ─────────────────────────────
+    // draw stops
     stops.forEach((s) => {
       if (!isValidCoord(s.latitude, s.longitude)) return;
 
-      const m = new window.google.maps.Marker({
+      const marker = new window.google.maps.Marker({
         position: {
           lat: Number(s.latitude),
-          lng: Number(s.longitude)
+          lng: Number(s.longitude),
         },
-        map
+        map,
       });
 
-      stopMarkersRef.current.push(m);
+      marker.addListener("click", () =>
+        openInfo(map, marker, stopCard(s))
+      );
+
+      stopMarkersRef.current.push(marker);
     });
 
-    // ── Draw route ─────────────────────────────
+    // route line
     if (route?.polyline) {
+      const path = polyline.decode(route.polyline)
+        .map(([lat, lng]) => ({ lat, lng }));
+
       if (polylineRef.current) polylineRef.current.setMap(null);
 
       polylineRef.current = new window.google.maps.Polyline({
-        path: polyline.decode(route.polyline).map(([lat, lng]) => ({ lat, lng })),
+        path,
         map,
-        strokeColor: "#5871A7"
+        strokeColor: "#5871A7",
       });
     }
 
-    // ── Filter vehicles ─────────────────────────
+    // vehicles
     const visible = selectedVehicleId === "all"
       ? vehicles
-      : vehicles.filter(v => v.vehicle_id == selectedVehicleId);
+      : vehicles.filter(v => String(v.vehicle_id) === String(selectedVehicleId));
 
-    const visibleIds = new Set(visible.map(v => v.vehicle_id));
+    visible.forEach((v) => {
+      const existing = vehicleMarkersRef.current.get(v.vehicle_id);
 
-    // ── Vehicles ───────────────────────────────
-    visible.forEach(v => {
-
-      if (!isValidCoord(v.lat, v.lng)) return;
-
-      const id = v.vehicle_id;
-      let marker = vehicleMarkersRef.current.get(id);
-
-      if (!marker) {
-        marker = new window.google.maps.Marker({
-          position: { lat: Number(v.lat), lng: Number(v.lng) },
-          map,
-          zIndex: 999
-        });
-        vehicleMarkersRef.current.set(id, marker);
+      if (existing) {
+        existing.setPosition({ lat: v.lat, lng: v.lng });
       } else {
-        marker.setPosition({
-          lat: Number(v.lat),
-          lng: Number(v.lng)
+        const marker = new window.google.maps.Marker({
+          position: { lat: v.lat, lng: v.lng },
+          map,
+          zIndex: 999,
         });
+
+        marker.addListener("click", () =>
+          openInfo(map, marker, vehicleCard(v))
+        );
+
+        vehicleMarkersRef.current.set(v.vehicle_id, marker);
       }
 
-      // ETA line
+      // ETA path
       const path = buildEtaPath(v);
-
       if (path.length > 1) {
-        let line = etaLinesRef.current.get(id);
+        const existingLine = etaLinesRef.current.get(v.vehicle_id);
 
-        if (!line) {
-          line = new window.google.maps.Polyline({
-            path,
-            strokeColor: "#10B981",
-            strokeWeight: 4,
-            map
-          });
-          etaLinesRef.current.set(id, line);
+        if (existingLine) {
+          existingLine.setPath(path);
         } else {
-          line.setPath(path);
+          const line = new window.google.maps.Polyline({
+            path,
+            map,
+            strokeColor: "#10B981",
+          });
+          etaLinesRef.current.set(v.vehicle_id, line);
         }
-      }
-    });
-
-    // ── CLEANUP ───────────────────────────────
-    vehicleMarkersRef.current.forEach((marker, id) => {
-      if (!visibleIds.has(id)) {
-        marker.setMap(null);
-        vehicleMarkersRef.current.delete(id);
-      }
-    });
-
-    etaLinesRef.current.forEach((line, id) => {
-      if (!visibleIds.has(id)) {
-        line.setMap(null);
-        etaLinesRef.current.delete(id);
       }
     });
 
@@ -248,16 +282,17 @@ export default function LogisticsRoutePlanner({ shipmentId }: { shipmentId: stri
     if (!loading) initMap();
   }, [loading, initMap]);
 
-  // ── UI ───────────────────────────────────────
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>Loading…</div>;
 
   return (
-    <div>
-
-      {/* FILTER */}
+    <div className="space-y-4">
       <select
         value={selectedVehicleId}
-        onChange={(e) => setSelectedVehicleId(e.target.value)}
+        onChange={(e) =>
+          setSelectedVehicleId(
+            e.target.value === "all" ? "all" : e.target.value
+          )
+        }
       >
         <option value="all">All Vehicles</option>
         {vehicles.map(v => (
@@ -267,9 +302,10 @@ export default function LogisticsRoutePlanner({ shipmentId }: { shipmentId: stri
         ))}
       </select>
 
-      {/* MAP */}
-      <div ref={mapRef} style={{ height: 500 }} />
-
+      <div
+        ref={mapRef}
+        className="w-full h-[500px] rounded-xl"
+      />
     </div>
   );
 }
