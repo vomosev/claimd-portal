@@ -62,16 +62,16 @@ export default function LogisticsShipments() {
             className="
                 flex items-center justify-between
                 p-4 rounded-xl
-                hover:shadow-md transition cursor-pointer
+                hover:shadow-md transition
                 bg-white dark:bg-[#111827]
-            "           
+            "
             >
                 <div className="flex items-center justify-between gap-4 w-full">
 
                     {/* Left side */}
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-center gap-4 min-w-0">
                         <div className="p-2 rounded-lg bg-[#5871A7]/10 flex-shrink-0">
-                            <Package size={18} />
+                            <Package size={18} className="text-[#5871A7]" />
                         </div>
 
                         <div className="min-w-0">
