@@ -1,4 +1,4 @@
-// logistics/shipment/add/page.tsx
+// logistics/shipments/add/page.tsx
 import LogisticsShipmentForm from "@/components/LogisticsShipmentForm";
 
 export default function LogisticsShipmentFormPage() {
