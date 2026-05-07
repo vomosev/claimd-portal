@@ -63,26 +63,30 @@ export default function LogisticsShipments() {
               flex items-center justify-between
               p-4 rounded-xl border
               hover:shadow-md transition cursor-pointer
-            "
-            onClick={() => router.push(`/logistics/transportmap/${s.id}`)}
+            "           
           >
             <div className="flex items-center gap-3">
 
-              <div className="p-2 rounded-lg bg-[#5871A7]/10">
-                <Package size={18} />
-              </div>
+                <div className="p-2 rounded-lg bg-[#5871A7]/10">
+                    <Package size={18} />
+                </div>
 
-              <div>
+                <div>
                 <p className="font-semibold">
-                  Shipment {s.id} • {s.reference} - {s.description}
+                    Shipment {s.id} • {s.reference} - {s.description}
                 </p>
                 <p className="text-xs text-gray-400">
-                  {s.stop_count} stops • {s.status}
+                    {s.stop_count} stops • {s.status}
                 </p>
-              </div>
-            </div>
+                </div>
+                <div onClick={() => router.push(`/logistics/transportmap/${s.id}`)}>
+                    Planner
+                </div>
+                <div onClick={() => router.push(`/logistics/transport/${s.id}`)}>
+                    Map
+                </div>
 
-            <ArrowRight size={16} className="text-gray-400" />
+            </div>
           </div>
         ))}
       </div>
