@@ -1,27 +1,36 @@
-// logistics/vehicle/edit/[vehicleId]/page.tsx
+// logistics/vehicles/edit/[vehicleId]/page.tsx
 "use client";
 
-import { use } from "react";
 import LogisticsVehicleForm from "@/components/LogisticsVehicleForm";
 
 interface PageProps {
-  params: Promise<{ vehicleId: string }>;
+  params: {
+    vehicleId: string;
+  };
 }
 
-export default function LogisticsVehicleFormPage({ params }: PageProps) {
-  const { vehicleId } = use(params);
+export default function LogisticsVehicleFormPage({
+  params,
+}: PageProps) {
 
-  if (!vehicleId || vehicleId.trim() === "") {
+  const vehicleId = Number(params.vehicleId);
+
+  if (!vehicleId || isNaN(vehicleId)) {
     return (
       <div className="p-6 lg:p-8">
-        <p className="text-red-500">Invalid vehicle ID.</p>
+        <p className="text-red-500">
+          Invalid vehicle ID.
+        </p>
       </div>
     );
   }
 
   return (
     <div className="p-6 lg:p-8">
-      <LogisticsVehicleForm mode="edit" vehicleId={Number(vehicleId)} />
+      <LogisticsVehicleForm
+        mode="edit"
+        vehicleId={vehicleId}
+      />
     </div>
   );
 }
