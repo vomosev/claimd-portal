@@ -57,7 +57,7 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
 
   const [stops, setStops] = useState<any[]>([]);
   const [vehicles, setVehicles] = useState<any[]>([]);
-  const [selectedVehicleId, setSelectedVehicleId] = useState<any>("all");
+  const [selectedVehicleId, setSelectedVehicleId] = useState<any>(null);
   const [mapInstance,      setMapInstance]      = useState<any>(null);
 
   const router = useRouter();
@@ -107,7 +107,20 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
     const vData = await vRes.json();
 
     setStops(Array.isArray(sData) ? sData : sData.stops ?? []);
-    setVehicles(Array.isArray(vData) ? vData : vData.vehicles ?? []);
+
+    const fetchedVehicles = Array.isArray(vData)
+      ? vData
+      : vData.vehicles ?? [];
+
+    setVehicles(fetchedVehicles);
+
+    // Auto-select the shipment vehicle
+    if (
+      fetchedVehicles.length > 0 &&
+      (selectedVehicleId === null || selectedVehicleId === "all")
+    ) {
+      setSelectedVehicleId(fetchedVehicles[0].vehicle_id);
+    }
   }, [shipmentId]);
 
   useEffect(() => {
@@ -246,9 +259,11 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
 
     // ── Vehicles ───────────────────────────
     const visibleVehicles =
-      selectedVehicleId === "all"
-        ? vehicles
-        : vehicles.filter(v => String(v.vehicle_id) === String(selectedVehicleId));
+      selectedVehicleId
+        ? vehicles.filter(
+            v => String(v.vehicle_id) === String(selectedVehicleId)
+          )
+        : vehicles;
 
     visibleVehicles.forEach(v => {
 
@@ -287,7 +302,7 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
 
       // ── ROUTE USING DIRECTIONS RENDERER ─────────────
       if (
-        selectedVehicleId !== "all" &&
+        selectedVehicleId &&
         String(selectedVehicleId) === String(v.vehicle_id)
       ) {
 
@@ -416,16 +431,22 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
       )}
 
       <select
-        value={selectedVehicleId}
+        className="
+          px-3 py-2 rounded-lg border
+          border-gray-200 dark:border-[#2E4066]
+          bg-white dark:bg-[#111827]
+          text-sm
+        "
+        value={selectedVehicleId ?? ""}
         onChange={(e) =>
-          setSelectedVehicleId(
-            e.target.value === "all" ? "all" : e.target.value
-          )
+          setSelectedVehicleId(e.target.value)
         }
       >
-        <option value="all">All Vehicles</option>
         {vehicles.map(v => (
-          <option key={v.vehicle_id} value={v.vehicle_id}>
+          <option
+            key={v.vehicle_id}
+            value={v.vehicle_id}
+          >
             Vehicle {v.vehicle_id}
           </option>
         ))}
