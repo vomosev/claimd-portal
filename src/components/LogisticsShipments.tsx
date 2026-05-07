@@ -65,7 +65,7 @@ export default function LogisticsShipments() {
               hover:shadow-md transition cursor-pointer
             "           
           >
-            <div className="ml-auto flex items-center gap-3">
+            <div className="flex items-center gap-3">
 
                 <div className="p-2 rounded-lg bg-[#5871A7]/10">
                     <Package size={18} />
@@ -78,20 +78,22 @@ export default function LogisticsShipments() {
                     {s.stop_count} stops • {s.status}
                 </p>
                 </div>
-                <button
-                    type="button"
-                    onClick={() => router.push(`/logistics/transport/${s.id}`)}
-                    className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
-                >
-                    Route Planner
-                </button>
-                <button
-                    type="button"
-                    onClick={() => router.push(`/logistics/transportmap/${s.id}`)}
-                    className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
-                >
-                    Shipment Route
-                </button>
+                <div className="ml-auto flex justify-end gap-2">
+                    <button
+                        type="button"
+                        onClick={() => router.push(`/logistics/transport/${s.id}`)}
+                        className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
+                    >
+                        Route Planner
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => router.push(`/logistics/transportmap/${s.id}`)}
+                        className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
+                    >
+                        Shipment Route
+                    </button>
+                </div>
 
             </div>
           </div>
