@@ -1,48 +1,30 @@
-// components/LogisticsRoutePlanner.tsx
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
-import polyline from "@mapbox/polyline";
+import { useEffect, useState, useRef, useCallback } from "react";
 
-// Google Maps typing
 declare global {
-  interface Window { google: any; }
-}
-
-interface Stop {
-  id: string | number;
-  name?: string;
-  label?: string;
-  eta?: string;
-  address?: string;
-  latitude?: number | string | null;
-  longitude?: number | string | null;
+  interface Window { google: any }
 }
 
 export default function LogisticsRoutePlanner({ shipmentId }: any) {
 
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
+  const mapRefInstance = useRef<any>(null);
 
-  const stopMarkersRef = useRef<any[]>([]);
+  const directionsServiceRef = useRef<any>(null);
+  const directionsRendererRef = useRef<any>(null);
+
   const vehicleMarkersRef = useRef<Map<any, any>>(new Map());
-  const directionsRef = useRef<Map<any, any>>(new Map());
-  const trailRef = useRef<Map<any, any[]>>(new Map());
-
+  const stopMarkersRef = useRef<any[]>([]);
   const infoWindowRef = useRef<any>(null);
 
-  const [stops, setStops] = useState<Stop[]>([]);
+  const [stops, setStops] = useState<any[]>([]);
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [selectedVehicleId, setSelectedVehicleId] = useState<any>("all");
 
-  const [loading, setLoading] = useState(true);
-
-  // ── Helpers ─────────────────────────────────────
-  const isValidCoord = (lat: any, lng: any) => {
-    const la = Number(lat);
-    const ln = Number(lng);
-    return !isNaN(la) && !isNaN(ln);
-  };
+  // ── Helpers ─────────────────────────────
+  const isValid = (lat: any, lng: any) =>
+    !isNaN(Number(lat)) && !isNaN(Number(lng));
 
   const openInfo = (map: any, marker: any, html: string) => {
     if (infoWindowRef.current) infoWindowRef.current.close();
@@ -51,26 +33,20 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
     infoWindowRef.current = iw;
   };
 
-  const stopCard = (s: Stop) => `
-    <div>
-      <strong>${s.name || s.label || "Stop"}</strong><br/>
-      ${s.address || ""}
-      ${s.eta ? `<br/>ETA: ${s.eta}` : ""}
-    </div>
-  `;
+  // ── Load Google Maps ─────────────────────
+  const loadMaps = async () => {
+    if (window.google) return;
 
-  const vehicleCard = (v: any) => `
-    <div>
-      <strong>Vehicle ${v.vehicle_id}</strong><br/>
-      Speed: ${v.speed || 0}<br/>
-      Status: ${v.status || ""}
-    </div>
-  `;
+    await new Promise<void>((resolve) => {
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_MAPS_API_KEY}`;
+      script.onload = () => resolve();
+      document.body.appendChild(script);
+    });
+  };
 
-  // ── Fetch data ─────────────────────────────────────
+  // ── Fetch data ───────────────────────────
   const fetchData = useCallback(async () => {
-    setLoading(true);
-
     const [sRes, vRes] = await Promise.all([
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/planner/${shipmentId}`),
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/fleet/live`)
@@ -81,8 +57,6 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
 
     setStops(Array.isArray(sData) ? sData : sData.stops ?? []);
     setVehicles(Array.isArray(vData) ? vData : vData.vehicles ?? []);
-
-    setLoading(false);
   }, [shipmentId]);
 
   useEffect(() => {
@@ -91,34 +65,40 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
     return () => clearInterval(i);
   }, [fetchData]);
 
-  // ── Map init ─────────────────────────────────────
+  // ── Init Map ─────────────────────────────
   const initMap = useCallback(async () => {
+
     if (!mapRef.current) return;
 
-    if (!window.google) {
-      await new Promise<void>((resolve) => {
-        const s = document.createElement("script");
-        s.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_MAPS_API_KEY}`;
-        s.onload = () => resolve();
-        document.body.appendChild(s);
-      });
-    }
+    await loadMaps();
 
-    if (!mapInstanceRef.current) {
-      mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
+    if (!mapRefInstance.current) {
+      mapRefInstance.current = new window.google.maps.Map(mapRef.current, {
         center: { lat: 51.5, lng: -0.1 },
         zoom: 13,
       });
+
+      directionsServiceRef.current = new window.google.maps.DirectionsService();
+
+      directionsRendererRef.current = new window.google.maps.DirectionsRenderer({
+        suppressMarkers: true,
+        polylineOptions: {
+          strokeColor: "#10B981",
+          strokeWeight: 5,
+        }
+      });
+
+      directionsRendererRef.current.setMap(mapRefInstance.current);
     }
 
-    const map = mapInstanceRef.current;
+    const map = mapRefInstance.current;
 
-    // clear stops
+    // ── Clear stop markers ─────────────────
     stopMarkersRef.current.forEach(m => m.setMap(null));
     stopMarkersRef.current = [];
 
-    stops.forEach(s => {
-      if (!isValidCoord(s.latitude, s.longitude)) return;
+    stops.forEach((s) => {
+      if (!isValid(s.latitude, s.longitude)) return;
 
       const marker = new window.google.maps.Marker({
         position: {
@@ -129,13 +109,18 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
       });
 
       marker.addListener("click", () =>
-        openInfo(map, marker, stopCard(s))
+        openInfo(map, marker, `
+          <div>
+            <strong>${s.name || "Stop"}</strong><br/>
+            ${s.address || ""}
+          </div>
+        `)
       );
 
       stopMarkersRef.current.push(marker);
     });
 
-    // ── Vehicles ─────────────────────────────
+    // ── Vehicles ───────────────────────────
     const visibleVehicles =
       selectedVehicleId === "all"
         ? vehicles
@@ -143,16 +128,14 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
 
     visibleVehicles.forEach(v => {
 
-      const id = v.vehicle_id;
-
       const pos = {
         lat: Number(v.lat),
         lng: Number(v.lng),
       };
 
-      if (!isValidCoord(pos.lat, pos.lng)) return;
+      if (!isValid(pos.lat, pos.lng)) return;
 
-      let marker = vehicleMarkersRef.current.get(id);
+      let marker = vehicleMarkersRef.current.get(v.vehicle_id);
 
       if (!marker) {
         marker = new window.google.maps.Marker({
@@ -162,85 +145,70 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
         });
 
         marker.addListener("click", () =>
-          openInfo(map, marker, vehicleCard(v))
+          openInfo(map, marker, `
+            <div>
+              <strong>Vehicle ${v.vehicle_id}</strong><br/>
+              Speed: ${v.speed || 0}<br/>
+              Status: ${v.status || ""}
+            </div>
+          `)
         );
 
-        vehicleMarkersRef.current.set(id, marker);
+        vehicleMarkersRef.current.set(v.vehicle_id, marker);
       } else {
         marker.setPosition(pos);
       }
 
-      // ── Breadcrumb trail ───────────────────
-      const trail = trailRef.current.get(id) || [];
-      trail.push(pos);
-      if (trail.length > 30) trail.shift();
-      trailRef.current.set(id, trail);
+      // ── ROUTE USING DIRECTIONS RENDERER ─────────────
+      if (
+        selectedVehicleId !== "all" &&
+        String(selectedVehicleId) === String(v.vehicle_id)
+      ) {
 
-      new window.google.maps.Polyline({
-        path: trail,
-        strokeColor: "#3b82f6",
-        strokeOpacity: 0.5,
-        strokeWeight: 3,
-        map,
-      });
+        const validStops = stops.filter(s =>
+          isValid(s.latitude, s.longitude)
+        );
 
-      // ── Directions (ONLY for selected vehicle) ─────────
-      if (selectedVehicleId !== "all" && String(selectedVehicleId) === String(id)) {
+        if (validStops.length < 1) return;
 
-        const directionsService = new window.google.maps.DirectionsService();
-
-        const waypoints = stops
-          .filter(s => isValidCoord(s.latitude, s.longitude))
-          .map(s => ({
-            location: {
-              lat: Number(s.latitude),
-              lng: Number(s.longitude),
-            },
-            stopover: true,
-          }));
-
-        if (waypoints.length === 0) return;
-
-        const request = {
-          origin: pos,
-          destination: waypoints[waypoints.length - 1].location,
-          waypoints: waypoints.slice(0, -1),
-          travelMode: window.google.maps.TravelMode.DRIVING,
-          drivingOptions: {
-            departureTime: new Date(),
-            trafficModel: "bestguess",
+        const waypoints = validStops.slice(0, -1).map(s => ({
+          location: {
+            lat: Number(s.latitude),
+            lng: Number(s.longitude),
           },
-        };
+          stopover: true,
+        }));
 
-        directionsService.route(request, (result: any, status: any) => {
-          if (status !== "OK") return;
-
-          const existing = directionsRef.current.get(id);
-          if (existing) existing.setMap(null);
-
-          const renderer = new window.google.maps.DirectionsRenderer({
-            directions: result,
-            suppressMarkers: true,
-            polylineOptions: {
-              strokeColor: "#10B981",
-              strokeWeight: 5,
+        directionsServiceRef.current.route(
+          {
+            origin: pos,
+            destination: {
+              lat: Number(validStops[validStops.length - 1].latitude),
+              lng: Number(validStops[validStops.length - 1].longitude),
             },
-            map,
-          });
-
-          directionsRef.current.set(id, renderer);
-        });
+            waypoints,
+            travelMode: window.google.maps.TravelMode.DRIVING,
+            drivingOptions: {
+              departureTime: new Date(),
+              trafficModel: "bestguess",
+            },
+          },
+          (result: any, status: any) => {
+            if (status === "OK") {
+              directionsRendererRef.current.setDirections(result);
+            }
+          }
+        );
       }
     });
 
   }, [stops, vehicles, selectedVehicleId]);
 
   useEffect(() => {
-    if (!loading) initMap();
-  }, [loading, initMap]);
+    initMap();
+  }, [initMap]);
 
-  if (loading) return <div>Loading…</div>;
-
+  // ── UI ──────────────────────────────────
   return (
     <div className="space-y-4">
 
@@ -260,7 +228,10 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
         ))}
       </select>
 
-      <div ref={mapRef} className="w-full h-[500px]" />
+      <div
+        ref={mapRef}
+        className="w-full h-[500px]"
+      />
 
     </div>
   );
