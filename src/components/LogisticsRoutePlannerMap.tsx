@@ -226,6 +226,39 @@ export default function LogisticsRoutePlanner({
   const polylineRef     = useRef<any | null>(null);
   const infoWindowRef   = useRef<any | null>(null);
 
+  const [vehicles, setVehicles] = useState<any[]>([]);
+  const vehicleMarkersRef = useRef<Map<string | number, any>>(new Map());
+
+  const fetchVehicles = useCallback(async () => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/fleet/live`
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = await res.json();
+      const raw: any[] = Array.isArray(data) ? data : data.vehicles ?? [];
+
+      const list = raw
+        .map((v) => ({
+          ...v,
+          lat: Number(v.lat),
+          lng: Number(v.lng),
+        }))
+        .filter((v) => !isNaN(v.lat) && !isNaN(v.lng));
+
+      setVehicles(list);
+    } catch (err) {
+      console.error("[RoutePlanner] vehicle fetch error:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchVehicles();
+    const interval = setInterval(fetchVehicles, 5000);
+    return () => clearInterval(interval);
+  }, [fetchVehicles]);
+
   // ── Sensors ──────────────────────────────────────────────────────────────────
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -300,6 +333,27 @@ export default function LogisticsRoutePlanner({
     },
     []
   );
+
+  const getVehicleIcon = () => {
+    const truckSvg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+        <circle cx="18" cy="18" r="18" fill="#5871A7"/>
+        <svg x="6" y="6" width="24" height="24" viewBox="0 0 24 24"
+          fill="none" stroke="white" stroke-width="2">
+          <rect x="1" y="3" width="15" height="13" rx="1"/>
+          <path d="M16 8h4l3 5v4h-7V8z"/>
+          <circle cx="5.5" cy="18.5" r="2.5"/>
+          <circle cx="18.5" cy="18.5" r="2.5"/>
+        </svg>
+      </svg>
+    `;
+
+    return {
+      url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(truckSvg)}`,
+      scaledSize: new window.google.maps.Size(36, 36),
+      anchor: new window.google.maps.Point(18, 18),
+    };
+  };
 
   // ── 3. Initialise / update Google Map ────────────────────────────────────────
   const initMap = useCallback(async () => {
@@ -428,12 +482,68 @@ export default function LogisticsRoutePlanner({
     if (stops.length > 1) {
       map.fitBounds(bounds, { top: 60, right: 40, bottom: 40, left: 40 });
     }
+
+  // ── VEHICLE LAYER ───────────────────────────────────────────────
+  const vehicleIcon = getVehicleIcon();
+
+  vehicles.forEach((v) => {
+    if (!isValidCoord(v.lat, v.lng)) return;
+
+    const id = v.vehicle_id;
+
+    const existing = vehicleMarkersRef.current.get(id);
+
+    if (existing) {
+      // smooth update
+      existing.setPosition(
+        new window.google.maps.LatLng(Number(v.lat), Number(v.lng))
+      );
+    } else {
+      const marker = new window.google.maps.Marker({
+        position: {
+          lat: Number(v.lat),
+          lng: Number(v.lng),
+        },
+        map,
+        icon: vehicleIcon,
+        zIndex: 999, // 🔥 ABOVE stops
+        title: `Vehicle ${id}`,
+      });
+
+      marker.addListener("click", () => {
+        const info = new window.google.maps.InfoWindow({
+          content: `
+            <div style="font-size:13px">
+              <strong>Vehicle ${id}</strong><br/>
+              Speed: ${v.speed || 0}<br/>
+              Status: ${v.status || "active"}
+            </div>
+          `,
+        });
+
+        info.open(map, marker);
+      });
+
+      vehicleMarkersRef.current.set(id, marker);
+    }
+  });
+
+  // remove stale vehicles
+  const activeIds = new Set(vehicles.map((v) => v.vehicle_id));
+
+  vehicleMarkersRef.current.forEach((marker, id) => {
+    if (!activeIds.has(id)) {
+      marker.setMap(null);
+      vehicleMarkersRef.current.delete(id);
+    }
+  });
+
   }, [stops, route, createInfoContent]);
 
   // Re-draw the map whenever data changes
   useEffect(() => {
     if (!loading && !error) initMap();
-  }, [loading, error, initMap]);
+  }, [loading, error, initMap, vehicles]);
 
   // ── 4. Cleanup on unmount ────────────────────────────────────────────────────
   useEffect(() => {

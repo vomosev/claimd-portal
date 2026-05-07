@@ -80,7 +80,7 @@ export default function LogisticsFleetMap() {
           headers: { "Content-Type": "application/json" },
           body:    JSON.stringify({
             vehicleId:  1,         // 🔥 replace with dynamic driver id
-            shipmentId: 1001,      // 🔥 replace with dynamic shipment id
+            shipmentId: 1,      // 🔥 replace with dynamic shipment id
             latitude:   coords.lat,
             longitude:  coords.lng,
             speed:      coords.speed   || 0,
