@@ -18,6 +18,8 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
   const stopMarkersRef = useRef<any[]>([]);
   const infoWindowRef = useRef<any>(null);
 
+  const lastRouteRequestRef = useRef<number>(0);
+
   const [stops, setStops] = useState<any[]>([]);
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [selectedVehicleId, setSelectedVehicleId] = useState<any>("all");
@@ -25,6 +27,12 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
   // ── Helpers ─────────────────────────────
   const isValid = (lat: any, lng: any) =>
     !isNaN(Number(lat)) && !isNaN(Number(lng));
+
+  const distance = (a: any, b: any) => {
+    const dx = a.lat - b.lat;
+    const dy = a.lng - b.lng;
+    return dx * dx + dy * dy;
+  };
 
   const openInfo = (map: any, marker: any, html: string) => {
     if (infoWindowRef.current) infoWindowRef.current.close();
@@ -65,6 +73,61 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
     return () => clearInterval(i);
   }, [fetchData]);
 
+  // ── Auto reorder stops (cheap optimisation) ─────────────
+  const reorderStops = (vehicle: any, stops: any[]) => {
+    const remaining = [...stops];
+    const ordered: any[] = [];
+
+    let current = { lat: Number(vehicle.lat), lng: Number(vehicle.lng) };
+
+    while (remaining.length) {
+      let nearestIndex = 0;
+      let min = Infinity;
+
+      remaining.forEach((s, i) => {
+        if (!isValid(s.latitude, s.longitude)) return;
+        const d = distance(current, {
+          lat: Number(s.latitude),
+          lng: Number(s.longitude),
+        });
+        if (d < min) {
+          min = d;
+          nearestIndex = i;
+        }
+      });
+
+      const next = remaining.splice(nearestIndex, 1)[0];
+      ordered.push(next);
+      current = {
+        lat: Number(next.latitude),
+        lng: Number(next.longitude),
+      };
+    }
+
+    return ordered;
+  };
+
+  // ── Smooth animation ─────────────────────
+  const animateMarker = (marker: any, newPos: any) => {
+    const start = marker.getPosition();
+    const startTime = performance.now();
+
+    const duration = 800;
+
+    const animate = (time: number) => {
+      const progress = Math.min((time - startTime) / duration, 1);
+
+      const lat = start.lat() + (newPos.lat - start.lat()) * progress;
+      const lng = start.lng() + (newPos.lng - start.lng()) * progress;
+
+      marker.setPosition({ lat, lng });
+
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+
+    requestAnimationFrame(animate);
+  };
+
   // ── Init Map ─────────────────────────────
   const initMap = useCallback(async () => {
 
@@ -97,22 +160,45 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
     stopMarkersRef.current.forEach(m => m.setMap(null));
     stopMarkersRef.current = [];
 
-    stops.forEach((s) => {
-      if (!isValid(s.latitude, s.longitude)) return;
+    const vehicle = vehicles.find(v => String(v.vehicle_id) === String(selectedVehicleId));
+
+    const orderedStops =
+      vehicle && selectedVehicleId !== "all"
+        ? reorderStops(vehicle, stops)
+        : stops;
+
+    // ── Stop markers with status ───────────
+    orderedStops.forEach((s, i) => {
+
+      const pos = {
+        lat: Number(s.latitude),
+        lng: Number(s.longitude),
+      };
+
+      if (!isValid(pos.lat, pos.lng)) return;
+
+      let color = "#3B82F6"; // pending
+      if (i === 0) color = "#F59E0B"; // next
+      if (s.completed) color = "#10B981"; // done
 
       const marker = new window.google.maps.Marker({
-        position: {
-          lat: Number(s.latitude),
-          lng: Number(s.longitude),
-        },
+        position: pos,
         map,
+        icon: {
+          path: window.google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: color,
+          fillOpacity: 1,
+          strokeWeight: 1,
+        }
       });
 
       marker.addListener("click", () =>
         openInfo(map, marker, `
           <div>
             <strong>${s.name || "Stop"}</strong><br/>
-            ${s.address || ""}
+            ${s.address || ""}<br/>
+            Status: ${s.completed ? "Completed" : i === 0 ? "Next Stop" : "Pending"}
           </div>
         `)
       );
@@ -121,12 +207,7 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
     });
 
     // ── Vehicles ───────────────────────────
-    const visibleVehicles =
-      selectedVehicleId === "all"
-        ? vehicles
-        : vehicles.filter(v => String(v.vehicle_id) === String(selectedVehicleId));
-
-    visibleVehicles.forEach(v => {
+    vehicles.forEach(v => {
 
       const pos = {
         lat: Number(v.lat),
@@ -144,30 +225,21 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
           zIndex: 999,
         });
 
-        marker.addListener("click", () =>
-          openInfo(map, marker, `
-            <div>
-              <strong>Vehicle ${v.vehicle_id}</strong><br/>
-              Speed: ${v.speed || 0}<br/>
-              Status: ${v.status || ""}
-            </div>
-          `)
-        );
-
         vehicleMarkersRef.current.set(v.vehicle_id, marker);
       } else {
-        marker.setPosition(pos);
+        animateMarker(marker, pos);
       }
 
-      // ── ROUTE USING DIRECTIONS RENDERER ─────────────
-      if (
-        selectedVehicleId !== "all" &&
-        String(selectedVehicleId) === String(v.vehicle_id)
-      ) {
+      // ── Directions (optimised calls) ─────
+      if (selectedVehicleId === v.vehicle_id) {
 
-        const validStops = stops.filter(s =>
-          isValid(s.latitude, s.longitude)
-        );
+        const now = Date.now();
+
+        if (now - lastRouteRequestRef.current < 4000) return; // debounce
+
+        lastRouteRequestRef.current = now;
+
+        const validStops = reorderStops(v, stops);
 
         if (validStops.length < 1) return;
 
@@ -188,6 +260,7 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
             },
             waypoints,
             travelMode: window.google.maps.TravelMode.DRIVING,
+            optimizeWaypoints: true,
             drivingOptions: {
               departureTime: new Date(),
               trafficModel: "bestguess",
@@ -228,10 +301,7 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
         ))}
       </select>
 
-      <div
-        ref={mapRef}
-        className="w-full h-[500px]"
-      />
+      <div ref={mapRef} className="w-full h-[500px]" />
 
     </div>
   );
