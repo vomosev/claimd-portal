@@ -152,10 +152,10 @@ export default function LogisticsShipments() {
                     <div className="flex items-center gap-2 flex-shrink-0">
 
                         <Button
-                                onClick={() => handleGeneratePass(`${currentUsername}`, `${s.id}`)}
-                                className="bg-white" disabled={isGeneratingPass}
+                            onClick={() => handleGeneratePass(`${currentUsername}`, `${s.id}`)}
+                            className="bg-white" disabled={isGeneratingPass}
                             >
-                            <span>
+                            <span className="flex items-center justify-center gap-2">
                             {/* Loading overlay */}
                             {isGeneratingPass && (
                                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
@@ -175,6 +175,10 @@ export default function LogisticsShipments() {
                                 className="inline-block"
                                 />
                             )}
+                            <span>
+                                {/* update the button text */}
+                                {isGenerating ? "Downloading Policy" : "Download Policy"}
+                            </span>
                             </span>
                         </Button>
 
