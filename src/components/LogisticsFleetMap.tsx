@@ -76,8 +76,74 @@ export default function FleetMap() {
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const [coords, setCoords] = useState<{
+    lat: number;
+    lng: number;
+    speed?: number;
+    heading?: number;
+  } | null>(null);
+
+  useEffect(() => {
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        setCoords({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          speed: pos.coords.speed || 0,
+          heading: pos.coords.heading || 0
+        });
+      },
+      (err) => console.error(err),
+      { enableHighAccuracy: true }
+    );
+
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, []);
+
+  // ── Send live vehicle position ──────────────────────────────────────────────
+  const updateVehicles = async () => {
+    try {
+      if (!coords) return; // make sure you have GPS first
+
+      const payload = {
+        vehicleId: 1,        // 🔥 replace with dynamic user/driver ID
+        shipmentId: 1001,    // 🔥 dynamic
+        latitude: coords.lat,
+        longitude: coords.lng,
+        speed: coords.speed || 0,
+        heading: coords.heading || 0
+      };
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/location`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = await res.json();
+
+      // optional: update UI state
+      setLastUpdated(new Date());
+      setOnline(true);
+      setError(null);
+
+    } catch (err) {
+      console.error("[FleetMap] location POST error:", err);
+      setOnline(false);
+      setError("Could not send location update.");
+    }
+  };
+
   // ── Fetch live vehicle positions ──────────────────────────────────────────
   const fetchVehicles = async () => {
+    await updateVehicles();
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/fleet/live`
@@ -108,51 +174,51 @@ export default function FleetMap() {
     }
   };
 
-  useEffect(() => {
-    const ws = new WebSocket("ws://nodejs.gridiron-app.com:8080");
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-
-      if (data.type === "location_update") {
-        setVehicles((prev) => {
-          const existing = prev.find(v => v.vehicle_id === data.vehicleId);
-
-          if (existing) {
-            return prev.map(v =>
-              v.vehicle_id === data.vehicleId
-                ? { ...v, lat: data.latitude, lng: data.longitude }
-                : v
-            );
-          }
-
-          return [
-            ...prev,
-            {
-              vehicle_id: data.vehicleId,
-              lat: data.latitude,
-              lng: data.longitude
-            }
-          ];
-        });
-      }
-    };
-
-    ws.onerror = () => setOnline(false);
-    ws.onopen  = () => setOnline(true);
-
-    return () => ws.close();
-  }, []);
-
   // useEffect(() => {
-  //   fetchVehicles();
+  //   const ws = new WebSocket("ws://nodejs.gridiron-app.com:8080");
 
-  //   intervalRef.current = setInterval(fetchVehicles, POLL_INTERVAL);
+  //   ws.onmessage = (event) => {
+  //     const data = JSON.parse(event.data);
 
-  //   return () => {
-  //     if (intervalRef.current) clearInterval(intervalRef.current);
+  //     if (data.type === "location_update") {
+  //       setVehicles((prev) => {
+  //         const existing = prev.find(v => v.vehicle_id === data.vehicleId);
+
+  //         if (existing) {
+  //           return prev.map(v =>
+  //             v.vehicle_id === data.vehicleId
+  //               ? { ...v, lat: data.latitude, lng: data.longitude }
+  //               : v
+  //           );
+  //         }
+
+  //         return [
+  //           ...prev,
+  //           {
+  //             vehicle_id: data.vehicleId,
+  //             lat: data.latitude,
+  //             lng: data.longitude
+  //           }
+  //         ];
+  //       });
+  //     }
   //   };
+
+  //   ws.onerror = () => setOnline(false);
+  //   ws.onopen  = () => setOnline(true);
+
+  //   return () => ws.close();
   // }, []);
+
+  useEffect(() => {
+    fetchVehicles();
+
+    intervalRef.current = setInterval(fetchVehicles, POLL_INTERVAL);
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
 
   // ── Map centre — coerce here too as a safety net ───────────────────────────
   const centre: [number, number] = (() => {
