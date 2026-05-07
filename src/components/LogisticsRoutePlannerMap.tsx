@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 declare global {
   interface Window { google: any }
@@ -53,6 +54,8 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [selectedVehicleId, setSelectedVehicleId] = useState<any>("all");
   const [mapInstance,      setMapInstance]      = useState<any>(null);
+
+  const router = useRouter();
 
   // ── Helpers ─────────────────────────────
   const isValid = (lat: any, lng: any) =>
@@ -337,6 +340,19 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
             View Route
           </h2>
         </div>
+        <button
+          type="button"
+          onClick={() => router.push(`/logistics/transportlist/${s.id}`)}
+          disabled={stops.length === 0}
+          className="
+            inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
+            bg-[#5871A7] hover:bg-[#4560A0] text-white
+            disabled:opacity-40 disabled:cursor-not-allowed
+            transition-colors
+          "
+        >
+          Plan Route
+        </button>
         <button
           type="button"
           onClick={handleRecentre}

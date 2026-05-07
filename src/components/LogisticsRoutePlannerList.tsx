@@ -27,6 +27,7 @@ import {
   AlertTriangle, RefreshCw,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 // ── TypeScript declaration for Google Maps on window ──────────────────────────
 declare global {
@@ -225,6 +226,8 @@ export default function LogisticsRoutePlanner({
   const markersRef      = useRef<any[]>([]);
   const polylineRef     = useRef<any | null>(null);
   const infoWindowRef   = useRef<any | null>(null);
+
+  const router = useRouter();
 
   // ── Sensors ──────────────────────────────────────────────────────────────────
   const sensors = useSensors(
@@ -555,6 +558,19 @@ export default function LogisticsRoutePlanner({
               Saving…
             </span>
           )}
+          <button
+            type="button"
+            onClick={() => router.push(`/logistics/transportmap/${shipmentId}`)}
+            disabled={stops.length === 0}
+            className="
+              inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
+              bg-[#5871A7] hover:bg-[#4560A0] text-white
+              disabled:opacity-40 disabled:cursor-not-allowed
+              transition-colors
+            "
+          >
+            View Route
+          </button>
           <button
             type="button"
             onClick={handleRecentre}
