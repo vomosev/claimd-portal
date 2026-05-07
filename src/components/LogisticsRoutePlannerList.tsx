@@ -583,7 +583,7 @@ export default function LogisticsRoutePlanner({
           >
             Re-centre
           </button>
-          <button
+          {/* <button
             type="button"
             onClick={fetchData}
             className="
@@ -595,7 +595,7 @@ export default function LogisticsRoutePlanner({
           >
             <RefreshCw size={13} />
             Refresh
-          </button>
+          </button> */}
         </div>
       </div>
 

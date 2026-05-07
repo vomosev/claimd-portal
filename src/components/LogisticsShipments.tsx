@@ -49,7 +49,7 @@ export default function LogisticsShipments() {
   return (
     <div className="space-y-4">
 
-      <h1 className="text-2xl font-semibold">Shipments</h1>
+      <h1 className="text-2xl font-semibold">Vehicle Routes</h1>
 
       {shipments.length === 0 && (
         <p className="text-gray-400">No shipments found</p>
