@@ -63,7 +63,7 @@ export default function LogisticsShipments() {
               p-4 rounded-xl border
               hover:shadow-md transition cursor-pointer
             "
-            onClick={() => router.push(`/logistics/${s.id}`)}
+            onClick={() => router.push(`/logistics/transportmap/${s.id}`)}
           >
             <div className="flex items-center gap-3">
 
