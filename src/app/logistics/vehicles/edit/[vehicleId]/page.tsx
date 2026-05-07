@@ -1,17 +1,21 @@
-// logistics/vehicles/edit/[vehicleId]/page.tsx
-"use client";
-
+// src/app/logistics/vehicles/edit/[vehicleId]/page.tsx
 import LogisticsVehicleForm from "@/components/LogisticsVehicleForm";
 
-export default function LogisticsVehicleEditPage({
+interface PageProps {
+  params: Promise<{
+    vehicleId: string;
+  }>;
+}
+
+export default async function LogisticsVehicleEditPage({
   params,
-}: {
-  params: { vehicleId: string };
-}) {
+}: PageProps) {
 
-  const vehicleId = Number(params.vehicleId);
+  const { vehicleId } = await params;
 
-  if (!vehicleId || isNaN(vehicleId)) {
+  const parsedVehicleId = Number(vehicleId);
+
+  if (!parsedVehicleId || isNaN(parsedVehicleId)) {
     return (
       <div className="p-6 lg:p-8">
         <p className="text-red-500">
@@ -25,7 +29,7 @@ export default function LogisticsVehicleEditPage({
     <div className="p-6 lg:p-8">
       <LogisticsVehicleForm
         mode="edit"
-        vehicleId={vehicleId}
+        vehicleId={parsedVehicleId}
       />
     </div>
   );
