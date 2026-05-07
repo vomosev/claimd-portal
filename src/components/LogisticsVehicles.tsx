@@ -74,7 +74,7 @@ export default function LogisticsVehicles() {
         <div>
           <h1 className="text-xl font-semibold flex items-center gap-2">
             <Truck className="text-[#5871A7]" size={28} />
-            Vehicles
+            My Vehicles
           </h1>
 
           <p className="text-sm text-gray-500 mt-1">
