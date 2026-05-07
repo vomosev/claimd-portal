@@ -542,9 +542,9 @@ export default function LogisticsRoutePlanner({
       {/* ── Section header ──────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+          <h1 className="text-xl font-semibold text-gray-800 dark:text-white">
             Plan Route {shipmentId}
-          </h2>
+          </h1>
           <p className="text-xs text-gray-500 mt-0.5">
             {stops.length} stop{stops.length !== 1 ? "s" : ""}
             {route?.polyline ? " · route loaded" : ""}

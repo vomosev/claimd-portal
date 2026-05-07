@@ -72,7 +72,7 @@ export default function LogisticsVehicles() {
       <div className="flex items-center justify-between flex-wrap gap-3">
 
         <div>
-          <h1 className="text-3xl font-semibold flex items-center gap-2">
+          <h1 className="text-xl font-semibold flex items-center gap-2">
             <Truck className="text-[#5871A7]" size={28} />
             Vehicles
           </h1>
