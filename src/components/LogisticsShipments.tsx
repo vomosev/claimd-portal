@@ -79,11 +79,11 @@ export default function LogisticsShipments() {
                     {s.stop_count} stops • {s.status}
                 </p>
                 </div>
-                <div onClick={() => router.push(`/logistics/transportmap/${s.id}`)}>
-                    Planner
-                </div>
                 <div onClick={() => router.push(`/logistics/transport/${s.id}`)}>
-                    Map
+                    Route Planner
+                </div>
+                <div onClick={() => router.push(`/logistics/transportmap/${s.id}`)}>
+                    Journey Map
                 </div>
 
             </div>
