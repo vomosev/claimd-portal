@@ -150,38 +150,44 @@ export default function LogisticsShipments() {
 
                     {/* Right side */}
                     <div className="flex items-center gap-2 flex-shrink-0">
-              <Button
-                    onClick={() => handleGeneratePass(`${currentUsername}`, `${s.id}`)}
-                    className="md:w-[40%] bg-[#5871A7] hover:bg-[#4560A0] text-white"
-                    disabled={isGeneratingPass}
-                    // className={`rounded-full w-full disabled:opacity-50 disabled:cursor-not-allowed geo-claim-button bg-clgeodrops hover:opacity-60 duration-200 ease-in-out text-white`}
-                  >
-                  <span className="flex items-center justify-center gap-2">
-                  {/* Loading overlay */}
-                  {isGeneratingPass && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
-                      <div className="bg-white rounded-lg p-6 flex flex-col items-center gap-3 shadow-xl">
-                        <br></br>
-                        <br></br>
-                        <h2>Generating your wallet pass...</h2>
-                        <h2>Sending a copy by email</h2>
-                      </div>
-                    </div>
-                  )}
-                  {!isGenerating && (
-                    <img 
-                      src={apiUrl + "/images/Add_to_Apple_Wallet_badge.svg.png"}
-                      alt="Apple" 
-                      style={{ height: '24px', verticalAlign: 'middle' }}
-                      className="inline-block"
-                    />
-                  )}
-                  <span>
-                    {/* update the button text */}
-                    {isGenerating ? "Downloading Policy" : "Download Policy"}
-                  </span>
-                </span>
-              </Button>
+
+                            <span className="flex items-center justify-center gap-2">
+                            {/* Loading overlay */}
+                            {isGeneratingPass && (
+                                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+                                <div className="bg-white rounded-lg p-6 flex flex-col items-center gap-3 shadow-xl">
+                                    <br></br>
+                                    <br></br>
+                                    <h2>Generating your wallet pass...</h2>
+                                    <h2>Sending a copy by email</h2>
+                                </div>
+                                </div>
+                            )}
+                            {!isGenerating && (
+<button
+    type="button"
+    onClick={() =>
+        handleGeneratePass(`${currentUsername}`, `${s.id}`)
+    }
+    disabled={isGeneratingPass}
+    className="disabled:opacity-50 disabled:cursor-not-allowed"
+>
+    <img
+        src={apiUrl + "/images/Add_to_Apple_Wallet_badge.svg.png"}
+        alt="Add to Apple Wallet"
+        style={{
+            height: "24px",
+            verticalAlign: "middle",
+        }}
+        className="inline-block"
+    />
+</button>
+                            )}
+                            <span>
+                                {/* update the button text */}
+                                {isGenerating ? "Downloading Policy" : "Download Policy"}
+                            </span>
+                            </span>
 
                         <button
                             type="button"
