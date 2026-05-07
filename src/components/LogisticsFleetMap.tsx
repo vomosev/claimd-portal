@@ -141,9 +141,16 @@ export default function FleetMap() {
     }
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updateVehicles();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [coords]);
+
   // ── Fetch live vehicle positions ──────────────────────────────────────────
   const fetchVehicles = async () => {
-    await updateVehicles();
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/fleet/live`
