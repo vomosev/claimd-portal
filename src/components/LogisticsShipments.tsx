@@ -99,7 +99,7 @@ export default function LogisticsShipments() {
                             onClick={() => router.push(`/logistics/transportmap/${s.id}`)}
                             className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
                         >
-                            Shipment Route
+                            Vehicle Routes
                         </button>
                     </div>
 
