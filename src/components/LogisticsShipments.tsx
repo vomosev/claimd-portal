@@ -164,24 +164,24 @@ export default function LogisticsShipments() {
                                 </div>
                             )}
                             {!isGenerating && (
-<button
-    type="button"
-    onClick={() =>
-        handleGeneratePass(`${currentUsername}`, `${s.id}`)
-    }
-    disabled={isGeneratingPass}
-    className="disabled:opacity-50 disabled:cursor-not-allowed"
->
-    <img
-        src={apiUrl + "/images/Add_to_Apple_Wallet_badge.svg.png"}
-        alt="Add to Apple Wallet"
-        style={{
-            height: "24px",
-            verticalAlign: "middle",
-        }}
-        className="inline-block"
-    />
-</button>
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        handleGeneratePass(`${currentUsername}`, `${s.id}`)
+                                    }
+                                    disabled={isGeneratingPass}
+                                    className="disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <img
+                                        src={apiUrl + "/images/Add_to_Apple_Wallet_badge.svg.png"}
+                                        alt="Add to Apple Wallet"
+                                        style={{
+                                            height: "24px",
+                                            verticalAlign: "middle",
+                                        }}
+                                        className="inline-block"
+                                    />
+                                </button>
                             )}
                             <span>
                                 {/* update the button text */}
