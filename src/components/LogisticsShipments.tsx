@@ -55,48 +55,56 @@ export default function LogisticsShipments() {
         <p className="text-gray-400">No shipments found</p>
       )}
 
-      <div className="grid gap-3">
+        <div className="grid gap-3">
         {shipments.map((s) => (
-          <div
+            <div
             key={s.id}
             className="
-              flex items-center justify-between
-              p-4 rounded-xl border
-              hover:shadow-md transition cursor-pointer
+                flex items-center justify-between
+                p-4 rounded-xl border
+                hover:shadow-md transition cursor-pointer
             "           
-          >
-            <div className="flex items-center gap-3">
+            >
+                <div className="flex items-center justify-between gap-4 w-full">
 
-                <div className="p-2 rounded-lg bg-[#5871A7]/10">
-                    <Package size={18} />
-                </div>
-                <div>
-                <p className="font-semibold">
-                    Shipment {s.id} • {s.reference} - {s.description}
-                </p>
-                <p className="text-xs text-gray-400">
-                    {s.stop_count} stops • {s.status}
-                </p>
-                </div>
-                <div className="ml-auto flex justify-end gap-2">
-                    <button
-                        type="button"
-                        onClick={() => router.push(`/logistics/transport/${s.id}`)}
-                        className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
-                    >
-                        Route Planner
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => router.push(`/logistics/transportmap/${s.id}`)}
-                        className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
-                    >
-                        Shipment Route
-                    </button>
-                </div>
+                    {/* Left side */}
+                    <div className="flex items-center gap-3 min-w-0">
+                        <div className="p-2 rounded-lg bg-[#5871A7]/10 flex-shrink-0">
+                            <Package size={18} />
+                        </div>
 
+                        <div className="min-w-0">
+                            <p className="font-semibold truncate">
+                                Shipment {s.id} • {s.reference} - {s.description}
+                            </p>
+
+                            <p className="text-xs text-gray-400">
+                                {s.stop_count} stops • {s.status}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Right side */}
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                        <button
+                            type="button"
+                            onClick={() => router.push(`/logistics/transport/${s.id}`)}
+                            className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
+                        >
+                            Route Planner
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => router.push(`/logistics/transportmap/${s.id}`)}
+                            className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
+                        >
+                            Shipment Route
+                        </button>
+                    </div>
+
+                </div>
             </div>
-          </div>
         ))}
       </div>
     </div>
