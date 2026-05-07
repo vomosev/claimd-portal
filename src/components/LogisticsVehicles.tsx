@@ -176,7 +176,7 @@ export default function LogisticsVehicles() {
               {/* Right */}
               <div className="flex items-center gap-2 flex-shrink-0">
 
-                <button
+                {/* <button
                   type="button"
                   onClick={() =>
                     router.push(`/logistics/vehicles/${v.id}`)
@@ -192,7 +192,7 @@ export default function LogisticsVehicles() {
                   "
                 >
                   View
-                </button>
+                </button> */}
 
                 <button
                   type="button"
