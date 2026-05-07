@@ -543,7 +543,7 @@ export default function LogisticsRoutePlanner({
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-            Plan Route
+            Plan Route {shipmentId}
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
             {stops.length} stop{stops.length !== 1 ? "s" : ""}
