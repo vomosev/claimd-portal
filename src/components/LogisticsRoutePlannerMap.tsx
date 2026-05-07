@@ -352,6 +352,32 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
         </button>
       </div>
 
+      {/* Stop legend */}
+      {stops.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {stops.map((stop, i) => {
+            const isFirst = i === 0;
+            const isLast  = i === stops.length - 1;
+            const colour  = isFirst ? "#10B981" : isLast ? "#EF4444" : "#5871A7";
+            const label   = isFirst ? "Pickup" : isLast ? "Delivery" : `Stop ${i + 1}`;
+            return (
+              <span
+                key={stop.id ?? i}
+                className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium border"
+                style={{ color: colour, borderColor: colour, background: colour + "12" }}
+              >
+                <span
+                  className="w-2 h-2 rounded-full"
+                  style={{ background: colour }}
+                />
+                {label}
+                {stop.label ? ` — ${stop.label}` : ""}
+              </span>
+            );
+          })}
+        </div>
+      )}
+
       <select
         value={selectedVehicleId}
         onChange={(e) =>
