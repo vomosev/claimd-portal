@@ -3,15 +3,11 @@
 
 import LogisticsVehicleForm from "@/components/LogisticsVehicleForm";
 
-interface PageProps {
-  params: {
-    vehicleId: string;
-  };
-}
-
-export default function LogisticsVehicleFormPage({
+export default function LogisticsVehicleEditPage({
   params,
-}: PageProps) {
+}: {
+  params: { vehicleId: string };
+}) {
 
   const vehicleId = Number(params.vehicleId);
 
