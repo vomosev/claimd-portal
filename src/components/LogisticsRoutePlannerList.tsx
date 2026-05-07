@@ -581,7 +581,7 @@ export default function LogisticsRoutePlanner({
               disabled:opacity-40 disabled:cursor-not-allowed transition-colors
             "
           >
-            Re-centre map
+            Re-centre
           </button>
           <button
             type="button"
