@@ -100,7 +100,7 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
   const fetchData = useCallback(async () => {
     const [sRes, vRes] = await Promise.all([
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/planner/${shipmentId}`),
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/fleet/live/${shipmentId}`)
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/fleet/livejourney/${shipmentId}`)
     ]);
 
     const sData = await sRes.json();
