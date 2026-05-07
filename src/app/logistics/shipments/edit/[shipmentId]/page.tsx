@@ -1,4 +1,4 @@
-// logistics/shipment/edit/[shipmentId]/page.tsx
+// logistics/shipments/edit/[shipmentId]/page.tsx
 "use client";
 
 import { use } from "react";

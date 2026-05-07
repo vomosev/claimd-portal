@@ -1,4 +1,4 @@
-// logistics/shipment/page.tsx
+// logistics/shipments/page.tsx
 "use client";
 
 import LogisticsShipments from "@/components/LogisticsShipments";
