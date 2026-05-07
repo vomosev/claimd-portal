@@ -157,7 +157,7 @@ export default function LogisticsShipments() {
                                 disabled={isGeneratingPass}
                                 // className={`rounded-full w-full disabled:opacity-50 disabled:cursor-not-allowed geo-claim-button bg-clgeodrops hover:opacity-60 duration-200 ease-in-out text-white`}
                             >
-                            <span className="flex items-center justify-center gap-2">
+                            <span>
                             {/* Loading overlay */}
                             {isGeneratingPass && (
                                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
@@ -177,10 +177,6 @@ export default function LogisticsShipments() {
                                 className="inline-block"
                                 />
                             )}
-                            <span>
-                                {/* update the button text */}
-                                {isGenerating ? "Downloading" : "Download"}
-                            </span>
                             </span>
                         </Button>
 
