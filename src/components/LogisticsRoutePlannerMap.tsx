@@ -364,7 +364,6 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
           <button
             type="button"
             onClick={handleRecentre}
-            disabled={stops.length === 0}
             className="
               inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
               bg-[#5871A7] hover:bg-[#4560A0] text-white
