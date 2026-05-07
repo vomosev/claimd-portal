@@ -52,6 +52,7 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
   const [stops, setStops] = useState<any[]>([]);
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [selectedVehicleId, setSelectedVehicleId] = useState<any>("all");
+  const [mapInstance,      setMapInstance]      = useState<any>(null);
 
   // ── Helpers ─────────────────────────────
   const isValid = (lat: any, lng: any) =>
@@ -74,6 +75,17 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
       script.onload = () => resolve();
       document.body.appendChild(script);
     });
+  };
+
+  // ── "Re-centre" button ────────────────────────────────────────────────────────
+  const handleRecentre = () => {
+    if (!mapInstance || stops.length === 0) return;
+    const firstStop = stops[0];
+    mapInstance.setCenter({
+      lat: Number(firstStop.latitude),
+      lng: Number(firstStop.longitude),
+    });
+    mapInstance.setZoom(13);
   };
 
   // ── Fetch data ───────────────────────────
@@ -156,29 +168,31 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
       directionsRendererRef.current.setMap(mapRefInstance.current);
     }
 
-      // ── Custom truck SVG for vehicle markers ────────────────────────────────
-      const truckSvg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
-          <circle cx="18" cy="18" r="18" fill="#5871A7"/>
-          <svg x="6" y="6" width="24" height="24" viewBox="0 0 24 24"
-            fill="none" stroke="white" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <rect x="1" y="3" width="15" height="13" rx="1"/>
-            <path d="M16 8h4l3 5v4h-7V8z"/>
-            <circle cx="5.5"  cy="18.5" r="2.5"/>
-            <circle cx="18.5" cy="18.5" r="2.5"/>
-          </svg>
+    // ── Custom truck SVG for vehicle markers ────────────────────────────────
+    const truckSvg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+        <circle cx="18" cy="18" r="18" fill="#5871A7"/>
+        <svg x="6" y="6" width="24" height="24" viewBox="0 0 24 24"
+          fill="none" stroke="white" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="3" width="15" height="13" rx="1"/>
+          <path d="M16 8h4l3 5v4h-7V8z"/>
+          <circle cx="5.5"  cy="18.5" r="2.5"/>
+          <circle cx="18.5" cy="18.5" r="2.5"/>
         </svg>
-      `;
-      const encodedTruck = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(truckSvg)}`;
+      </svg>
+    `;
+    const encodedTruck = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(truckSvg)}`;
 
-      const vehicleIcon = {
-        url:        encodedTruck,
-        scaledSize: new window.google.maps.Size(36, 36),
-        anchor:     new window.google.maps.Point(18, 18),
-      };
+    const vehicleIcon = {
+      url:        encodedTruck,
+      scaledSize: new window.google.maps.Size(36, 36),
+      anchor:     new window.google.maps.Point(18, 18),
+    };
 
     const map = mapRefInstance.current;
+
+    setMapInstance(map);
 
     // ── Clear stop markers ─────────────────
     stopMarkersRef.current.forEach(m => m.setMap(null));
@@ -315,6 +329,28 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
   // ── UI ──────────────────────────────────
   return (
     <div className="space-y-4">
+
+      {/* Header row */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="text-xl font-semibold">
+            Shipment Route
+          </h2>
+        </div>
+        <button
+          type="button"
+          onClick={handleRecentre}
+          disabled={stops.length === 0}
+          className="
+            inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
+            bg-[#5871A7] hover:bg-[#4560A0] text-white
+            disabled:opacity-40 disabled:cursor-not-allowed
+            transition-colors
+          "
+        >
+          Re-centre
+        </button>
+      </div>
 
       <select
         value={selectedVehicleId}
