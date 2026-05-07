@@ -372,6 +372,14 @@ export default function LogisticsFleetMap() {
       {/* Status bar */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
+        <div>
+          <h2 className="text-xl font-semibold">
+            Fleet Tracking
+          </h2>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Current location of vehicles and their planned routes based on latest data. Click on stops or vehicles for details.
+          </p>
+        </div>
           <span className={`
             inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full
             ${online
