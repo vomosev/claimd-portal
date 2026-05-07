@@ -8,6 +8,7 @@ interface Shipment {
   id: number;
   reference: string;
   status: string;
+  description: string;
   created_at: string;
   stop_count: number;
 }
@@ -73,7 +74,7 @@ export default function LogisticsShipments() {
 
               <div>
                 <p className="font-semibold">
-                  {s.reference || `Shipment ${s.id}`}
+                  Shipment {s.id} • {s.reference} - {s.description}
                 </p>
                 <p className="text-xs text-gray-400">
                   {s.stop_count} stops • {s.status}
