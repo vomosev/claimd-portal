@@ -153,7 +153,7 @@ export default function LogisticsShipments() {
 
                         <Button
                                 onClick={() => handleGeneratePass(`${currentUsername}`, `${s.id}`)}
-                                disabled={isGeneratingPass}
+                                className="bg-white" disabled={isGeneratingPass}
                             >
                             <span>
                             {/* Loading overlay */}
