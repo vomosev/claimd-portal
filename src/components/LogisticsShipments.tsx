@@ -139,7 +139,7 @@ export default function LogisticsShipments() {
 
                         <div className="min-w-0">
                             <p className="font-semibold truncate">
-                                Shipment {s.id} • {s.reference} - {s.description}
+                                {s.id} • {s.reference} - {s.description}
                             </p>
 
                             <p className="text-xs text-gray-400">
