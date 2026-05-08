@@ -140,11 +140,11 @@ export default function LogisticsShipments() {
 
                         <div className="min-w-0">
                             <p className="font-semibold truncate">
-                                {s.id} • {s.reference} - {s.description}
+                                {s.id} • {s.reference} {` - ${s.description}` || ""}
                             </p>
 
                             <p className="text-xs text-gray-400">
-                                {s.address} • {s.stop_count} stops - {s.status}
+                                {s.address} • {s.stop_count} stops {` - ${s.status}` || ""}
                             </p>
                         </div>
                     </div>
