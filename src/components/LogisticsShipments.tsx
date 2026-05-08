@@ -8,6 +8,7 @@ import { Button } from "./ui/button";
 
 interface Shipment {
   id: number;
+  address: string;
   reference: string;
   status: string;
   description: string;
@@ -143,7 +144,7 @@ export default function LogisticsShipments() {
                             </p>
 
                             <p className="text-xs text-gray-400">
-                                {s.stop_count} stops • {s.status}
+                                {s.address} • {s.stop_count} stops - {s.status}
                             </p>
                         </div>
                     </div>
