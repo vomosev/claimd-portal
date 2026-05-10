@@ -610,7 +610,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
         toast.success("Shipment created successfully!");
       } else {
         toast.success("Shipment updated successfully!");
-        router.push("/logistics/shipments");
+        router.push(`/logistics/transportlist/${shipmentId}`);
       }
     } catch (err: any) {
       console.error("Shipment submit error:", err);
