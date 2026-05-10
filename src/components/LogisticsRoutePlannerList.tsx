@@ -642,6 +642,17 @@ export default function LogisticsRoutePlanner({
       )}
 
         <Link
+          href={"`/logistics/shipments/add"}
+          className="
+            inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
+            bg-[#5871A7] hover:bg-[#4560A0] text-white
+            transition-colors
+          "
+        >
+          Add Shipment
+        </Link>
+        {" "}
+        <Link
           href={`/logistics/shipments/edit/${shipmentId}`}
           className="
             inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
