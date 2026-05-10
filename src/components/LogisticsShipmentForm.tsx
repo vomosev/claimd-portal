@@ -610,8 +610,8 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
         toast.success("Shipment created successfully!");
       } else {
         toast.success("Shipment updated successfully!");
-        router.push(`/logistics/transportlist/${shipmentId}`);
       }
+      router.push(`/logistics/transportlist/${shipmentId}`);
     } catch (err: any) {
       console.error("Shipment submit error:", err);
       toast.error("Failed to save: " + (err.message || "Unknown error"));
