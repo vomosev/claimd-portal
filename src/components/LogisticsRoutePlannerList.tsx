@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 // ── TypeScript declaration for Google Maps on window ──────────────────────────
 declare global {
@@ -639,6 +640,17 @@ export default function LogisticsRoutePlanner({
           </p>
         </div>
       )}
+
+        <Link
+          href={`/logistics/shipments/edit/${shipmentId}`}
+          className="
+            inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
+            bg-[#5871A7] hover:bg-[#4560A0] text-white
+            transition-colors
+          "
+        >
+          Edit Shipment
+        </Link>
 
       {/* ══════════════════════════════════════════════════════════════════════
           STOP LIST — draggable, shown below the map

@@ -4,7 +4,11 @@
 import * as z from "zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useCallback } from "react";
+import {
+  useState,
+  useCallback,
+  useEffect
+} from "react";
 import { useRouter } from "next/navigation";
 import {
   Package, MapPin, Plus, Trash2, Save,
@@ -407,6 +411,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
   const [confirmed,    setConfirmed]    = useState(false);
   const [savedId,      setSavedId]      = useState<number | null>(null);
   const [geocodingIdx, setGeocodingIdx] = useState<number | null>(null);
+  const [loadingShipment, setLoadingShipment] = useState(mode === "edit");
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -424,6 +429,119 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
     control: form.control,
     name:    "stops",
   });
+
+  useEffect(() => {
+
+    if (
+      mode !== "edit" ||
+      !shipmentId
+    ) {
+      return;
+    }
+
+    const loadShipment =
+      async () => {
+
+        try {
+
+          setLoadingShipment(true);
+
+          const res =
+            await fetch(
+
+              `${process.env.NEXT_PUBLIC_API_URL}/logistics/shipments/${shipmentId}`
+            );
+
+          const data =
+            await res.json();
+
+          form.reset({
+
+            reference:
+              data.reference || "",
+
+            description:
+              data.description || "",
+
+            driver:
+              data.driver || "",
+
+            vehicle:
+              data.vehicle || "",
+
+            stops:
+              data.stops?.length
+                ? data.stops.map((s: any) => ({
+
+                    name:
+                      s.name || "",
+
+                    type:
+                      s.type || "delivery",
+
+                    address:
+                      s.address || "",
+
+                    latitude:
+                      s.latitude
+                        ? String(s.latitude)
+                        : "",
+
+                    longitude:
+                      s.longitude
+                        ? String(s.longitude)
+                        : "",
+
+                    status:
+                      s.status || "pending",
+
+                    eta:
+                      s.eta || "",
+
+                    actual_arrival:
+                      s.actual_arrival || "",
+
+                    actual_departure:
+                      s.actual_departure || "",
+
+                    duration_sec:
+                      s.duration_sec
+                        ? String(s.duration_sec)
+                        : "",
+
+                    distance_m:
+                      s.distance_m
+                        ? String(s.distance_m)
+                        : ""
+                  }))
+
+                : [emptyStop()]
+          });
+
+        } catch (err) {
+
+          console.error(
+            "Failed to load shipment",
+            err
+          );
+
+          toast.error(
+            "Failed to load shipment"
+          );
+
+        } finally {
+
+          setLoadingShipment(false);
+        }
+      };
+
+    loadShipment();
+
+  }, [
+    mode,
+    shipmentId,
+    form
+  ]);
 
   // ── Geocode a single stop ──────────────────────────────────────────────────
   const handleGeocode = useCallback(async (index: number) => {
@@ -515,6 +633,29 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
             form.reset();
           }}
         />
+      </div>
+    );
+  }
+
+  if (loadingShipment) {
+
+    return (
+
+      <div className="
+        flex
+        items-center
+        justify-center
+        py-20
+      ">
+
+        <Loader2
+          className="
+            animate-spin
+            text-[#5871A7]
+          "
+          size={40}
+        />
+
       </div>
     );
   }
