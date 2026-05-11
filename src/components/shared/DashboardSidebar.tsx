@@ -420,7 +420,7 @@ const DashboardSidebar = ({
 
             <div className="mt-10 flex flex-col gap-1.5">
 
-              {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && !adminStatus && navigationItems.map((item) => (
+              {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && datarole === "user" && navigationItems.map((item) => (
                 <NavigationLink
                   key={item.href}
                   href={item.href}
