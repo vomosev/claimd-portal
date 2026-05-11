@@ -185,10 +185,11 @@ function SignInForm() {
     // Check if user has valid cookies on component mount
     const sessionInfo = getSessionInfo();
     if (sessionInfo.isValid) {
+      console.log("adminStatus", adminStatus);
       setIsAuthenticated(true);
       setCurrentUser(sessionInfo.username);
-      console.log("adminStatus", adminStatus);
       const datarole = localStorage.getItem("datarole");
+      console.log("datarole", datarole);
       if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("admin")) {
         window.location.href = "/admin/ins-policy";
       } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("user")) {

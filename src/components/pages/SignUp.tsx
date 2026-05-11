@@ -180,6 +180,8 @@ const SignUpForm = () => {
   // ── Redirect helper ─────────────────────────────────────────────────────────
   const redirectAfterAuth = () => {
       const datarole = localStorage.getItem("datarole");
+      console.log("datarole", datarole);
+      // Order matters here since some roles may include others (e.g. "admin" may also include "user" permissions)
       if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("admin")) {
         window.location.href = "/admin/ins-policy";
       } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("user")) {
