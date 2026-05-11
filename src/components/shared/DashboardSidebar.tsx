@@ -68,6 +68,7 @@ const DashboardSidebar = ({
           setUserrole(data.role);
           localStorage.setItem("datarole", data.role);
           datarole = data.role;
+          console.log(">>>>>>>>>> role:", datarole);
           if ((String(data.role).includes("admin")) || (String(data.role).includes("superuser"))) {
             setAdminStatus(true);
           } else {
@@ -308,7 +309,7 @@ const DashboardSidebar = ({
         >
           <div className="px-4 py-4 flex flex-col gap-1.5">
 
-            {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && datarole === "user" && navigationItems.map((item) => (
+            {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("user") && navigationItems.map((item) => (
               <NavigationLink
                 key={item.href}
                 href={item.href}
@@ -332,7 +333,7 @@ const DashboardSidebar = ({
               />
             ))}
 
-            {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && datarole === "driver" && navigationItemsDriver.map((item) => (
+            {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("driver") && navigationItemsDriver.map((item) => (
               <NavigationLink
                 key={item.href}
                 href={item.href}
@@ -420,7 +421,7 @@ const DashboardSidebar = ({
 
             <div className="mt-10 flex flex-col gap-1.5">
 
-              {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && datarole === "user" && navigationItems.map((item) => (
+              {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("user") && navigationItems.map((item) => (
                 <NavigationLink
                   key={item.href}
                   href={item.href}
@@ -442,7 +443,7 @@ const DashboardSidebar = ({
                 />
               ))}
 
-              {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && datarole === "driver" && navigationItemsDriver.map((item) => (
+              {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("driver") && navigationItemsDriver.map((item) => (
                 <NavigationLink
                   key={item.href}
                   href={item.href}
