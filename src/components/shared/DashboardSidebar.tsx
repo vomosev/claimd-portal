@@ -40,7 +40,7 @@ const DashboardSidebar = ({
   isCollapsed: boolean;
   setIsCollapsed: (val: boolean) => void;
 }) => {
-  const [role, setUserrole] = useState(null);
+  const [datarole, setUserrole] = useState(null);
   const [adminStatus, setAdminStatus] = useState(false);
   const [currentUsername, setCurrentUsername] = useState("");
   const [isNavigating, setIsNavigating] = useState(false);
@@ -51,7 +51,6 @@ const DashboardSidebar = ({
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  let datarole = "";
 
   // Handle localStorage access safely
   useEffect(() => {
@@ -67,7 +66,6 @@ const DashboardSidebar = ({
         .then((data) => {
           setUserrole(data.role);
           localStorage.setItem("datarole", data.role);
-          datarole = data.role;
           console.log(">>>>>>>>>> role:", datarole);
           if ((String(data.role).includes("admin")) || (String(data.role).includes("superuser"))) {
             setAdminStatus(true);
