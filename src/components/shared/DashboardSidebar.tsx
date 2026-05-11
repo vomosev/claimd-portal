@@ -193,7 +193,7 @@ const DashboardSidebar = ({
     // { href: "/admin/ins-claim/new", label: "New Claim Admin", icon: Trophy, degree: 0 },
   ];
 
-  // Admin Navigation items configuration
+  // Driver Navigation items configuration
   const navigationItemsDriver = [ 
     { href: "/logistics/transportmap/fleet", label: "Fleet Tracking", icon: Globe, degree: 0 },
     { href: "/logistics/shipments", label: "Vehicle Routes", icon: Route, degree: 0 },
@@ -333,7 +333,7 @@ const DashboardSidebar = ({
               />
             ))}
 
-            {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("driver") && navigationItemsDriver.map((item) => (
+            {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && navigationItemsDriver.map((item) => (
               <NavigationLink
                 key={item.href}
                 href={item.href}
