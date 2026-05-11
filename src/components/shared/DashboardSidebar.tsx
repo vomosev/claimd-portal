@@ -73,6 +73,17 @@ const DashboardSidebar = ({
           } else {
             setAdminStatus(false);
           }
+          if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(data.role).includes("admin")) {
+            window.location.href = "/admin/ins-policy";
+          } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(data.role).includes("user")) {
+            window.location.href = "/dashboard/ins-policy";
+          } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(data.role).includes("subscriber")) {
+            window.location.href = "/logistics/subscriber";
+          } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(data.role).includes("driver")) {
+            window.location.href = "/logistics/shipments";
+          } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(data.role).includes("logisticsadmin")) {
+            window.location.href = "/logistics/transportmap/fleet";
+          }
         })
         .catch((err) => {
           console.error("Error fetching user role:", err);
