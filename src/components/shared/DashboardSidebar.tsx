@@ -66,7 +66,8 @@ const DashboardSidebar = ({
         .then((data) => {
           setUserrole(data.role);
           localStorage.setItem("datarole", data.role);
-          console.log(">>>>>>>>>> role:", datarole);
+          console.log(">>>>>>>>>> datarole:", datarole);
+          console.log(">>>>>>>>>> data.role:", data.role);
           if ((String(data.role).includes("admin")) || (String(data.role).includes("superuser"))) {
             setAdminStatus(true);
           } else {
