@@ -333,7 +333,7 @@ const DashboardSidebar = ({
               />
             ))}
 
-            {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && navigationItemsDriver.map((item) => (
+            {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("driver") && navigationItemsDriver.map((item) => (
               <NavigationLink
                 key={item.href}
                 href={item.href}
@@ -443,7 +443,7 @@ const DashboardSidebar = ({
                 />
               ))}
 
-              {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && navigationItemsDriver.map((item) => (
+              {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("driver") && navigationItemsDriver.map((item) => (
                 <NavigationLink
                   key={item.href}
                   href={item.href}
