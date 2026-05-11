@@ -51,6 +51,7 @@ const DashboardSidebar = ({
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  let datarole = "";
 
   // Handle localStorage access safely
   useEffect(() => {
@@ -65,6 +66,8 @@ const DashboardSidebar = ({
         .then((res) => res.json())
         .then((data) => {
           setUserrole(data.role);
+          localStorage.setItem("datarole", data.role);
+          datarole = data.role;
           if ((String(data.role).includes("admin")) || (String(data.role).includes("superuser"))) {
             setAdminStatus(true);
           } else {
@@ -185,12 +188,16 @@ const DashboardSidebar = ({
   const navigationItemsAdmin = [ 
     { href: "/admin/ins-policy", label: "Policies Admin", icon: Award, degree: 0 },
     { href: "/admin/ins-claim", label: "Claims Admin", icon: Flame, degree: 0 },
+    // { href: "/admin/ins-policy/new", label: "New Policy Admin", icon: Award, degree: 0 },
+    // { href: "/admin/ins-claim/new", label: "New Claim Admin", icon: Trophy, degree: 0 },
+  ];
+
+  // Admin Navigation items configuration
+  const navigationItemsDriver = [ 
     { href: "/logistics/transportmap/fleet", label: "Fleet Tracking", icon: Globe, degree: 0 },
     { href: "/logistics/shipments", label: "Vehicle Routes", icon: Route, degree: 0 },
     { href: "/logistics/shipments/add", label: "Add Route", icon: Link2, degree: 0 },
     { href: "/logistics/vehicles", label: "My Vehicles", icon: Truck, degree: 0 },
-    // { href: "/admin/ins-policy/new", label: "New Policy Admin", icon: Award, degree: 0 },
-    // { href: "/admin/ins-claim/new", label: "New Claim Admin", icon: Trophy, degree: 0 },
   ];
 
   const bottomNavigationItems = [
@@ -301,7 +308,7 @@ const DashboardSidebar = ({
         >
           <div className="px-4 py-4 flex flex-col gap-1.5">
 
-            {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && !adminStatus && navigationItems.map((item) => (
+            {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && (!adminStatus && datarole === "user") && navigationItems.map((item) => (
               <NavigationLink
                 key={item.href}
                 href={item.href}
@@ -316,6 +323,16 @@ const DashboardSidebar = ({
             )}
 
             {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus && navigationItemsAdmin.map((item) => (
+              <NavigationLink
+                key={item.href}
+                href={item.href}
+                label={item.label}
+                icon={item.icon}
+                degree={item.degree}
+              />
+            ))}
+
+            {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && datarole === "driver" && navigationItemsDriver.map((item) => (
               <NavigationLink
                 key={item.href}
                 href={item.href}
@@ -421,6 +438,18 @@ const DashboardSidebar = ({
                   label={item.label}
                   icon={item.icon}
                   degree={item.degree}
+                  showLabel={!isCollapsed}
+                />
+              ))}
+
+              {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && datarole === "driver" && navigationItemsDriver.map((item) => (
+                <NavigationLink
+                  key={item.href}
+                  href={item.href}
+                  label={item.label}
+                  icon={item.icon}
+                  degree={item.degree}
+                  showLabel={!isCollapsed}
                 />
               ))}
 
