@@ -6,7 +6,7 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    // router.push(process.env.NEXT_PUBLIC_DEFAULT_PAGE || '/public');
+    router.push(process.env.NEXT_PUBLIC_DEFAULT_PAGE || '/public');
     const datarole = localStorage.getItem("datarole");
     console.log("---------- datarole:", datarole);
     if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("admin")) {
