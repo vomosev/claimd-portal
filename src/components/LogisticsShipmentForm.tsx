@@ -78,7 +78,7 @@ const stopSchema = z.object({
 });
 
 const schema = z.object({
-  reference:   z.string().min(1, "Shipment reference is required"),
+  reference:   z.string().min(1, "Route reference is required"),
   description: z.string().optional(),
   driver:      z.string().optional(),
   vehicle:     z.string().optional(),
@@ -377,14 +377,14 @@ function ConfirmationScreen({
       </div>
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-          Shipment Created
+          Route Created
         </h2>
         <p className="text-gray-500 dark:text-gray-400">
           {stopCount} stop{stopCount !== 1 ? "s" : ""} added to the route.
         </p>
         <div className="inline-block mt-2 px-5 py-2.5 rounded-xl bg-[#5871A7]/10 border border-[#5871A7]/30">
           <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-0.5">
-            Shipment ID
+            Route ID
           </p>
           <p className="text-xl font-mono font-bold text-[#5871A7]">
             SHP-{String(shipmentId).padStart(6, "0")}
@@ -393,10 +393,10 @@ function ConfirmationScreen({
       </div>
       <div className="flex gap-3">
         <Button variant="outline" onClick={() => router.push("/logistics/shipments")}>
-          View All Shipments
+          View All Routes
         </Button>
         <Button className="bg-[#5871A7] hover:bg-[#4560A0] text-white" onClick={onNew}>
-          Add Another Shipment
+          Add Another Route
         </Button>
       </div>
     </div>
@@ -607,13 +607,13 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
       if (mode === "add") {
         setSavedId(data.shipmentId ?? data.id);
         setConfirmed(true);
-        toast.success("Shipment created successfully!");
+        toast.success("Route created successfully!");
       } else {
-        toast.success("Shipment updated successfully!");
+        toast.success("Route updated successfully!");
       }
       router.push(`/logistics/transportlist/${shipmentId}`);
     } catch (err: any) {
-      console.error("Shipment submit error:", err);
+      console.error("Route submit error:", err);
       toast.error("Failed to save: " + (err.message || "Unknown error"));
     } finally {
       setSaving(false);
@@ -670,14 +670,14 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
           <h1 className="text-xl font-semibold flex items-center gap-2.5">
             <Package className="text-[#5871A7]" size={28} />
             {mode === "add"
-              ? "New Shipment"
-              : `Edit Shipment — SHP-${String(shipmentId).padStart(6, "0")}`
+              ? "New Route"
+              : `Edit Route — SHP-${String(shipmentId).padStart(6, "0")}`
             }
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             {mode === "add"
-              ? "Create a shipment and add all stops in sequence order."
-              : "Update shipment details and stops."
+              ? "Create a route and add all stops in sequence order."
+              : "Update route details and stops."
             }
           </p>
         </div>
@@ -693,11 +693,11 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
 
-          {/* ── Section 1: Shipment details ──────────────────────────────── */}
+          {/* ── Section 1: Route details ──────────────────────────────── */}
           <section className="space-y-5">
             <h2 className="text-xl font-semibold flex items-center gap-2.5">
               <Package className="text-[#5871A7]" size={20} />
-              Shipment Details
+              Route Details
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -862,12 +862,12 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
               {saving ? (
                 <>
                   <Loader2 size={16} className="mr-2 animate-spin" />
-                  {mode === "add" ? "Creating Shipment…" : "Updating Shipment…"}
+                  {mode === "add" ? "Creating Route…" : "Updating Route…"}
                 </>
               ) : (
                 <>
                   <Save size={16} className="mr-2" />
-                  {mode === "add" ? "Create Shipment" : "Update Shipment"}
+                  {mode === "add" ? "Create Route" : "Update Route"}
                 </>
               )}
             </Button>

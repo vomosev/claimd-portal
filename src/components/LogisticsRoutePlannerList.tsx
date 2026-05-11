@@ -649,7 +649,7 @@ export default function LogisticsRoutePlanner({
             transition-colors
           "
         >
-          Add Shipment
+          Add
         </Link>
         {" "}
         <Link
@@ -660,7 +660,7 @@ export default function LogisticsRoutePlanner({
             transition-colors
           "
         >
-          Edit Shipment
+          Edit
         </Link>
 
       {/* ══════════════════════════════════════════════════════════════════════
