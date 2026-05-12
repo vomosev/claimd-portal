@@ -125,11 +125,6 @@ export default function PoliciesTable() {
         setAdminStatus(isAdmin);
         setAccessChecked(true);
         console.log("isAdmin", isAdmin);
-        // if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && adminStatus) {
-        //   window.location.href = "/admin/ins-policy";
-        // } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && !adminStatus) {
-        //   window.location.href = "/dashboard/ins-policy";
-        // }
       })
       .catch(() => {
         setAdminStatus(false);

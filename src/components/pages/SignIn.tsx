@@ -104,6 +104,8 @@ function SignInForm() {
           String(data.role).includes("superuser");
         setAdminStatus(isAdmin);
         setAccessChecked(true);
+        const datarole = localStorage.setItem("datarole", data.role);
+        console.log("setItem datarole", datarole);
       })
       .catch(() => {
         setAdminStatus(false);
