@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import polyline from "@mapbox/polyline";
+import { Navigation } from "lucide-react";
 
 // ── TypeScript declaration for Google Maps on window ──────────────────────────
 declare global {
@@ -373,6 +374,7 @@ export default function LogisticsDriverRouteMap({
             transition-colors
           "
         >
+          <Navigation size={13} />
           Re-centre
         </button>
       </div>

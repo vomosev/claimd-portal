@@ -25,6 +25,7 @@ import { CSS } from "@dnd-kit/utilities";
 import {
   GripVertical, MapPin, Clock, Loader2,
   AlertTriangle, RefreshCw,
+  Navigation,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -580,6 +581,7 @@ export default function LogisticsRoutePlanner({
               disabled:opacity-40 disabled:cursor-not-allowed transition-colors
             "
           >
+            <Navigation size={13} />
             Re-centre
           </button>
         </div>
