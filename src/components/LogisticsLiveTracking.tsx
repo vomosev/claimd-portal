@@ -743,19 +743,20 @@ export default function LogisticsRoutePlanner({
             text-gray-500
             mb-1
           ">
-            ETA
+            Information
           </div>
 
           <div className="
             text-xl
             font-bold
           ">
-            {eta || "--"}
+            ETA: {eta || "--"} Remaining: {distanceRemaining || "--"} Speed: {speed} mph
+
           </div>
 
         </div>
 
-        <div className="
+        {/* <div className="
           p-4
           rounded-2xl
           border
@@ -801,7 +802,7 @@ export default function LogisticsRoutePlanner({
             {speed} mph
           </div>
 
-        </div>
+        </div> */}
 
       </div>
 
