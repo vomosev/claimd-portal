@@ -369,7 +369,7 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
             onClick={() => router.push(`/logistics/transportlist/${shipmentId}`)}
             className="
               inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
-              bg-[#5871A7] hover:bg-[#4560A0] text-white
+              bg-[#10B981] hover:bg-[#4560A0] text-white
               disabled:opacity-40 disabled:cursor-not-allowed
               transition-colors
             "

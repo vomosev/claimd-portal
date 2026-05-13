@@ -756,17 +756,12 @@ export default function LogisticsRoutePlanner({
               `/logistics/transportlist/${shipmentId}`
             )
           }
-          className="
-            inline-flex
-            items-center
-            gap-2
-            px-5
-            py-3
-            rounded-full
-            bg-[#10B981]
-            text-white
-            font-semibold
-          "
+        className="
+            inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
+            bg-[#10B981] hover:bg-[#4560A0] text-white
+            disabled:opacity-40 disabled:cursor-not-allowed
+            transition-colors
+        "
         >
 
           <Route size={18} />
