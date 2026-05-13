@@ -661,7 +661,7 @@ export default function LogisticsRoutePlanner({
             text-2xl
             font-bold
           ">
-            Live Driver Navigation
+            View Route {shipmentId}
           </h1>
 
           <p className="
