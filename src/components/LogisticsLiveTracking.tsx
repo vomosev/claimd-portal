@@ -1,11 +1,10 @@
-
 "use client";
 
 import {
   useEffect,
   useState,
   useRef,
-  useCallback,
+  useCallback
 } from "react";
 
 import { useRouter } from "next/navigation";
@@ -13,9 +12,8 @@ import { useRouter } from "next/navigation";
 import {
   RefreshCw,
   Navigation,
-  Gauge,
-  Clock3,
-  MapPin,
+  Route,
+  Truck,
 } from "lucide-react";
 
 declare global {
@@ -25,78 +23,33 @@ declare global {
 }
 
 interface Stop {
+
   id?: string | number;
-  latitude: number | string | null;
-  longitude: number | string | null;
+
+  latitude: number | string;
+
+  longitude: number | string;
+
   label?: string;
+
   address?: string;
-  sequence?: number;
-}
-
-function makeStopIcon(
-  sequence: number,
-  isFirst: boolean,
-  isLast: boolean
-) {
-
-  const fill =
-    isFirst
-      ? "#10B981"
-      : isLast
-      ? "#EF4444"
-      : "#5871A7";
-
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg"
-      width="32"
-      height="40"
-      viewBox="0 0 32 40">
-
-      <path
-        d="M16 0C7.16 0 0 7.16 0 16c0 10 16 24 16 24s16-14 16-24C32 7.16 24.84 0 16 0z"
-        fill="${fill}"
-      />
-
-      <circle
-        cx="16"
-        cy="16"
-        r="10"
-        fill="white"
-        opacity="0.9"
-      />
-
-      <text
-        x="16"
-        y="21"
-        text-anchor="middle"
-        font-family="Arial,sans-serif"
-        font-size="11"
-        font-weight="bold"
-        fill="${fill}"
-      >
-        ${sequence}
-      </text>
-    </svg>
-  `;
-
-  return {
-    url:
-      "data:image/svg+xml;charset=UTF-8," +
-      encodeURIComponent(svg),
-  };
 }
 
 export default function LogisticsRoutePlanner({
-  shipmentId,
+  shipmentId
 }: any) {
 
   const router =
     useRouter();
 
+  // =====================================================
+  // REFS
+  // =====================================================
+
   const mapRef =
     useRef<HTMLDivElement>(null);
 
-  const mapRefInstance =
+  const mapInstanceRef =
     useRef<any>(null);
 
   const directionsServiceRef =
@@ -111,20 +64,18 @@ export default function LogisticsRoutePlanner({
   const stopMarkersRef =
     useRef<any[]>([]);
 
-  const infoWindowRef =
-    useRef<any>(null);
+  // =====================================================
+  // STATE
+  // =====================================================
 
   const [stops, setStops] =
-    useState<any[]>([]);
+    useState<Stop[]>([]);
 
   const [currentPosition, setCurrentPosition] =
     useState<any>(null);
 
   const [currentHeading, setCurrentHeading] =
-    useState(0);
-
-  const [currentSpeed, setCurrentSpeed] =
-    useState(0);
+    useState<number | null>(null);
 
   const [eta, setEta] =
     useState("");
@@ -132,12 +83,12 @@ export default function LogisticsRoutePlanner({
   const [distanceRemaining, setDistanceRemaining] =
     useState("");
 
-  const [currentRoad, setCurrentRoad] =
-    useState("");
+  const [speed, setSpeed] =
+    useState<number>(0);
 
-  // =============================================================================
-  // VALIDATE LAT LNG
-  // =============================================================================
+  // =====================================================
+  // HELPERS
+  // =====================================================
 
   const isValid = (
     lat: any,
@@ -150,36 +101,9 @@ export default function LogisticsRoutePlanner({
     );
   };
 
-  // =============================================================================
-  // INFO WINDOW
-  // =============================================================================
-
-  const openInfo = (
-    map: any,
-    marker: any,
-    html: string
-  ) => {
-
-    if (infoWindowRef.current) {
-
-      infoWindowRef.current.close();
-    }
-
-    const iw =
-      new window.google.maps.InfoWindow({
-
-        content:
-          html,
-      });
-
-    iw.open(map, marker);
-
-    infoWindowRef.current = iw;
-  };
-
-  // =============================================================================
+  // =====================================================
   // LOAD GOOGLE MAPS
-  // =============================================================================
+  // =====================================================
 
   const loadMaps = async () => {
 
@@ -197,16 +121,17 @@ export default function LogisticsRoutePlanner({
 
       script.async = true;
 
-      script.onload = () =>
-        resolve();
+      script.defer = true;
+
+      script.onload = () => resolve();
 
       document.body.appendChild(script);
     });
   };
 
-  // =============================================================================
+  // =====================================================
   // FETCH STOPS
-  // =============================================================================
+  // =====================================================
 
   const fetchStops =
     useCallback(async () => {
@@ -222,12 +147,9 @@ export default function LogisticsRoutePlanner({
           await response.json();
 
         setStops(
-
           Array.isArray(data)
-
             ? data
-
-            : data.stops ?? []
+            : data.stops || []
         );
 
       } catch (err) {
@@ -240,9 +162,78 @@ export default function LogisticsRoutePlanner({
 
     }, [shipmentId]);
 
-  // =============================================================================
-  // LOAD STOPS
-  // =============================================================================
+  // =====================================================
+  // INIT MAP
+  // =====================================================
+
+  useEffect(() => {
+
+    async function initialise() {
+
+      await loadMaps();
+
+      if (
+        !mapRef.current ||
+        mapInstanceRef.current
+      ) {
+        return;
+      }
+
+      const map =
+        new window.google.maps.Map(
+          mapRef.current,
+          {
+
+            center: {
+              lat: 51.5,
+              lng: -0.1,
+            },
+
+            zoom: 17,
+
+            tilt: 45,
+
+            mapTypeControl: false,
+
+            fullscreenControl: false,
+
+            streetViewControl: false,
+          }
+        );
+
+      mapInstanceRef.current =
+        map;
+
+      directionsServiceRef.current =
+        new window.google.maps.DirectionsService();
+
+      directionsRendererRef.current =
+        new window.google.maps.DirectionsRenderer({
+
+          suppressMarkers: true,
+
+          preserveViewport: true,
+
+          polylineOptions: {
+
+            strokeColor: "#10B981",
+
+            strokeWeight: 6,
+          }
+        });
+
+      directionsRendererRef.current.setMap(
+        map
+      );
+    }
+
+    initialise();
+
+  }, []);
+
+  // =====================================================
+  // FETCH STOPS
+  // =====================================================
 
   useEffect(() => {
 
@@ -250,9 +241,9 @@ export default function LogisticsRoutePlanner({
 
   }, [fetchStops]);
 
-  // =============================================================================
+  // =====================================================
   // LIVE GPS TRACKING
-  // =============================================================================
+  // =====================================================
 
   useEffect(() => {
 
@@ -261,7 +252,7 @@ export default function LogisticsRoutePlanner({
     ) {
 
       console.error(
-        "Geolocation not supported"
+        "Geolocation unsupported"
       );
 
       return;
@@ -270,12 +261,12 @@ export default function LogisticsRoutePlanner({
     const watchId =
       navigator.geolocation.watchPosition(
 
-        async (position) => {
+        (position) => {
 
           const coords =
             position.coords;
 
-          const livePosition = {
+          const pos = {
 
             lat:
               coords.latitude,
@@ -284,69 +275,32 @@ export default function LogisticsRoutePlanner({
               coords.longitude,
           };
 
-          setCurrentPosition(
-            livePosition
-          );
+          setCurrentPosition(pos);
 
-          setCurrentHeading(
-            coords.heading || 0
-          );
+          if (
+            coords.heading !== null
+          ) {
 
-          setCurrentSpeed(
-
-            coords.speed
-
-              ? Math.round(
-                  coords.speed * 2.23694
-                )
-
-              : 0
-          );
-
-          // =====================================================
-          // OPTIONAL ROAD NAME USING REVERSE GEOCODE
-          // =====================================================
-
-          try {
-
-            if (window.google) {
-
-              const geocoder =
-                new window.google.maps.Geocoder();
-
-              geocoder.geocode(
-
-                {
-                  location:
-                    livePosition
-                },
-
-                (
-                  results: any,
-                  status: any
-                ) => {
-
-                  if (
-                    status === "OK" &&
-                    results?.length
-                  ) {
-
-                    setCurrentRoad(
-                      results[0].formatted_address
-                    );
-                  }
-                }
-              );
-            }
-
-          } catch (err) {
-
-            console.error(
-              "[ROAD LOOKUP ERROR]",
-              err
+            setCurrentHeading(
+              coords.heading
             );
           }
 
+          if (
+            coords.speed !== null
+          ) {
+
+            setSpeed(
+              Math.round(
+                coords.speed * 2.23694
+              )
+            );
+          }
+
+          console.log(
+            "[GPS UPDATE]",
+            pos
+          );
         },
 
         (err) => {
@@ -359,14 +313,11 @@ export default function LogisticsRoutePlanner({
 
         {
 
-          enableHighAccuracy:
-            true,
+          enableHighAccuracy: true,
 
-          maximumAge:
-            0,
+          maximumAge: 0,
 
-          timeout:
-            10000,
+          timeout: 10000,
         }
       );
 
@@ -379,616 +330,405 @@ export default function LogisticsRoutePlanner({
 
   }, []);
 
-  // =============================================================================
-  // SMOOTH MARKER MOVEMENT
-  // =============================================================================
-
-  const animateMarkerMovement = (
-    marker: any,
-    newPosition: any
-  ) => {
-
-    const start =
-      marker.getPosition();
-
-    if (!start) {
-
-      marker.setPosition(
-        newPosition
-      );
-
-      return;
-    }
-
-    const startLat =
-      start.lat();
-
-    const startLng =
-      start.lng();
-
-    const endLat =
-      newPosition.lat;
-
-    const endLng =
-      newPosition.lng;
-
-    let step = 0;
-
-    const totalSteps = 60;
-
-    const interval =
-      setInterval(() => {
-
-        step++;
-
-        const lat =
-          startLat +
-          (
-            (endLat - startLat) *
-            step
-          ) /
-          totalSteps;
-
-        const lng =
-          startLng +
-          (
-            (endLng - startLng) *
-            step
-          ) /
-          totalSteps;
-
-        marker.setPosition({
-          lat,
-          lng,
-        });
-
-        if (
-          step >= totalSteps
-        ) {
-
-          clearInterval(
-            interval
-          );
-        }
-
-      }, 50);
-  };
-
-  // =============================================================================
-  // INIT MAP
-  // =============================================================================
-
-  const initMap =
-    useCallback(async () => {
-
-      if (!mapRef.current) {
-        return;
-      }
-
-      await loadMaps();
-
-      if (!mapRefInstance.current) {
-
-        mapRefInstance.current =
-          new window.google.maps.Map(
-
-            mapRef.current,
-
-            {
-
-              center: {
-
-                lat: 51.5,
-
-                lng: -0.1,
-              },
-
-              zoom: 16,
-
-              tilt: 45,
-
-              heading:
-                currentHeading,
-
-              mapTypeControl:
-                false,
-
-              fullscreenControl:
-                false,
-
-              streetViewControl:
-                false,
-            }
-          );
-
-        directionsServiceRef.current =
-          new window.google.maps.DirectionsService();
-
-        directionsRendererRef.current =
-          new window.google.maps.DirectionsRenderer({
-
-            suppressMarkers:
-              true,
-
-            preserveViewport:
-              true,
-
-            polylineOptions: {
-
-              strokeColor:
-                "#10B981",
-
-              strokeWeight:
-                6,
-            }
-          });
-
-        directionsRendererRef.current.setMap(
-          mapRefInstance.current
-        );
-      }
-
-      const map =
-        mapRefInstance.current;
-
-      // =====================================================
-      // ROTATE MAP WITH HEADING
-      // =====================================================
-
-      if (
-        map &&
-        currentHeading
-      ) {
-
-        map.setHeading(
-          currentHeading
-        );
-      }
-
-      // =====================================================
-      // CLEAR OLD STOP MARKERS
-      // =====================================================
-
-      stopMarkersRef.current.forEach(
-        (m) => m.setMap(null)
-      );
-
-      stopMarkersRef.current = [];
-
-      // =====================================================
-      // DRAW STOPS
-      // =====================================================
-
-      stops.forEach((s, i) => {
-
-        if (
-          !isValid(
-            s.latitude,
-            s.longitude
-          )
-        ) {
-          return;
-        }
-
-        const isFirst =
-          i === 0;
-
-        const isLast =
-          i === stops.length - 1;
-
-        const seq =
-          s.sequence ?? i + 1;
-
-        const iconDef =
-          makeStopIcon(
-            seq,
-            isFirst,
-            isLast
-          );
-
-        const marker =
-          new window.google.maps.Marker({
-
-            position: {
-
-              lat:
-                Number(s.latitude),
-
-              lng:
-                Number(s.longitude),
-            },
-
-            map,
-
-            icon: {
-
-              url:
-                iconDef.url,
-
-              scaledSize:
-                new window.google.maps.Size(
-                  32,
-                  40
-                ),
-
-              anchor:
-                new window.google.maps.Point(
-                  16,
-                  40
-                ),
-            },
-
-            title:
-              s.label ||
-              `Stop ${seq}`,
-          });
-
-        marker.addListener(
-          "click",
-          () => {
-
-            openInfo(
-
-              map,
-
-              marker,
-
-              `
-                <div style="font-family:Arial;line-height:1.5;">
-                  <strong>${s.label || `Stop ${seq}`}</strong><br/>
-                  ${s.address || ""}
-                </div>
-              `
-            );
-          }
-        );
-
-        stopMarkersRef.current.push(
-          marker
-        );
-      });
-
-      // =====================================================
-      // CURRENT USER POSITION
-      // =====================================================
-
-      if (
-        currentPosition &&
-        isValid(
-          currentPosition.lat,
-          currentPosition.lng
-        )
-      ) {
-
-        const truckSvg = `
-          <svg xmlns="http://www.w3.org/2000/svg"
-            width="56"
-            height="56"
-            viewBox="0 0 56 56">
-
-            <circle
-              cx="28"
-              cy="28"
-              r="28"
-              fill="#5871A7"
-            />
-
-            <path
-              d="M16 18h18v12h7l5 6v6h-3a5 5 0 01-10 0H25a5 5 0 01-10 0h-3V18h4z"
-              fill="white"
-            />
-          </svg>
-        `;
-
-        const icon = {
-
-          url:
-            `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(truckSvg)}`,
-
-          scaledSize:
-            new window.google.maps.Size(
-              56,
-              56
-            ),
-
-          anchor:
-            new window.google.maps.Point(
-              28,
-              28
-            ),
-
-          rotation:
-            currentHeading,
-        };
-
-        // =====================================================
-        // CREATE OR UPDATE LIVE MARKER
-        // =====================================================
-
-        if (
-          !vehicleMarkerRef.current
-        ) {
-
-          vehicleMarkerRef.current =
-            new window.google.maps.Marker({
-
-              position:
-                currentPosition,
-
-              map,
-
-              zIndex:
-                999,
-
-              optimized:
-                true,
-
-              icon,
-            });
-
-        } else {
-
-          animateMarkerMovement(
-            vehicleMarkerRef.current,
-            currentPosition
-          );
-
-          vehicleMarkerRef.current.setIcon(
-            icon
-          );
-        }
-
-        // =====================================================
-        // FOLLOW USER
-        // =====================================================
-
-        map.panTo(
-          currentPosition
-        );
-
-        // =====================================================
-        // ROUTING
-        // =====================================================
-
-        if (
-          stops.length > 0
-        ) {
-
-          const validStops =
-            stops.filter(
-              (s) =>
-                isValid(
-                  s.latitude,
-                  s.longitude
-                )
-            );
-
-          if (
-            validStops.length
-          ) {
-
-            const waypoints =
-              validStops
-                .slice(0, -1)
-                .map((s) => ({
-
-                  location: {
-
-                    lat:
-                      Number(s.latitude),
-
-                    lng:
-                      Number(s.longitude),
-                  },
-
-                  stopover:
-                    true,
-                }));
-
-            directionsServiceRef.current.route(
-
-              {
-
-                origin:
-                  currentPosition,
-
-                destination: {
-
-                  lat:
-                    Number(
-                      validStops[
-                        validStops.length - 1
-                      ]?.latitude
-                    ),
-
-                  lng:
-                    Number(
-                      validStops[
-                        validStops.length - 1
-                      ]?.longitude
-                    ),
-                },
-
-                waypoints,
-
-                optimizeWaypoints:
-                  false,
-
-                travelMode:
-                  window.google.maps.TravelMode.DRIVING,
-
-                drivingOptions: {
-
-                  departureTime:
-                    new Date(),
-
-                  trafficModel:
-                    "bestguess",
-                }
-              },
-
-              (
-                result: any,
-                status: any
-              ) => {
-
-                if (
-                  status === "OK"
-                ) {
-
-                  directionsRendererRef.current.setDirections(
-                    result
-                  );
-
-                  const route =
-                    result.routes[0];
-
-                  if (
-                    route?.legs?.length
-                  ) {
-
-                    const firstLeg =
-                      route.legs[0];
-
-                    setEta(
-                      firstLeg.duration?.text || ""
-                    );
-
-                    setDistanceRemaining(
-                      firstLeg.distance?.text || ""
-                    );
-                  }
-                }
-              }
-            );
-          }
-        }
-      }
-
-    }, [
-      stops,
-      currentPosition,
-      currentHeading,
-    ]);
-
-  // =============================================================================
-  // MAP INITIALISATION
-  // =============================================================================
+  // =====================================================
+  // DRAW STOPS
+  // =====================================================
 
   useEffect(() => {
 
-    initMap();
+    if (
+      !window.google ||
+      !mapInstanceRef.current
+    ) {
+      return;
+    }
 
-  }, [initMap]);
+    stopMarkersRef.current.forEach(
+      m => m.setMap(null)
+    );
 
-  // =============================================================================
+    stopMarkersRef.current = [];
+
+    const map =
+      mapInstanceRef.current;
+
+    stops.forEach((stop, index) => {
+
+      if (
+        !isValid(
+          stop.latitude,
+          stop.longitude
+        )
+      ) {
+        return;
+      }
+
+      const marker =
+        new window.google.maps.Marker({
+
+          position: {
+
+            lat:
+              Number(stop.latitude),
+
+            lng:
+              Number(stop.longitude),
+          },
+
+          map,
+
+          title:
+            stop.label || `Stop ${index + 1}`,
+        });
+
+      stopMarkersRef.current.push(
+        marker
+      );
+    });
+
+  }, [stops]);
+
+  // =====================================================
+  // LIVE DRIVER MARKER
+  // =====================================================
+
+  useEffect(() => {
+
+    if (
+      !window.google ||
+      !mapInstanceRef.current ||
+      !currentPosition
+    ) {
+      return;
+    }
+
+    const map =
+      mapInstanceRef.current;
+
+    const truckSvg = `
+      <svg xmlns="http://www.w3.org/2000/svg"
+        width="56"
+        height="56"
+        viewBox="0 0 56 56">
+
+        <circle
+          cx="28"
+          cy="28"
+          r="28"
+          fill="#5871A7"
+        />
+
+        <path
+          d="M16 18h18v12h7l5 6v6h-3a5 5 0 01-10 0H25a5 5 0 01-10 0h-3V18h4z"
+          fill="white"
+        />
+      </svg>
+    `;
+
+    const icon = {
+
+      url:
+        `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(truckSvg)}`,
+
+      scaledSize:
+        new window.google.maps.Size(
+          56,
+          56
+        ),
+
+      anchor:
+        new window.google.maps.Point(
+          28,
+          28
+        ),
+    };
+
+    // =====================================================
+    // CREATE OR UPDATE MARKER
+    // =====================================================
+
+    if (
+      !vehicleMarkerRef.current
+    ) {
+
+      vehicleMarkerRef.current =
+        new window.google.maps.Marker({
+
+          position:
+            currentPosition,
+
+          map,
+
+          zIndex: 999,
+
+          icon,
+        });
+
+    } else {
+
+      vehicleMarkerRef.current.setPosition(
+        currentPosition
+      );
+    }
+
+    // =====================================================
+    // FOLLOW DRIVER
+    // =====================================================
+
+    map.panTo(
+      currentPosition
+    );
+
+    // =====================================================
+    // ROTATE MAP
+    // =====================================================
+
+    if (
+      currentHeading !== null
+    ) {
+
+      map.setHeading(
+        currentHeading
+      );
+    }
+
+  }, [
+    currentPosition,
+    currentHeading,
+  ]);
+
+  // =====================================================
+  // LIVE ROUTE RECALCULATION
+  // =====================================================
+
+  useEffect(() => {
+
+    if (
+      !window.google ||
+      !currentPosition ||
+      !stops.length ||
+      !directionsServiceRef.current
+    ) {
+      return;
+    }
+
+    const validStops =
+      stops.filter(
+        s =>
+          isValid(
+            s.latitude,
+            s.longitude
+          )
+      );
+
+    if (
+      !validStops.length
+    ) {
+      return;
+    }
+
+    const waypoints =
+      validStops
+        .slice(0, -1)
+        .map((s) => ({
+
+          location: {
+
+            lat:
+              Number(s.latitude),
+
+            lng:
+              Number(s.longitude),
+          },
+
+          stopover: true,
+        }));
+
+    directionsServiceRef.current.route(
+
+      {
+
+        origin:
+          currentPosition,
+
+        destination: {
+
+          lat:
+            Number(
+              validStops[
+                validStops.length - 1
+              ].latitude
+            ),
+
+          lng:
+            Number(
+              validStops[
+                validStops.length - 1
+              ].longitude
+            ),
+        },
+
+        waypoints,
+
+        travelMode:
+          window.google.maps.TravelMode.DRIVING,
+
+        drivingOptions: {
+
+          departureTime:
+            new Date(),
+
+          trafficModel:
+            "bestguess",
+        }
+      },
+
+      (
+        result: any,
+        status: any
+      ) => {
+
+        if (
+          status === "OK"
+        ) {
+
+          directionsRendererRef.current.setDirections(
+            result
+          );
+
+          const leg =
+            result.routes?.[0]?.legs?.[0];
+
+          if (leg) {
+
+            setEta(
+              leg.duration?.text || ""
+            );
+
+            setDistanceRemaining(
+              leg.distance?.text || ""
+            );
+          }
+        }
+      }
+    );
+
+  }, [
+    currentPosition,
+    stops,
+  ]);
+
+  // =====================================================
   // RECENTRE
-  // =============================================================================
+  // =====================================================
 
   const handleRecentre = () => {
 
     if (
-      mapRefInstance.current &&
+      mapInstanceRef.current &&
       currentPosition
     ) {
 
-      mapRefInstance.current.panTo(
+      mapInstanceRef.current.panTo(
         currentPosition
       );
 
-      mapRefInstance.current.setZoom(
+      mapInstanceRef.current.setZoom(
         17
       );
     }
   };
 
-  // =============================================================================
+  // =====================================================
   // UI
-  // =============================================================================
+  // =====================================================
 
   return (
 
     <div className="space-y-4">
 
-      {/* ================================================= */}
       {/* HEADER */}
-      {/* ================================================= */}
 
-      <div className="flex items-center justify-between">
+      <div className="
+        flex
+        items-center
+        justify-between
+      ">
 
         <div>
 
-          <h1 className="text-2xl font-bold">
+          <h1 className="
+            text-2xl
+            font-bold
+          ">
             Live Driver Navigation
           </h1>
 
-          <p className="text-sm text-gray-500">
-            Real-time GPS tracking and live SATNAV navigation
+          <p className="
+            text-sm
+            text-gray-500
+          ">
+            Real-time satnav tracking
           </p>
 
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="
+          flex
+          items-center
+          gap-2
+        ">
 
           <button
-            type="button"
-            onClick={() =>
-              router.push(
-                `/logistics/transportlist/${shipmentId}`
-              )
-            }
-            className="
-              px-4 py-2 rounded-full
-              bg-[#5871A7]
-              text-white
-              text-sm font-semibold
-            "
-          >
-            Plan Route
-          </button>
-
-          <button
-            type="button"
             onClick={handleRecentre}
             className="
-              px-4 py-2 rounded-full
-              bg-[#10B981]
+              inline-flex
+              items-center
+              gap-2
+              px-4
+              py-2
+              rounded-full
+              bg-[#5871A7]
               text-white
-              text-sm font-semibold
-              flex items-center gap-2
             "
           >
+
             <Navigation size={16} />
-            Follow
+
+            Re-centre
+
           </button>
 
           <button
-            type="button"
             onClick={fetchStops}
             className="
-              px-4 py-2 rounded-full
+              inline-flex
+              items-center
+              gap-2
+              px-4
+              py-2
+              rounded-full
               border
-              text-sm
-              flex items-center gap-2
             "
           >
-            <RefreshCw size={15} />
+
+            <RefreshCw size={16} />
+
             Refresh
+
           </button>
 
         </div>
 
       </div>
 
-      {/* ================================================= */}
-      {/* STATUS CARDS */}
-      {/* ================================================= */}
+      {/* STATUS */}
 
       <div className="
         grid
-        grid-cols-2
-        lg:grid-cols-4
-        gap-3
+        grid-cols-1
+        md:grid-cols-3
+        gap-4
       ">
 
         <div className="
@@ -999,48 +739,16 @@ export default function LogisticsRoutePlanner({
         ">
 
           <div className="
-            flex
-            items-center
-            gap-2
+            text-xs
             text-gray-500
-            text-sm
+            mb-1
           ">
-            <Gauge size={15} />
-            Speed
-          </div>
-
-          <div className="
-            text-2xl
-            font-bold
-            mt-1
-          ">
-            {currentSpeed} mph
-          </div>
-
-        </div>
-
-        <div className="
-          p-4
-          rounded-2xl
-          border
-          bg-white
-        ">
-
-          <div className="
-            flex
-            items-center
-            gap-2
-            text-gray-500
-            text-sm
-          ">
-            <Clock3 size={15} />
             ETA
           </div>
 
           <div className="
-            text-2xl
+            text-xl
             font-bold
-            mt-1
           ">
             {eta || "--"}
           </div>
@@ -1055,20 +763,16 @@ export default function LogisticsRoutePlanner({
         ">
 
           <div className="
-            flex
-            items-center
-            gap-2
+            text-xs
             text-gray-500
-            text-sm
+            mb-1
           ">
-            <MapPin size={15} />
-            Distance
+            Remaining
           </div>
 
           <div className="
-            text-2xl
+            text-xl
             font-bold
-            mt-1
           ">
             {distanceRemaining || "--"}
           </div>
@@ -1083,43 +787,70 @@ export default function LogisticsRoutePlanner({
         ">
 
           <div className="
-            flex
-            items-center
-            gap-2
+            text-xs
             text-gray-500
-            text-sm
+            mb-1
           ">
-            <Navigation size={15} />
-            Current Road
+            Speed
           </div>
 
           <div className="
-            text-sm
-            font-semibold
-            mt-1
-            truncate
+            text-xl
+            font-bold
           ">
-            {currentRoad || "Locating..."}
+            {speed} mph
           </div>
 
         </div>
 
       </div>
 
-      {/* ================================================= */}
       {/* MAP */}
-      {/* ================================================= */}
 
       <div
         ref={mapRef}
         className="
           w-full
-          h-[700px]
+          h-[650px]
           rounded-3xl
           overflow-hidden
           border
         "
       />
+
+      {/* FOOTER */}
+
+      <div className="
+        flex
+        justify-end
+      ">
+
+        <button
+          onClick={() =>
+            router.push(
+              `/logistics/transportlist/${shipmentId}`
+            )
+          }
+          className="
+            inline-flex
+            items-center
+            gap-2
+            px-5
+            py-3
+            rounded-full
+            bg-[#10B981]
+            text-white
+            font-semibold
+          "
+        >
+
+          <Route size={18} />
+
+          Plan Route
+
+        </button>
+
+      </div>
 
     </div>
   );
