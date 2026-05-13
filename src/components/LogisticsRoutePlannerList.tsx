@@ -26,6 +26,7 @@ import {
   GripVertical, MapPin, Clock, Loader2,
   AlertTriangle, RefreshCw,
   Navigation,
+  Route,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -570,6 +571,7 @@ export default function LogisticsRoutePlanner({
               transition-colors
             "
           >
+            <Route size={18} />
             View Route
           </button>
           <button
