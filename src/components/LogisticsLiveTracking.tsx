@@ -682,18 +682,14 @@ export default function LogisticsRoutePlanner({
           <button
             onClick={handleRecentre}
             className="
-              inline-flex
-              items-center
-              gap-2
-              px-4
-              py-2
-              rounded-full
-              bg-[#5871A7]
-              text-white
+              inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
+              bg-[#5871A7] hover:bg-[#4560A0] text-white
+              disabled:opacity-40 disabled:cursor-not-allowed
+              transition-colors
             "
           >
 
-            <Navigation size={16} />
+            <Navigation size={13} />
 
             Re-centre
 
@@ -702,18 +698,13 @@ export default function LogisticsRoutePlanner({
           <button
             onClick={fetchStops}
             className="
-              inline-flex
-              items-center
-              gap-2
-              px-4
-              py-2
-              rounded-full
-              border
+              inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm
+              border border-gray-200 dark:border-[#2E4066]
+              text-gray-500 hover:text-[#5871A7] hover:border-[#5871A7]/40
+              transition-colors
             "
           >
-
-            <RefreshCw size={16} />
-
+            <RefreshCw size={13} />
             Refresh
 
           </button>
@@ -732,77 +723,22 @@ export default function LogisticsRoutePlanner({
       ">
 
         <div className="
-          p-4
-          rounded-2xl
-          border
-          bg-white
+        p-4
+        rounded-2xl
+        border
+        bg-white
+        w-full
+        h-full
         ">
-
-          <div className="
-            text-xs
-            text-gray-500
-            mb-1
-          ">
-            Information
-          </div>
 
           <div className="
             text-xl
             font-bold
           ">
             ETA: {eta || "--"} Remaining: {distanceRemaining || "--"} Speed: {speed} mph
-
           </div>
 
         </div>
-
-        {/* <div className="
-          p-4
-          rounded-2xl
-          border
-          bg-white
-        ">
-
-          <div className="
-            text-xs
-            text-gray-500
-            mb-1
-          ">
-            Remaining
-          </div>
-
-          <div className="
-            text-xl
-            font-bold
-          ">
-            {distanceRemaining || "--"}
-          </div>
-
-        </div>
-
-        <div className="
-          p-4
-          rounded-2xl
-          border
-          bg-white
-        ">
-
-          <div className="
-            text-xs
-            text-gray-500
-            mb-1
-          ">
-            Speed
-          </div>
-
-          <div className="
-            text-xl
-            font-bold
-          ">
-            {speed} mph
-          </div>
-
-        </div> */}
 
       </div>
 
@@ -815,7 +751,6 @@ export default function LogisticsRoutePlanner({
           h-[650px]
           rounded-3xl
           overflow-hidden
-          border
         "
       />
 
