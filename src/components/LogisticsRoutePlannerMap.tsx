@@ -390,6 +390,19 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
           </button>
           <button
             type="button"
+            onClick={() => router.push(`/logistics/transportmap/${shipmentId}/livetracking`)}
+            className="
+              inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm
+              border border-gray-200 dark:border-[#2E4066]
+              text-gray-500 hover:text-[#5871A7] hover:border-[#5871A7]/40
+              transition-colors
+            "
+          >
+            <MapPin size={13} />
+            Live
+          </button>
+          <button
+            type="button"
             onClick={fetchData}
             className="
               inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm
