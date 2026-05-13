@@ -723,21 +723,10 @@ export default function LogisticsRoutePlanner({
       ">
 
         <div className="
-        p-4
-        rounded-2xl
-        border
-        bg-white
-        w-full
-        h-full
-        ">
-
-          <div className="
             text-xl
             font-bold
-          ">
+            ">
             ETA: {eta || "--"} Remaining: {distanceRemaining || "--"} Speed: {speed} mph
-          </div>
-
         </div>
 
       </div>
