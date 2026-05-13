@@ -347,7 +347,7 @@ const DashboardSidebar = ({
               />
             ))}
 
-            {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("driver") && navigationItemsDriver.map((item) => (
+            {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && driverStatus && navigationItemsDriver.map((item) => (
               <NavigationLink
                 key={item.href}
                 href={item.href}
