@@ -679,35 +679,55 @@ export default function LogisticsRoutePlanner({
           gap-2
         ">
 
-          <button
-            onClick={handleRecentre}
-            className="
-              inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
-              bg-[#5871A7] hover:bg-[#4560A0] text-white
-              disabled:opacity-40 disabled:cursor-not-allowed
-              transition-colors
-            "
-          >
+            <button
+                onClick={() =>
+                    router.push(
+                    `/logistics/transportlist/${shipmentId}`
+                    )
+            }
+                className="
+                    inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
+                    bg-[#10B981] hover:bg-[#4560A0] text-white
+                    disabled:opacity-40 disabled:cursor-not-allowed
+                    transition-colors
+                "
+            >
 
-            <Navigation size={13} />
+                <Route size={18} />
 
-            Re-centre
+                Plan Route
 
-          </button>
+            </button>
 
-          <button
-            onClick={fetchStops}
-            className="
-              inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm
-              border border-gray-200 dark:border-[#2E4066]
-              text-gray-500 hover:text-[#5871A7] hover:border-[#5871A7]/40
-              transition-colors
-            "
-          >
-            <RefreshCw size={13} />
-            Refresh
+            <button
+                onClick={handleRecentre}
+                className="
+                    inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
+                    bg-[#5871A7] hover:bg-[#4560A0] text-white
+                    disabled:opacity-40 disabled:cursor-not-allowed
+                    transition-colors
+                "
+            >
 
-          </button>
+                <Navigation size={13} />
+
+                Re-centre
+
+            </button>
+
+            <button
+                onClick={fetchStops}
+                className="
+                inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm
+                border border-gray-200 dark:border-[#2E4066]
+                text-gray-500 hover:text-[#5871A7] hover:border-[#5871A7]/40
+                transition-colors
+                "
+            >
+                <RefreshCw size={13} />
+                Refresh
+
+            </button>
 
         </div>
 
@@ -749,26 +769,6 @@ export default function LogisticsRoutePlanner({
         flex
         justify-end
       ">
-
-        <button
-          onClick={() =>
-            router.push(
-              `/logistics/transportlist/${shipmentId}`
-            )
-          }
-        className="
-            inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
-            bg-[#10B981] hover:bg-[#4560A0] text-white
-            disabled:opacity-40 disabled:cursor-not-allowed
-            transition-colors
-        "
-        >
-
-          <Route size={18} />
-
-          Plan Route
-
-        </button>
 
       </div>
 
