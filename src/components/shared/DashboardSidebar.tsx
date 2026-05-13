@@ -46,6 +46,7 @@ const DashboardSidebar = ({
   const [isNavigating, setIsNavigating] = useState(false);
   const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
   const [pendingRoute, setPendingRoute] = useState<string | null>(null);
+  const [driverStatus, setDriverStatus] = useState(false);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -70,6 +71,11 @@ const DashboardSidebar = ({
             setAdminStatus(true);
           } else {
             setAdminStatus(false);
+          }
+          if (String(data.role).includes("driver")) {
+            setDriverStatus(true);
+          } else {
+            setDriverStatus(false);
           }
           // if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(data.role).includes("admin")) {
           //   window.location.href = "/admin/ins-policy";
@@ -197,10 +203,6 @@ const DashboardSidebar = ({
   const navigationItemsAdmin = [ 
     { href: "/admin/ins-policy", label: "Policies Admin", icon: Award, degree: 0 },
     { href: "/admin/ins-claim", label: "Claims Admin", icon: Flame, degree: 0 },
-    { href: "/logistics/transportmap/fleet", label: "Fleet Tracking", icon: Globe, degree: 0 },
-    { href: "/logistics/shipments", label: "Vehicle Routes", icon: Route, degree: 0 },
-    { href: "/logistics/shipments/add", label: "Add Route", icon: Link2, degree: 0 },
-    { href: "/logistics/vehicles", label: "My Vehicles", icon: Truck, degree: 0 },
     // { href: "/admin/ins-policy/new", label: "New Policy Admin", icon: Award, degree: 0 },
     // { href: "/admin/ins-claim/new", label: "New Claim Admin", icon: Trophy, degree: 0 },
   ];
@@ -455,7 +457,7 @@ const DashboardSidebar = ({
                 />
               ))}
 
-              {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("driver") && navigationItemsDriver.map((item) => (
+              {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && driverStatus && navigationItemsDriver.map((item) => (
                 <NavigationLink
                   key={item.href}
                   href={item.href}
