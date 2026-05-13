@@ -561,7 +561,7 @@ export default function LogisticsRoutePlanner({
           )}
           <button
             type="button"
-            onClick={() => router.push(`/logistics/transportmap/${shipmentId}`)}
+            onClick={() => router.push(`/logistics/transportmap/${shipmentId}/livetracking`)}
             className="
               inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
               bg-[#5871A7] hover:bg-[#4560A0] text-white
