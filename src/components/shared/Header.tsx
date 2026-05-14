@@ -177,7 +177,7 @@ const Header = () => {
       }`}
     >
       {/* Category Links - Desktop */}
-      <div className="hidden md:flex gap-2 w-full overflow-x-auto pb-2 md:w-auto md:overflow-visible md:pb-0">
+      {/* <div className="hidden md:flex gap-2 w-full overflow-x-auto pb-2 md:w-auto md:overflow-visible md:pb-0">
         {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && Number(process.env.NEXT_PUBLIC_CATEGORIES) === 1 && categories.map((category, idx) => (
           <Link
             key={idx}
@@ -192,7 +192,7 @@ const Header = () => {
             {category}
           </Link>
         ))}
-      </div>
+      </div> */}
 
       {/* Category Dropdown - Mobile */}
       <div
@@ -213,7 +213,7 @@ const Header = () => {
         </button>
 
         {/* Dropdown Menu */}
-        {isDropdownOpen && (
+        {/* {isDropdownOpen && (
           <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#2D385B] rounded-[10px] shadow-lg z-50 overflow-hidden">
             {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && Number(process.env.NEXT_PUBLIC_CATEGORIES) === 1 && categories.map((category, idx) => (
               <button
@@ -230,7 +230,7 @@ const Header = () => {
             ))}
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* Search and Avatar */}
       <div className="flex items-center justify-between space-x-2 w-full md:w-auto">
