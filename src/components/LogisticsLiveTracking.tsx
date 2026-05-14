@@ -657,12 +657,7 @@ export default function LogisticsRoutePlanner({
 
         <div>
 
-          <h1 className="
-            text-2xl
-            font-bold
-          ">
-            View Route {shipmentId}
-          </h1>
+          <h1 className="text-xl font-semibold text-gray-800 dark:text-white">View Route {shipmentId}</h1>
 
           <p className="
             text-sm
@@ -701,7 +696,7 @@ export default function LogisticsRoutePlanner({
             }
                 className="
                     inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
-                    bg-[#10B981] hover:bg-[#4560A0] text-white
+                    bg-[#5871A7] hover:bg-[#4560A0] text-white
                     disabled:opacity-40 disabled:cursor-not-allowed
                     transition-colors
                 "
