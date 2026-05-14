@@ -178,7 +178,7 @@ const SignUpForm = () => {
   // ── Redirect helper ─────────────────────────────────────────────────────────
   const redirectAfterAuth = () => {
       const datarole = localStorage.getItem("datarole");
-      console.log("signupdatarole", datarole);
+      // console.log("signupdatarole", datarole);
       // some roles may include others (e.g. "admin" may also include "user" permissions)
       window.location.href = "/admin/ins-policy";
   };

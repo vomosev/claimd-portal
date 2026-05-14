@@ -105,7 +105,7 @@ function SignInForm() {
         setAdminStatus(isAdmin);
         setAccessChecked(true);
         localStorage.setItem("datarole", data.role);
-        console.log("setItem datarole", data.role);
+        // console.log("setItem datarole", data.role);
       })
       .catch(() => {
         setAdminStatus(false);
@@ -141,7 +141,7 @@ function SignInForm() {
       });
 
       const cssText = await response.text();
-      console.log(`>>>>>>>>>> ${API_URL}/target-css/${WORLD_ID}`, "cssText");
+      // console.log(`>>>>>>>>>> ${API_URL}/target-css/${WORLD_ID}`, "cssText");
 
       // Extract only the CSS values, removing HTML tags if any
       const cleanCssText = cssText.replace(/<[^>]*>/g, "");
@@ -185,11 +185,11 @@ function SignInForm() {
     // Check if user has valid cookies on component mount
     const sessionInfo = getSessionInfo();
     if (sessionInfo.isValid) {
-      console.log("adminStatus", adminStatus);
+      // console.log("adminStatus", adminStatus);
       setIsAuthenticated(true);
       setCurrentUser(sessionInfo.username);
       const datarole = localStorage.getItem("datarole");
-      console.log("signin datarole", datarole);
+      // console.log("signin datarole", datarole);
     } else {
       setIsAuthenticated(false);
     }
@@ -202,7 +202,7 @@ function SignInForm() {
 
     try {
 
-      console.log("handleSubmit");
+      // console.log("handleSubmit");
 
       const res = await fetch(`${API_URL}/loginmobile`, {
         method: "POST",
@@ -218,7 +218,7 @@ function SignInForm() {
       const userrole = await resrole.json();
       localStorage.setItem("datarole", userrole.role);
       const datarole = localStorage.getItem("datarole");
-      console.log("setItem datarole", datarole);
+      // console.log("setItem datarole", datarole);
 
       if (res.ok && data.success) {
         localStorage.setItem("username", username);
