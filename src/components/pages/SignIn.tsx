@@ -212,9 +212,8 @@ function SignInForm() {
       const data = await res.json();
 
       const resrole = await fetch(`${API_URL}/getuserrole/${currentUsername}`, {
-        method: "POST",
+        method: "GET",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
       });
       const datarole = await resrole.json();
       localStorage.setItem("datarole", datarole.role);
