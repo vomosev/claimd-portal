@@ -180,17 +180,7 @@ const SignUpForm = () => {
       const datarole = localStorage.getItem("datarole");
       console.log("signupdatarole", datarole);
       // some roles may include others (e.g. "admin" may also include "user" permissions)
-      if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("admin")) {
-        window.location.href = "/admin/ins-policy";
-      } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("user")) {
-        window.location.href = "/dashboard/ins-policy";
-      } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("subscriber")) {
-        window.location.href = "/logistics/subscriber";
-      } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("driver")) {
-        window.location.href = "/logistics/shipments";
-      } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("logisticsadmin")) {
-        window.location.href = "/logistics/transportmap/fleet";
-      }
+      window.location.href = "/admin/ins-policy";
   };
 
   // ── On mount ────────────────────────────────────────────────────────────────
