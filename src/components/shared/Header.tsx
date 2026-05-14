@@ -235,7 +235,7 @@ const Header = () => {
       {/* Search and Avatar */}
       <div className="flex items-center justify-between space-x-2 w-full md:w-auto">
         {/* Search Bar */}
-        {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && Number(process.env.NEXT_PUBLIC_CATEGORIES) === 1 && !pathname.includes("/search") && (
+        {/* {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && Number(process.env.NEXT_PUBLIC_CATEGORIES) === 1 && !pathname.includes("/search") && (
           <div
             onSubmit={handleSearch}
             className="flex items-center flex-1 md:flex-initial"
@@ -257,7 +257,7 @@ const Header = () => {
               />
             </div>
           </div>
-        )}
+        )} */}
 
         <span className="relative text-sm font-black text-black dark:text-white leading-none"><a href="/dashboard/mantlepiece">{balancePoints}</a></span>
 
