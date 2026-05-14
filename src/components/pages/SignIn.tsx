@@ -211,7 +211,7 @@ function SignInForm() {
       });
       const data = await res.json();
 
-      const resrole = await fetch(`${API_URL}/getuserrole/${currentUsername}`, {
+      const resrole = await fetch(`${API_URL}/getuserrole/${username}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
