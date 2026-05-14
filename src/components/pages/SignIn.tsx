@@ -189,7 +189,7 @@ function SignInForm() {
       setIsAuthenticated(true);
       setCurrentUser(sessionInfo.username);
       const datarole = localStorage.getItem("datarole");
-      console.log("datarole", datarole);
+      console.log("signin datarole", datarole);
     } else {
       setIsAuthenticated(false);
     }
@@ -217,7 +217,6 @@ function SignInForm() {
         body: JSON.stringify({ username, password }),
       });
       const datarole = await resrole.json();
-
       localStorage.setItem("datarole", datarole.role);
       console.log("setItem datarole", datarole.role);
 
@@ -239,17 +238,6 @@ function SignInForm() {
           setShowPinVerification(true);
         } else {
           // some roles may include others (e.g. "admin" may also include "user" permissions)
-          // if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("admin")) {
-          //   window.location.href = "/admin/ins-policy";
-          // } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("user")) {
-          //   window.location.href = "/dashboard/ins-policy";
-          // } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("subscriber")) {
-          //   window.location.href = "/logistics/subscriber";
-          // } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("driver")) {
-          //   window.location.href = "/logistics/shipments";
-          // } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("logisticsadmin")) {
-          //   window.location.href = "/logistics/transportmap/fleet";
-          // }
         }
       } else if (
         data.requiresPin ||
@@ -260,6 +248,17 @@ function SignInForm() {
         setShowPinVerification(true);
       } else {
         setError(data.message || "Login failed");
+      }
+      if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("admin")) {
+        window.location.href = "/admin/ins-policy";
+      } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("user")) {
+        window.location.href = "/dashboard/ins-policy";
+      } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("subscriber")) {
+        window.location.href = "/logistics/subscriber";
+      } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("driver")) {
+        window.location.href = "/logistics/shipments";
+      } else if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("logisticsadmin")) {
+        window.location.href = "/logistics/transportmap/fleet";
       }
     } catch (e) {
       console.error(e);
