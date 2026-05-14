@@ -14,7 +14,7 @@ import PinVerification from "./PinVerification";
 import { setPaygNewCookie, setUsernameCookie, hasValidSession, getSessionInfo, getUsernameFromCookie, clearSessionCookies } from '@/utils/cookieUtils';
 
 // Add your API URL - adjust this to match your actual API endpoint
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://nodejs.gridiron-app.com";
 
 // Function to assign handle if user doesn't have one
 async function ensureUserHasHandle(username: string) {
@@ -96,7 +96,7 @@ function SignInForm() {
   // ── Check admin access ───────────────────────────────────────────────────────
   useEffect(() => {
     if (!currentUsername) return;
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/getuserrole/${currentUsername}`)
+    fetch(`${API_URL}/getuserrole/${currentUsername}`)
       .then((r) => r.json())
       .then((data) => {
         const isAdmin =
@@ -129,21 +129,19 @@ function SignInForm() {
   };
 
   // Function to fetch and apply CSS
-  const worldId = process.env.NEXT_PUBLIC_WORLDID || "0";
-  const apiUrl =
-    process.env.NEXT_PUBLIC_API_URL || "https://nodejs.gridiron-app.com";
+  const WORLD_ID = process.env.NEXT_PUBLIC_WORLDID || "0";
 
   const fetchAndApplyCSS = async () => {
     setCssLoading(true);
     try {
-      const response = await fetch(`${apiUrl}/target-css/${worldId}`, {
+      const response = await fetch(`${API_URL}/target-css/${WORLD_ID}`, {
         headers: {
           Accept: "text/css,*/*",
         },
       });
 
       const cssText = await response.text();
-      console.log(`>>>>>>>>>> ${apiUrl}/target-css/${worldId}`, "cssText");
+      console.log(`>>>>>>>>>> ${API_URL}/target-css/${WORLD_ID}`, "cssText");
 
       // Extract only the CSS values, removing HTML tags if any
       const cleanCssText = cssText.replace(/<[^>]*>/g, "");
@@ -293,7 +291,7 @@ function SignInForm() {
     <div
       className="min-h-screen bg-no-repeat bg-cover bg-center flex items-center justify-center relative py-10"
       style={{
-        backgroundImage: `url(https://nodejs.gridiron-app.com/images/bkg_${worldId}.png)`,
+        backgroundImage: `url(https://nodejs.gridiron-app.com/images/bkg_${WORLD_ID}.png)`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",

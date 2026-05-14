@@ -17,7 +17,7 @@ import {
   getSessionInfo,
 } from "@/utils/cookieUtils";
 
-const API_URL  = process.env.NEXT_PUBLIC_API_URL;
+const API_URL  = process.env.NEXT_PUBLIC_API_URL || "https://nodejs.gridiron-app.com";
 const WORLD_ID = process.env.NEXT_PUBLIC_WORLDID || "0";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -128,8 +128,6 @@ const SignUpForm = () => {
 
   const searchParams  = useSearchParams();
   const publicAwardID = searchParams.get("id");
-  const apiUrl        = process.env.NEXT_PUBLIC_API_URL || "https://nodejs.gridiron-app.com";
-  const worldId       = WORLD_ID;
   const [currentUsername, setCurrentUsername] = useState("");
   const [adminStatus,     setAdminStatus]     = useState(false);
   const [accessChecked,   setAccessChecked]   = useState(false);
@@ -167,7 +165,7 @@ const SignUpForm = () => {
 
   const fetchAndApplyCSS = async () => {
     try {
-      const res     = await fetch(`${apiUrl}/target-css/${worldId}`, {
+      const res     = await fetch(`${API_URL}/target-css/${WORLD_ID}`, {
         headers: { Accept: "text/css,*/*" },
       });
       const cssText = await res.text();
@@ -214,11 +212,11 @@ const SignUpForm = () => {
 
     // Fetch dynamic field definitions from worldsettings
     const fetchDynamicFields = async () => {
-      if (!worldId || process.env.NEXT_PUBLIC_SIGNUP_DETAILS !== "1") return;
+      if (!WORLD_ID || process.env.NEXT_PUBLIC_SIGNUP_DETAILS !== "1") return;
       setFieldsLoading(true);
       try {
         const res = await fetch(
-          `${apiUrl}/worldsettings/jsoncolumns/${worldId}`
+          `${API_URL}/worldsettings/jsoncolumns/${WORLD_ID}`
         );
         if (!res.ok) return;
 
@@ -343,7 +341,7 @@ const SignUpForm = () => {
             headers: { "Content-Type": "application/json" },
             body:    JSON.stringify({
               userid:      username,
-              worldid:     worldId,
+              worldid:     WORLD_ID,
               jsoncolumns: JSON.stringify(payload),
             }),
           });
@@ -388,7 +386,7 @@ const SignUpForm = () => {
     <div
       className="min-h-screen bg-no-repeat bg-cover bg-center flex items-center justify-center relative py-10"
       style={{
-        backgroundImage:    `url(https://nodejs.gridiron-app.com/images/bkg_${worldId}.png)`,
+        backgroundImage:    `url(https://nodejs.gridiron-app.com/images/bkg_${WORLD_ID}.png)`,
         backgroundSize:     "cover",
         backgroundPosition: "center",
         backgroundRepeat:   "no-repeat",
