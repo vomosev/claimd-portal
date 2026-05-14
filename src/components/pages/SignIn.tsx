@@ -202,6 +202,8 @@ function SignInForm() {
 
     try {
 
+      console.log("handleSubmit");
+
       const res = await fetch(`${API_URL}/loginmobile`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
