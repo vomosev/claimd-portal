@@ -668,6 +668,8 @@ export default function LogisticsRoutePlanner({
 
         </div>
 
+        {typeof window !== "undefined" && window.innerWidth < 768 && <hr />}
+
         <div className="
           flex
           items-center
