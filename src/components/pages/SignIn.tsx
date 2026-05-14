@@ -215,9 +215,10 @@ function SignInForm() {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
-      const datarole = await resrole.json();
-      localStorage.setItem("datarole", datarole.role);
-      console.log("setItem datarole", datarole.role);
+      const userrole = await resrole.json();
+      localStorage.setItem("datarole", userrole.role);
+      const datarole = localStorage.getItem("datarole");
+      console.log("setItem datarole", datarole);
 
       if (res.ok && data.success) {
         localStorage.setItem("username", username);
