@@ -649,11 +649,7 @@ export default function LogisticsRoutePlanner({
 
       {/* HEADER */}
 
-      <div className="
-        flex
-        items-center
-        justify-between
-      ">
+      <div className="flex items-center justify-between flex-wrap gap-3">
 
         <div>
 
