@@ -554,6 +554,9 @@ export default function LogisticsRoutePlanner({
             {" "}— drag the handle to reorder, changes save automatically.
           </p>
         </div>
+
+        {typeof window !== "undefined" && window.innerWidth < 768 && <hr />}
+
         <div className="flex items-center gap-2">
           {saving && (
             <span className="flex items-center gap-1.5 text-xs text-gray-400">

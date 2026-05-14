@@ -365,6 +365,9 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
             Current location of vehicles and their planned routes based on latest data. Click on stops or vehicles for details.
           </p>
         </div>
+
+        {typeof window !== "undefined" && window.innerWidth < 768 && <hr />}
+
         <div className="flex items-center gap-2">
           <button
             type="button"
