@@ -104,8 +104,8 @@ function SignInForm() {
           String(data.role).includes("superuser");
         setAdminStatus(isAdmin);
         setAccessChecked(true);
-        const datarole = localStorage.setItem("datarole", data.role);
-        console.log("setItem datarole", datarole);
+        localStorage.setItem("datarole", data.role);
+        console.log("setItem datarole", data.role);
       })
       .catch(() => {
         setAdminStatus(false);
@@ -201,13 +201,23 @@ function SignInForm() {
     setError("");
 
     try {
+
       const res = await fetch(`${API_URL}/loginmobile`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
-
       const data = await res.json();
+
+      const resrole = await fetch(`${API_URL}/getuserrole/${currentUsername}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      const datarole = await resrole.json();
+
+      localStorage.setItem("datarole", datarole.role);
+      console.log("setItem datarole", datarole.role);
 
       if (res.ok && data.success) {
         localStorage.setItem("username", username);
@@ -226,8 +236,6 @@ function SignInForm() {
           setAttemptedEmail(username);
           setShowPinVerification(true);
         } else {
-          const datarole = localStorage.getItem("datarole");
-          console.log("datarole", datarole);
           // some roles may include others (e.g. "admin" may also include "user" permissions)
           if (Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && String(datarole).includes("admin")) {
             window.location.href = "/admin/ins-policy";
