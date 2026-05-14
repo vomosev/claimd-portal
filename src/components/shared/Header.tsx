@@ -229,8 +229,8 @@ const Header = () => {
               </button>
             ))}
           </div>
-        )}
-      </div> */}
+        )} */}
+      </div>
 
       {/* Search and Avatar */}
       <div className="flex items-center justify-between space-x-2 w-full md:w-auto">
