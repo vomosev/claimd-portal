@@ -199,7 +199,7 @@ const Header = () => {
         id="category-dropdown"
         className="md:hidden relative w-full flex items-center"
       >
-        <button
+        {/* <button
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           className={`flex items-center justify-between w-full px-4 py-2 rounded-[10px] text-sm font-bold transition-all duration-200 bg-white dark:bg-[#2D385B] text-blue-950 dark:text-white`}
         >
@@ -210,7 +210,7 @@ const Header = () => {
               isDropdownOpen ? "rotate-180" : ""
             }`}
           />
-        </button>
+        </button> */}
 
         {/* Dropdown Menu */}
         {/* {isDropdownOpen && (
