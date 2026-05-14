@@ -177,8 +177,8 @@ const Header = () => {
       }`}
     >
       {/* Category Links - Desktop */}
-      {/* <div className="hidden md:flex gap-2 w-full overflow-x-auto pb-2 md:w-auto md:overflow-visible md:pb-0">
-        {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && Number(process.env.NEXT_PUBLIC_CATEGORIES) === 1 && categories.map((category, idx) => (
+      <div className="hidden md:flex gap-2 w-full overflow-x-auto pb-2 md:w-auto md:overflow-visible md:pb-0">
+        {/* {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && Number(process.env.NEXT_PUBLIC_CATEGORIES) === 1 && categories.map((category, idx) => (
           <Link
             key={idx}
             href={getCategoryUrl(category)}
@@ -191,8 +191,8 @@ const Header = () => {
           >
             {category}
           </Link>
-        ))}
-      </div> */}
+        ))} */}
+      </div>
 
       {/* Category Dropdown - Mobile */}
       <div
