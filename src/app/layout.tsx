@@ -50,14 +50,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <Toaster
-          position="top-center"
-          containerStyle={{
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-          }}
-        />
         {/* In your app/layout.tsx or page head */}
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -69,6 +61,14 @@ export default function RootLayout({
       <body
         className={`${baseFont.variable}  bg-[#EEEFF3] dark:bg-[#1C2541] dark:text-white font-sans tracking-tight text-primary`}
       >
+        <Toaster
+          position="top-center"
+          containerStyle={{
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+        />
         <AuthProvider>
           {children}
         </AuthProvider>
