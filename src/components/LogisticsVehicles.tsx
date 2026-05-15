@@ -85,11 +85,16 @@ export default function LogisticsVehicles() {
         <button
           type="button"
           onClick={() => router.push("/logistics/vehicles/add")}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
+          className="
+            inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
+            bg-[#5871A7] hover:bg-[#4560A0] text-white
+            disabled:opacity-40 disabled:cursor-not-allowed
+            transition-colors
+          "
         >
           <Plus size={16} />
           Add Vehicle
-        </button>
+        </button> 
       </div>
 
       {/* Empty state */}
