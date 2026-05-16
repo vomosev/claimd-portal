@@ -377,7 +377,7 @@ const PublicAwardDetailsPage = () => {
             {displayName === 'public' ? 'Sign up to find out more' : `${displayName}'s profile`}
           </Button> */}
 
-            <h1 className='text-3xl font-semibold flex items-center justify-between mb-4 logo-wrapper'>
+            <h1 className='text-xl md:text-3xl font-semibold flex items-center justify-between mb-4 logo-wrapper'>
               {award.assetname} • {award.locationname}
               <Button
                 onClick={() => window.open('/public', '_self')}

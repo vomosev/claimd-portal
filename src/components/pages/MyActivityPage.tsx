@@ -514,7 +514,7 @@ export default function MyActivityPage() {
 
       {/* Page header */}
       <div>
-        <h1 className="text-3xl font-semibold">My Tickets & Rewards</h1>
+        <h1 className="text-xl md:text-3xl font-semibold">My Tickets & Rewards</h1>
         <p className="text-sm text-gray-500 mt-1">
           Your downloaded passes, street teams and available rewards
         </p>

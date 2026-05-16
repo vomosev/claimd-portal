@@ -328,7 +328,7 @@ export default function MailingListImportForm() {
 
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-semibold">Import Mailing List</h1>
+        <h1 className="text-xl md:text-3xl font-semibold">Import Mailing List</h1>
         <p className="text-sm italic text-gray-500">Upload a CSV file</p>
       </div>
       <hr className="border-[#D4D8EA] dark:border-[#2E4066]" />

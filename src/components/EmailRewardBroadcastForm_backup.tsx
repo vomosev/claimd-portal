@@ -945,7 +945,7 @@ export default function EmailBroadcastForm({
           >
             <ArrowLeft size={16} className="mr-1" /> Back
           </Button>
-          <h1 className="text-3xl font-semibold">View Email Broadcast</h1>
+          <h1 className="text-xl md:text-3xl font-semibold">View Email Broadcast</h1>
         </div>
         <hr className="border-[#D4D8EA] dark:border-[#2E4066]" />
         <div className="rounded-lg border border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-700 p-6">
@@ -988,7 +988,7 @@ export default function EmailBroadcastForm({
           >
             <ArrowLeft size={16} className="mr-1" /> Back
           </Button>
-          <h1 className="text-3xl font-semibold">
+          <h1 className="text-xl md:text-3xl font-semibold">
             {mode === "new" ? "New Reward Broadcast" : "Edit Reward Broadcast"}
           </h1>
         </div>

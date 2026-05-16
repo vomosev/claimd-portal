@@ -40,7 +40,7 @@ const RoutesPage = () => {
   return (
     <div>
       <div className="flex justify-between items-end">
-        <h1 className="text-3xl font-semibold">Routes</h1>
+        <h1 className="text-xl md:text-3xl font-semibold">Routes</h1>
         <div className="flex gap-1 bg-white dark:bg-[#1C2541] dark:border dark:border-[#2E4066] items-center rounded-[10px] p-3">
           <MapPin className="text-geodrops" />
           <span> My Location (100m)</span>

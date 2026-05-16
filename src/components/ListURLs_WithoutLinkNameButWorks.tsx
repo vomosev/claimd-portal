@@ -157,7 +157,7 @@ export default function ListURLs() {
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-semibold">Manage Links</h1>
+          <h1 className="text-xl md:text-3xl font-semibold">Manage Links</h1>
           <p className="text-sm text-gray-500 mt-1">
             Manage the links displayed on your profile page.
           </p>

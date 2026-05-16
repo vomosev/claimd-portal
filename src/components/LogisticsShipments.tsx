@@ -37,7 +37,7 @@ export default function LogisticsShipments() {
   const handleGeneratePass = async (userid: string, shipment_id: string) => {
     try {
       setIsGeneratingPass(true);
-      toast.success(`Generating card and sending to ${userid}`);
+      toast.success(`Generating card and sending to ${currentUsername}`);
       const formData = {
         userName: currentUsername,
         eventName: shipment_id,

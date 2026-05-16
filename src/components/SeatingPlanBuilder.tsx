@@ -619,7 +619,7 @@ export default function SeatingPlanBuilder({ awardId }: SeatingPlanBuilderProps)
         >
           <ArrowLeft size={16} className="mr-1" /> Back
         </Button>
-        <h1 className="text-3xl font-semibold">Edit Seating Plan</h1>
+        <h1 className="text-xl md:text-3xl font-semibold">Edit Seating Plan</h1>
       </div>
 
       {/* Dev indicator */}

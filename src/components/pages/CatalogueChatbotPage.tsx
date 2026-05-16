@@ -296,7 +296,7 @@ const CatalogueChatbot = ({ username: propUsername }: ChatbotProps) => {
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-semibold mb-1 flex items-center gap-3">
+          <h1 className="text-xl md:text-3xl font-semibold mb-1 flex items-center gap-3">
             {/* <BotMessageSquare className="text-blue-600 dark:text-blue-400" size={28} /> */}
             ChatBot
           </h1>

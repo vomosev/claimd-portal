@@ -561,7 +561,7 @@ export default function FNOLForm({ mode, claimId }: FNOLFormProps) {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
         <div>
-          <h1 className="text-3xl font-semibold">
+          <h1 className="text-xl md:text-3xl font-semibold">
             {mode === "new"
               ? "New Claim"
               : `Edit Claim — ${claimId}`}

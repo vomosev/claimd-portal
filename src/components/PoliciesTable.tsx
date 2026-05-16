@@ -233,7 +233,7 @@ export default function PoliciesTable() {
       {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold flex items-center gap-2.5">
+          <h1 className="text-xl md:text-3xl font-semibold flex items-center gap-2.5">
             <Shield className="text-[#5871A7]" size={28} />
             Policies
           </h1>

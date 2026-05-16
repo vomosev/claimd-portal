@@ -486,8 +486,8 @@ export default function SpotifySearch(): React.ReactElement {
       </Head>
 
       <div className="container mx-auto px-4 py-8">
-        {/* <h1 className="text-3xl font-bold mb-8"></h1> */}
-        <h1 className="text-3xl font-semibold flex items-center justify-between mb-4 logo-wrapper">
+        {/* <h1 className="text-xl md:text-3xl font-bold mb-8"></h1> */}
+        <h1 className="text-xl md:text-3xl font-semibold flex items-center justify-between mb-4 logo-wrapper">
           Search For Artists/Tracks on Spotify
           <div className="flex gap-2">
             {returnTo === "award-form" && (

@@ -844,7 +844,7 @@ export default function EmailEventbriteBroadcastForm({
           >
             <ArrowLeft size={16} className="mr-1" /> Back
           </Button>
-          <h1 className="text-3xl font-semibold">View Eventbrite Broadcast</h1>
+          <h1 className="text-xl md:text-3xl font-semibold">View Eventbrite Broadcast</h1>
         </div>
         <hr className="border-[#D4D8EA] dark:border-[#2E4066]" />
         <div className="rounded-lg border border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-700 p-6">
@@ -886,7 +886,7 @@ export default function EmailEventbriteBroadcastForm({
           >
             <ArrowLeft size={16} className="mr-1" /> Back
           </Button>
-          <h1 className="text-3xl font-semibold flex items-center gap-2.5">
+          <h1 className="text-xl md:text-3xl font-semibold flex items-center gap-2.5">
             <span style={{ color: "#F05537" }}>🎟</span>
             {mode === "new" ? "New Eventbrite Broadcast" : "Edit Eventbrite Broadcast"}
           </h1>

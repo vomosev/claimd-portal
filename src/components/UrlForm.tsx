@@ -907,7 +907,7 @@ export default function UrlForm({ mode, recordId }: UrlFormProps) {
 
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-semibold">
+        <h1 className="text-xl md:text-3xl font-semibold">
           {mode === "add" ? "Add" : "Edit"} Link(s)
         </h1>
         <p className="text-sm italic text-gray-500">

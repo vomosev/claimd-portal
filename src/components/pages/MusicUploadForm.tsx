@@ -569,7 +569,7 @@ const MusicUploadForm = () => {
 
         {/* Header */}
         <div className='mb-8'>
-          <h1 className='text-3xl font-semibold mb-2'>Add Music</h1>
+          <h1 className='text-xl md:text-3xl font-semibold mb-2'>Add Music</h1>
           <p className='text-gray-500 dark:text-gray-400'>
             Upload your {releaseType} to the platform
           </p>

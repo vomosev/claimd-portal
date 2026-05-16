@@ -388,7 +388,7 @@ export default function SubscriptionPage() {
 
       {/* Title */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-semibold text-center flex-1">
+        <h1 className="text-xl md:text-3xl font-semibold text-center flex-1">
           Buy your drop ticket/pass
         </h1>
       </div>

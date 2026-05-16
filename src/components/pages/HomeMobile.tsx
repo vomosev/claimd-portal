@@ -372,7 +372,7 @@ const HomePage = () => {
 
       {/* ── Page heading ───────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
-        <h1 className="text-3xl font-semibold">Latest Drops</h1>
+        <h1 className="text-xl md:text-3xl font-semibold">Latest Drops</h1>
         {awards.length > 0 && (
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 sm:mt-0">
             {totalItems} Drops available

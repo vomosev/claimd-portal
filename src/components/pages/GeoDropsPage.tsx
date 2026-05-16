@@ -570,7 +570,7 @@ const GeoDropsPage = () => {
     <div className="relative">
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-semibold">Map</h1>
+          <h1 className="text-xl md:text-3xl font-semibold">Map</h1>
           <Button
             onClick={handleGetUserLocation}
             disabled={isLocating}
@@ -593,7 +593,7 @@ const GeoDropsPage = () => {
       </div>
 
       <div className="mt-20">
-        <h1 className="text-3xl font-semibold">Nearest</h1>
+        <h1 className="text-xl md:text-3xl font-semibold">Nearest</h1>
         <div className="mt-6 grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
           {awards.slice(0, 10).map((award, i) => (
             <GeoDropsCard key={award.awardid} award={award} />

@@ -840,7 +840,7 @@ export default function EmailMailchimpBroadcastForm({
           >
             <ArrowLeft size={16} className="mr-1" /> Back
           </Button>
-          <h1 className="text-3xl font-semibold">View Mailchimp Broadcast</h1>
+          <h1 className="text-xl md:text-3xl font-semibold">View Mailchimp Broadcast</h1>
         </div>
         <hr className="border-[#D4D8EA] dark:border-[#2E4066]" />
         <div className="rounded-lg border border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-700 p-6">
@@ -869,7 +869,7 @@ export default function EmailMailchimpBroadcastForm({
           >
             <ArrowLeft size={16} className="mr-1" /> Back
           </Button>
-          <h1 className="text-3xl font-semibold flex items-center gap-2.5">
+          <h1 className="text-xl md:text-3xl font-semibold flex items-center gap-2.5">
             {/* Mailchimp wordmark colour */}
             <span style={{ color: "#FFE01B", WebkitTextStroke: "1px #333" }}>🐒</span>
             {mode === "new" ? "New Mailchimp Broadcast" : "Edit Mailchimp Broadcast"}

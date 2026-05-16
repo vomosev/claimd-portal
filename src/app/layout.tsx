@@ -61,6 +61,9 @@ export default function RootLayout({
       <body
         className={`${baseFont.variable}  bg-[#EEEFF3] dark:bg-[#1C2541] dark:text-white font-sans tracking-tight text-primary`}
       >
+        <AuthProvider>
+          {children}
+        </AuthProvider>
         <Toaster
           position="top-center"
           containerStyle={{
@@ -69,9 +72,6 @@ export default function RootLayout({
             transform: "translate(-50%, -50%)",
           }}
         />
-        <AuthProvider>
-          {children}
-        </AuthProvider>
         {/* <Toaster position="top-right" /> */}
       </body>
     </html>

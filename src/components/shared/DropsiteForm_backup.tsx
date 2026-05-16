@@ -652,7 +652,7 @@ export default function DropsiteForm({ mode, worldId }: DropsiteFormProps) {
   return (
     <div className="lg:w-[85%] space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-semibold">
+        <h1 className="text-xl md:text-3xl font-semibold">
           {mode === "add" ? "Add" : "Edit"} Dropsite
         </h1>
       </div>

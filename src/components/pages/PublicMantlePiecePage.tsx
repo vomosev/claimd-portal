@@ -198,7 +198,7 @@ const PublicMantlePiecePage = ({ displayName }: PublicMantlePiecePageProps) => {
     <div className="p-5">
       <div className="flex flex-col mb-6 mt-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3">
-          <h1 className="text-3xl font-semibold">{displayName} has {currentPoints} points</h1>
+          <h1 className="text-xl md:text-3xl font-semibold">{displayName} has {currentPoints} points</h1>
           {hasAnyAwards && (
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 sm:mt-0">
               {totalItems} {viewMode === "claimed" ? "unlocked" : "created"} Drops

@@ -467,7 +467,7 @@ export default function ListExportForm() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-semibold">Export Lists</h1>
+          <h1 className="text-xl md:text-3xl font-semibold">Export Lists</h1>
           <p className="text-sm text-gray-500 mt-1">
             Download user data from your Drops, Dropsites and Mailing Lists.
           </p>

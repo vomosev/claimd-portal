@@ -842,7 +842,7 @@ export default function SeatingPaymentPage() {
           alt="Logo" width={100} height={100} />
       </div>
 
-      <h1 className="text-3xl font-semibold text-center">
+      <h1 className="text-xl md:text-3xl font-semibold text-center">
         Buy your drop ticket/pass
       </h1>
 

@@ -174,7 +174,7 @@ export default function EmailBroadcastTable() {
       {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold flex items-center gap-2.5">
+          <h1 className="text-xl md:text-3xl font-semibold flex items-center gap-2.5">
             {/* <Mail className="text-geodrops" /> */}
             Send Updates
           </h1>

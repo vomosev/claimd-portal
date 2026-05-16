@@ -218,7 +218,7 @@ const MantlePiecePage = () => {
   return (
     <div className="pb-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-        <h1 className="text-3xl font-semibold">You have {currentPoints} points ({balancePoints} left)</h1>
+        <h1 className="text-xl md:text-3xl font-semibold">You have {currentPoints} points ({balancePoints} left)</h1>
         {hasAnyAwards && (
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 sm:mt-0">
             {totalItems} {viewMode === "claimed" ? "unlocked" : "created"} Drops

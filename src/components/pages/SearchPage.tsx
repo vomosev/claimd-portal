@@ -133,7 +133,7 @@ const HomePage = () => {
 
   return (
     <div>
-      <h1 className='text-3xl font-semibold'>
+      <h1 className='text-xl md:text-3xl font-semibold'>
         {query ? `Search Results for "${query}"` : 'Find Drops'}
       </h1>
 

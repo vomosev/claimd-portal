@@ -1133,7 +1133,7 @@ export default function AwardForm({ mode, awardId }: AwardFormProps) {
   return (
     <div className="lg:w-[85%] space-y-6">
       <div className="flex justify-center items-left flex-col md:flex-row md:justify-between">
-        <h1 className="text-3xl font-semibold">
+        <h1 className="text-xl md:text-3xl font-semibold">
           {mode === "add" ? "Add" : "Edit"} Geo-Drop
         </h1>
         <h2 className="text-lg font-medium italic">

@@ -154,7 +154,7 @@ export default function SubscriptionPage() {
 
   return (
     <div className="space-y-8 lg:w-[95%] py-8">
-      <h1 className="text-3xl font-semibold text-center">Choose Your Geo-Drops Subscription</h1>
+      <h1 className="text-xl md:text-3xl font-semibold text-center">Choose Your Geo-Drops Subscription</h1>
       
       <p className="text-center text-lg text-[#61667A] dark:text-gray-400">
         Contact support for downgrades/custom pricing as that cannot be done here.

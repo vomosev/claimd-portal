@@ -511,7 +511,7 @@ export default function SettingsPage() {
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="space-y-8 lg:w-[85%]">
-      <h1 className="text-3xl font-semibold">Settings</h1>
+      <h1 className="text-xl md:text-3xl font-semibold">Settings</h1>
       <hr className="border-[#D4D8EA] dark:border-[#2E4066]" />
 
       {/* ── Profile image + static fields (inside Form context) ─────────── */}

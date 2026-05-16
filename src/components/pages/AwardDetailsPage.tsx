@@ -503,7 +503,7 @@ const AwardDetailsPage = () => {
   const handleGeneratePass = async (userid: string, awardid: string) => {
     try {
       setIsGeneratingPass(true);
-      toast.success(`Generating card and sending to ${userid}`);
+      toast.success(`Generating card and sending to ${currentUsername}`);
       const formData = {
         userName: currentUsername,
         eventName: `Award ${awardid}`,
@@ -977,7 +977,7 @@ const AwardDetailsPage = () => {
           
           {/* Headings */}
           <div className='mb-6'>
-            <h1 className='text-3xl font-semibold flex items-center justify-between mb-4 logo-wrapper'>
+            <h1 className='text-xl md:text-3xl font-semibold flex items-center justify-between mb-4 logo-wrapper'>
               <span>{award.assetname} • {award.locationname}</span>
               {(process.env.NEXT_PUBLIC_DISTRIBUTION === "0") && (
                 <Button
