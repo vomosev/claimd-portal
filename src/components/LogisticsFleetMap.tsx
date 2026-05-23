@@ -3,17 +3,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-// ── TypeScript declaration for Google Maps on window ──────────────────────────
 declare global {
-  interface Window {
-    google: any;
-  }
+  interface Window { google: any; }
 }
 
-// ── Config ────────────────────────────────────────────────────────────────────
-const POLL_INTERVAL = 10000; // 10 seconds
+const POLL_INTERVAL      = 10_000;   // vehicle fetch — 10 s
+const LOCATION_INTERVAL  =  5_000;   // driver POST  —  5 s
 
-// ── Types ──────────────────────────────────────────────────────────────────────
 interface Vehicle {
   vehicle_id: string | number;
   lat:        number | string;
@@ -25,53 +21,136 @@ interface Vehicle {
   last_seen?: string;
 }
 
-// ── Component ──────────────────────────────────────────────────────────────────
+// ── Truck icon SVG ─────────────────────────────────────────────────────────────
+const TRUCK_SVG = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+    <circle cx="18" cy="18" r="18" fill="#5871A7"/>
+    <svg x="6" y="6" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="white" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <rect x="1" y="3" width="15" height="13" rx="1"/>
+      <path d="M16 8h4l3 5v4h-7V8z"/>
+      <circle cx="5.5"  cy="18.5" r="2.5"/>
+      <circle cx="18.5" cy="18.5" r="2.5"/>
+    </svg>
+  </svg>
+`;
+
+const ENCODED_TRUCK = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(TRUCK_SVG)}`;
+
+// ── "My Location" pin SVG (blue dot) ──────────────────────────────────────────
+const MY_LOCATION_SVG = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10" fill="#4285F4" opacity="0.25"/>
+    <circle cx="12" cy="12" r="6"  fill="#4285F4"/>
+    <circle cx="12" cy="12" r="3"  fill="white"/>
+  </svg>
+`;
+
+const ENCODED_MY_LOCATION = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(MY_LOCATION_SVG)}`;
+
+// ── Helper: get current position as a Promise ─────────────────────────────────
+function getCurrentPosition(
+  options?: PositionOptions
+): Promise<GeolocationPosition> {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error("Geolocation not supported"));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(resolve, reject, options);
+  });
+}
+
 export default function LogisticsFleetMap() {
-  const mapRef     = useRef<HTMLDivElement>(null);
+  const mapRef      = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Google Maps instances
-  const [map,              setMap]              = useState<any>(null);
+  const [map,               setMap]               = useState<any>(null);
   const [currentInfoWindow, setCurrentInfoWindow] = useState<any>(null);
+  const [vehicles,          setVehicles]          = useState<Vehicle[]>([]);
+  const [markers,           setMarkers]           = useState<Map<string | number, any>>(new Map());
+  const [error,             setError]             = useState<string | null>(null);
+  const [online,            setOnline]            = useState(true);
+  const [lastUpdated,       setLastUpdated]       = useState<Date | null>(null);
 
-  // Vehicle state
-  const [vehicles,    setVehicles]    = useState<Vehicle[]>([]);
-  const [markers,     setMarkers]     = useState<Map<string | number, any>>(new Map());
-  const [error,       setError]       = useState<string | null>(null);
-  const [online,      setOnline]      = useState(true);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-
-  // Driver GPS state (this device)
-  const [coords, setCoords] = useState<{
-    lat: number;
-    lng: number;
-    speed?: number;
-    heading?: number;
+  // The driver's own live coordinates (updated by watchPosition + manual button)
+  const [myCoords, setMyCoords] = useState<{
+    lat: number; lng: number; speed?: number; heading?: number;
   } | null>(null);
 
-  // ── 1. Watch driver's own GPS position ─────────────────────────────────────
+  // Marker for "My Location" so it stays on the map
+  const myMarkerRef = useRef<any>(null);
+
+  // ── 1. Get initial GPS fix immediately ─────────────────────────────────────
+  // watchPosition can take several seconds to fire the first callback.
+  // Calling getCurrentPosition upfront gives us a position instantly.
+  useEffect(() => {
+    getCurrentPosition({ enableHighAccuracy: true, timeout: 10_000 })
+      .then((pos) => {
+        setMyCoords({
+          lat:     pos.coords.latitude,
+          lng:     pos.coords.longitude,
+          speed:   pos.coords.speed   ?? 0,
+          heading: pos.coords.heading ?? 0,
+        });
+      })
+      .catch((err) => console.error("[FleetMap] initial GPS error:", err));
+  }, []);
+
+  // ── 2. Keep watching for GPS updates ───────────────────────────────────────
   useEffect(() => {
     if (!navigator.geolocation) return;
 
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
-        setCoords({
+        setMyCoords({
           lat:     pos.coords.latitude,
           lng:     pos.coords.longitude,
-          speed:   pos.coords.speed   || 0,
-          heading: pos.coords.heading || 0,
+          speed:   pos.coords.speed   ?? 0,
+          heading: pos.coords.heading ?? 0,
         });
       },
-      (err) => console.error("[FleetMap] GPS error:", err),
-      { enableHighAccuracy: true }
+      (err) => console.error("[FleetMap] GPS watch error:", err),
+      {
+        enableHighAccuracy: true,
+        timeout:            15_000,
+        maximumAge:         0,          // ← always use a fresh reading
+      }
     );
 
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
-  // ── 2. POST driver's live location to the backend ──────────────────────────
-  const updateDriverPosition = useCallback(async () => {
-    if (!coords) return;
+  // ── 3. Update "My Location" marker on the map whenever coords change ───────
+  useEffect(() => {
+    if (!map || !myCoords || !window.google) return;
+
+    const pos = { lat: myCoords.lat, lng: myCoords.lng };
+
+    if (myMarkerRef.current) {
+      // Smoothly move the existing marker
+      myMarkerRef.current.setPosition(pos);
+    } else {
+      // Create the marker for the first time
+      myMarkerRef.current = new window.google.maps.Marker({
+        position: pos,
+        map,
+        title: "My Location",
+        icon: {
+          url:        ENCODED_MY_LOCATION,
+          scaledSize: new window.google.maps.Size(24, 24),
+          anchor:     new window.google.maps.Point(12, 12),
+        },
+        zIndex: 999,   // always on top
+      });
+    }
+  }, [map, myCoords]);
+
+  // ── 4. POST driver's position to backend every 5 s ─────────────────────────
+  const postDriverPosition = useCallback(async (
+    coords: { lat: number; lng: number; speed?: number; heading?: number }
+  ) => {
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/location`,
@@ -79,12 +158,12 @@ export default function LogisticsFleetMap() {
           method:  "POST",
           headers: { "Content-Type": "application/json" },
           body:    JSON.stringify({
-            vehicleId:  1,         // 🔥 replace with dynamic driver id
-            shipmentId: 1,      // 🔥 replace with dynamic shipment id
+            vehicleId:  1,          // 🔥 replace with dynamic driver id
+            shipmentId: 1,          // 🔥 replace with dynamic shipment id
             latitude:   coords.lat,
             longitude:  coords.lng,
-            speed:      coords.speed   || 0,
-            heading:    coords.heading || 0,
+            speed:      coords.speed   ?? 0,
+            heading:    coords.heading ?? 0,
           }),
         }
       );
@@ -92,15 +171,24 @@ export default function LogisticsFleetMap() {
     } catch (err) {
       console.error("[FleetMap] location POST error:", err);
     }
-  }, [coords]);
+  }, []);
 
   useEffect(() => {
-    updateDriverPosition();
-    const t = setInterval(updateDriverPosition, POLL_INTERVAL);
-    return () => clearInterval(t);
-  }, [updateDriverPosition]);
+    if (!myCoords) return;
 
-  // ── 3. Fetch all live vehicle positions from the backend ───────────────────
+    // Post immediately when we get a new fix
+    postDriverPosition(myCoords);
+
+    const t = setInterval(() => {
+      // Re-read from the ref so the interval always uses the latest coords
+      // rather than stale closure values
+      postDriverPosition(myCoords);
+    }, LOCATION_INTERVAL);
+
+    return () => clearInterval(t);
+  }, [myCoords, postDriverPosition]);
+
+  // ── 5. Fetch all fleet vehicle positions ───────────────────────────────────
   const fetchVehicles = useCallback(async () => {
     try {
       const res = await fetch(
@@ -108,12 +196,14 @@ export default function LogisticsFleetMap() {
       );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-      const data  = await res.json();
-      const raw: any[] = Array.isArray(data) ? data : data.vehicles ?? [];
+      const data   = await res.json();
+      const raw    = Array.isArray(data) ? data : data.vehicles ?? [];
 
       const list: Vehicle[] = raw
-        .map((v) => ({ ...v, lat: Number(v.lat), lng: Number(v.lng) }))
-        .filter((v) => !isNaN(v.lat as number) && !isNaN(v.lng as number));
+        .map((v: any) => ({ ...v, lat: Number(v.lat), lng: Number(v.lng) }))
+        .filter((v: Vehicle) =>
+          !isNaN(v.lat as number) && !isNaN(v.lng as number)
+        );
 
       setVehicles(list);
       setLastUpdated(new Date());
@@ -129,31 +219,29 @@ export default function LogisticsFleetMap() {
   useEffect(() => {
     fetchVehicles();
     intervalRef.current = setInterval(fetchVehicles, POLL_INTERVAL);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [fetchVehicles]);
 
-  // ── 4. Create InfoWindow content for a vehicle ────────────────────────────
+  // ── 6. InfoWindow content ──────────────────────────────────────────────────
   const createInfoWindowContent = (v: Vehicle) => {
     const lat = Number(v.lat);
     const lng = Number(v.lng);
     return `
-      <div style="font-family:sans-serif; max-width:220px; line-height:1.5;">
-        <h4 style="margin:0 0 8px; font-size:14px; font-weight:700; color:#1f2937;">
+      <div style="font-family:sans-serif;max-width:220px;line-height:1.5;">
+        <h4 style="margin:0 0 8px;font-size:14px;font-weight:700;color:#1f2937;">
           Vehicle ${v.vehicle_id}
         </h4>
-        ${v.driver   ? `<p style="margin:2px 0; font-size:13px;"><strong>Driver:</strong> ${v.driver}</p>` : ""}
-        ${v.speed    != null ? `<p style="margin:2px 0; font-size:13px;"><strong>Speed:</strong> ${Number(v.speed)} km/h</p>` : ""}
-        ${v.status   ? `<p style="margin:2px 0; font-size:13px; text-transform:capitalize;"><strong>Status:</strong> ${v.status}</p>` : ""}
-        ${v.last_seen ? `<p style="margin:2px 0; font-size:12px; color:#6b7280;"><strong>Last seen:</strong> ${new Date(v.last_seen).toLocaleTimeString()}</p>` : ""}
-        <p style="margin:6px 0 0; font-size:11px; color:#9ca3af; font-family:monospace;">
+        ${v.driver    ? `<p style="margin:2px 0;font-size:13px;"><strong>Driver:</strong> ${v.driver}</p>` : ""}
+        ${v.speed     != null ? `<p style="margin:2px 0;font-size:13px;"><strong>Speed:</strong> ${Number(v.speed)} km/h</p>` : ""}
+        ${v.status    ? `<p style="margin:2px 0;font-size:13px;text-transform:capitalize;"><strong>Status:</strong> ${v.status}</p>` : ""}
+        ${v.last_seen ? `<p style="margin:2px 0;font-size:12px;color:#6b7280;"><strong>Last seen:</strong> ${new Date(v.last_seen).toLocaleTimeString()}</p>` : ""}
+        <p style="margin:6px 0 0;font-size:11px;color:#9ca3af;font-family:monospace;">
           ${lat.toFixed(5)}, ${lng.toFixed(5)}
         </p>
-        <p style="margin:6px 0 0; font-size:12px;">
+        <p style="margin:6px 0 0;font-size:12px;">
           <a href="https://www.google.com/maps?q=${lat},${lng}"
              target="_blank"
-             style="color:#3b82f6; text-decoration:none;">
+             style="color:#3b82f6;text-decoration:none;">
             📍 Open in Google Maps
           </a>
         </p>
@@ -161,57 +249,51 @@ export default function LogisticsFleetMap() {
     `;
   };
 
-  // ── 5. Handle marker click → show InfoWindow ──────────────────────────────
+  // ── 7. Marker click handler ────────────────────────────────────────────────
   const handleMarkerClick = useCallback(
     (vehicle: Vehicle, marker: any, mapInstance: any) => {
       if (currentInfoWindow) currentInfoWindow.close();
 
-      const infoWindow = new window.google.maps.InfoWindow({
+      const iw = new window.google.maps.InfoWindow({
         content: createInfoWindowContent(vehicle),
       });
-
-      infoWindow.open(mapInstance, marker);
-      setCurrentInfoWindow(infoWindow);
-
-      infoWindow.addListener("closeclick", () => {
-        setCurrentInfoWindow(null);
-      });
+      iw.open(mapInstance, marker);
+      setCurrentInfoWindow(iw);
+      iw.addListener("closeclick", () => setCurrentInfoWindow(null));
     },
-    [currentInfoWindow]
+    [currentInfoWindow]   // eslint-disable-line
   );
 
-  // ── 6. Initialise Google Maps on mount ────────────────────────────────────
+  // ── 8. Initialise Google Maps ──────────────────────────────────────────────
   useEffect(() => {
     const init = async () => {
-      // Default centre — try to use driver's GPS first
+      // Use the driver's GPS for the initial centre if available
       let centreLat = 51.507351;
       let centreLng = -0.127758;
 
       try {
-        const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
-          navigator.geolocation.getCurrentPosition(resolve, reject, {
-            enableHighAccuracy: true,
-            timeout: 10000,
-          })
-        );
+        const pos = await getCurrentPosition({
+          enableHighAccuracy: true,
+          timeout:            10_000,
+        });
         centreLat = pos.coords.latitude;
         centreLng = pos.coords.longitude;
       } catch {
         // fall back to London
       }
 
-      // Load Google Maps SDK if not already present
+      // Load the Google Maps SDK once
       if (!window.google) {
         await new Promise<void>((resolve) => {
           const existing = document.getElementById("googleMapsScript");
           if (!existing) {
-            const script = document.createElement("script");
-            script.id    = "googleMapsScript";
-            script.src   = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_MAPS_API_KEY}`;
-            script.async = true;
-            script.defer = true;
-            script.onload = () => resolve();
-            document.body.appendChild(script);
+            const s   = document.createElement("script");
+            s.id      = "googleMapsScript";
+            s.src     = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_MAPS_API_KEY}`;
+            s.async   = true;
+            s.defer   = true;
+            s.onload  = () => resolve();
+            document.body.appendChild(s);
           } else {
             resolve();
           }
@@ -220,24 +302,8 @@ export default function LogisticsFleetMap() {
 
       if (!window.google || !mapRef.current) return;
 
-      // ── Custom truck SVG for vehicle markers ────────────────────────────────
-      const truckSvg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
-          <circle cx="18" cy="18" r="18" fill="#5871A7"/>
-          <svg x="6" y="6" width="24" height="24" viewBox="0 0 24 24"
-            fill="none" stroke="white" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <rect x="1" y="3" width="15" height="13" rx="1"/>
-            <path d="M16 8h4l3 5v4h-7V8z"/>
-            <circle cx="5.5"  cy="18.5" r="2.5"/>
-            <circle cx="18.5" cy="18.5" r="2.5"/>
-          </svg>
-        </svg>
-      `;
-      const encodedTruck = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(truckSvg)}`;
-
       const vehicleIcon = {
-        url:        encodedTruck,
+        url:        ENCODED_TRUCK,
         scaledSize: new window.google.maps.Size(36, 36),
         anchor:     new window.google.maps.Point(18, 18),
       };
@@ -246,13 +312,11 @@ export default function LogisticsFleetMap() {
         center: { lat: centreLat, lng: centreLng },
         zoom:   13,
         styles: [
-          // Subtle style to make vehicle markers pop
-          { featureType: "poi",   stylers: [{ visibility: "off"      }] },
-          { featureType: "transit", stylers: [{ visibility: "simplified" }] },
+          { featureType: "poi",     stylers: [{ visibility: "off"         }] },
+          { featureType: "transit", stylers: [{ visibility: "simplified"  }] },
         ],
       });
 
-      // Close InfoWindow on map click
       mapInstance.addListener("click", () => {
         if (currentInfoWindow) {
           currentInfoWindow.close();
@@ -262,7 +326,7 @@ export default function LogisticsFleetMap() {
 
       setMap(mapInstance);
 
-      // ── Initial vehicle markers ───────────────────────────────────────────
+      // Drop initial vehicle markers
       const markerMap = new Map<string | number, any>();
       vehicles.forEach((v) => {
         const lat = Number(v.lat);
@@ -275,7 +339,6 @@ export default function LogisticsFleetMap() {
           title:    `Vehicle ${v.vehicle_id}`,
           icon:     vehicleIcon,
         });
-
         marker.addListener("click", () =>
           handleMarkerClick(v, marker, mapInstance)
         );
@@ -289,32 +352,18 @@ export default function LogisticsFleetMap() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── 7. Update markers smoothly when vehicle positions change ──────────────
+  // ── 9. Update vehicle markers when data refreshes ─────────────────────────
   useEffect(() => {
     if (!map || !window.google) return;
 
-    const truckSvg = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
-        <circle cx="18" cy="18" r="18" fill="#5871A7"/>
-        <svg x="6" y="6" width="24" height="24" viewBox="0 0 24 24"
-          fill="none" stroke="white" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <rect x="1" y="3" width="15" height="13" rx="1"/>
-          <path d="M16 8h4l3 5v4h-7V8z"/>
-          <circle cx="5.5"  cy="18.5" r="2.5"/>
-          <circle cx="18.5" cy="18.5" r="2.5"/>
-        </svg>
-      </svg>
-    `;
-    const encodedTruck = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(truckSvg)}`;
     const vehicleIcon = {
-      url:        encodedTruck,
+      url:        ENCODED_TRUCK,
       scaledSize: new window.google.maps.Size(36, 36),
       anchor:     new window.google.maps.Point(18, 18),
     };
 
-    setMarkers((prevMarkers) => {
-      const updated = new Map(prevMarkers);
+    setMarkers((prev) => {
+      const updated = new Map(prev);
 
       vehicles.forEach((v) => {
         const lat = Number(v.lat);
@@ -323,10 +372,8 @@ export default function LogisticsFleetMap() {
 
         const existing = updated.get(v.vehicle_id);
         if (existing) {
-          // Smoothly move the marker to the new position
           existing.setPosition(new window.google.maps.LatLng(lat, lng));
         } else {
-          // New vehicle — create a fresh marker
           const marker = new window.google.maps.Marker({
             position: { lat, lng },
             map,
@@ -340,7 +387,6 @@ export default function LogisticsFleetMap() {
         }
       });
 
-      // Remove markers for vehicles no longer in the list
       const activeIds = new Set(vehicles.map((v) => v.vehicle_id));
       updated.forEach((marker, id) => {
         if (!activeIds.has(id)) {
@@ -353,34 +399,51 @@ export default function LogisticsFleetMap() {
     });
   }, [vehicles, map, handleMarkerClick]);
 
-  // ── 8. "My Location" button ───────────────────────────────────────────────
-  const handleCentreOnMe = () => {
-    if (!navigator.geolocation || !map) return;
-    navigator.geolocation.getCurrentPosition(
-      ({ coords: { latitude, longitude } }) => {
-        map.setCenter({ lat: latitude, lng: longitude });
+  // ── 10. "My Location" button — manual update + re-centre ──────────────────
+  const handleMyLocation = useCallback(async () => {
+    try {
+      const pos = await getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout:            10_000,
+        maximumAge:         0,     // force a fresh reading
+      });
+
+      const freshCoords = {
+        lat:     pos.coords.latitude,
+        lng:     pos.coords.longitude,
+        speed:   pos.coords.speed   ?? 0,
+        heading: pos.coords.heading ?? 0,
+      };
+
+      // Update state — this triggers the marker + POST effects above
+      setMyCoords(freshCoords);
+
+      // Re-centre and zoom the map
+      if (map) {
+        map.setCenter({ lat: freshCoords.lat, lng: freshCoords.lng });
         map.setZoom(15);
-      },
-      (err) => console.error("[FleetMap] centre error:", err)
-    );
-  };
+      }
+    } catch (err) {
+      console.error("[FleetMap] my-location error:", err);
+    }
+  }, [map]);
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="flex flex-col gap-3">
 
-      {/* Status bar */}
+      {/* Header */}
       <div className="flex items-center justify-between px-1">
         <div>
-          <h2 className="text-xl font-semibold">
-            Fleet Tracking
-          </h2>
+          <h2 className="text-xl font-semibold">Fleet Tracking</h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Current location of vehicles and their planned routes based on latest data. Click on stops or vehicles for details.
+            Live vehicle positions. Click a vehicle for details.
           </p>
         </div>
       </div>
-      <div className="flex items-center justify-between px-1">
+
+      {/* Status bar */}
+      <div className="flex items-center justify-between px-1 flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <span className={`
             inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full
@@ -389,37 +452,69 @@ export default function LogisticsFleetMap() {
               : "bg-red-100   dark:bg-red-900/30   text-red-700   dark:text-red-400"
             }
           `}>
-            <span className={`w-1.5 h-1.5 rounded-full ${online ? "bg-green-500 animate-pulse" : "bg-red-500"}`} />
+            <span className={`
+              w-1.5 h-1.5 rounded-full
+              ${online ? "bg-green-500 animate-pulse" : "bg-red-500"}
+            `} />
             {online ? "Live" : "Offline"}
           </span>
+
           <span className="text-xs text-gray-500 dark:text-gray-400">
             {vehicles.length} vehicle{vehicles.length !== 1 ? "s" : ""} tracked
           </span>
+
+          {/* Show driver's current coords when available */}
+          {myCoords && (
+            <span className="text-xs text-gray-400 font-mono hidden sm:inline">
+              📍 {myCoords.lat.toFixed(4)}, {myCoords.lng.toFixed(4)}
+            </span>
+          )}
         </div>
-        <div className="flex items-center gap-3">
+
+        <div className="flex items-center gap-2">
           {lastUpdated && (
             <span className="text-xs text-gray-400">
               Updated {lastUpdated.toLocaleTimeString()}
             </span>
           )}
-          {/* <button
+
+          {/* ── My Location button ──────────────────────────────────────── */}
+          <button
             type="button"
-            onClick={handleCentreOnMe}
-            className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#5871A7] text-white hover:bg-[#4560A0] transition-colors"
+            onClick={handleMyLocation}
+            className="
+              inline-flex items-center gap-1.5
+              text-xs font-semibold
+              px-3 py-1.5 rounded-full
+              bg-[#5871A7] hover:bg-[#4560A0]
+              text-white
+              transition-colors
+            "
+            title="Update and centre on my current location"
           >
+            {/* Blue dot icon */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="12" height="12"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <circle cx="12" cy="12" r="8" opacity="0.3"/>
+              <circle cx="12" cy="12" r="5"/>
+            </svg>
             My Location
-          </button> */}
+          </button>
         </div>
       </div>
 
       {/* Error banner */}
       {error && (
         <div className="rounded-lg border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/20 px-4 py-2.5 text-sm text-red-600 dark:text-red-400">
-          {error} — retrying every {POLL_INTERVAL / 1000}s…
+          {error} — retrying every {POLL_INTERVAL / 1_000}s…
         </div>
       )}
 
-      {/* Google Map container */}
+      {/* Map */}
       <div
         ref={mapRef}
         className="w-full h-[500px] rounded-[20px] overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm bg-gray-100 dark:bg-gray-800"
