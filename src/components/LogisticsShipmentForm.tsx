@@ -726,8 +726,6 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
                   <FormControl>
                     <Input
                       placeholder={currentUsername}
-                      readOnly
-                      className="bg-gray-50 dark:bg-gray-900 text-gray-500 cursor-default"
                       {...field}
                     />
                   </FormControl>
