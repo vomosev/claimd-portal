@@ -410,14 +410,12 @@ export default function LogisticsRoutePlanner({
     //     width="56"
     //     height="56"
     //     viewBox="0 0 56 56">
-
     //     <circle
     //       cx="28"
     //       cy="28"
     //       r="28"
     //       fill="#5871A7"
     //     />
-
     //     <path
     //       d="M16 18h18v12h7l5 6v6h-3a5 5 0 01-10 0H25a5 5 0 01-10 0h-3V18h4z"
     //       fill="white"
