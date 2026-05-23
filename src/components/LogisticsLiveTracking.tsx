@@ -664,7 +664,7 @@ export default function LogisticsRoutePlanner({
 
         <div>
 
-          <h1 className="text-xl font-semibold text-gray-800 dark:text-white">View Route {shipmentId} Stops</h1>
+          <h1 className="text-xl font-semibold text-gray-800 dark:text-white">View Route {shipmentId}</h1>
 
           <p className="
             text-sm
