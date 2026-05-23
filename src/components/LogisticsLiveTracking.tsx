@@ -86,6 +86,8 @@ export default function LogisticsRoutePlanner({
   const [speed, setSpeed] =
     useState<number>(0);
 
+  const [distanceUnit, setDistanceUnit] = useState<"mi" | "km">("mi");
+
   // =====================================================
   // HELPERS
   // =====================================================
@@ -746,12 +748,32 @@ export default function LogisticsRoutePlanner({
         gap-4
       ">
 
-        <div className="
-            text-md
-            font-bold
-            ">
-            ETA: {eta || "--"} Remaining: { distanceRemaining ? `${(Number(distanceRemaining) * 0.621371).toFixed(1)} mi` : "--" } Speed: {speed} mph
-        </div>
+<div
+  className="
+    text-md
+    font-bold
+    cursor-pointer
+  "
+  onClick={() =>
+    setDistanceUnit(
+      distanceUnit === "mi" ? "km" : "mi"
+    )
+  }
+>
+  ETA: {eta || "--"}{" "}
+  Remaining: {
+    distanceRemaining
+      ? distanceUnit === "mi"
+        ? `${(Number(distanceRemaining) * 0.621371).toFixed(1)} mi`
+        : `${Number(distanceRemaining).toFixed(1)} km`
+      : "--"
+  }{" "}
+  Speed: {
+    distanceUnit === "mi"
+      ? `${speed} mph`
+      : `${(Number(speed) * 1.60934).toFixed(1)} km/h`
+  }
+</div>
 
       </div>
 
