@@ -750,7 +750,7 @@ export default function LogisticsRoutePlanner({
             text-md
             font-bold
             ">
-            ETA: {eta || "--"} Remaining: {distanceRemaining || "--"} Speed: {speed} mph
+            ETA: {eta || "--"} Remaining: { distanceRemaining ? `${(Number(distanceRemaining) * 0.621371).toFixed(1)} mi` : "--" } Speed: {speed} mph
         </div>
 
       </div>
