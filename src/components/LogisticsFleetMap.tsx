@@ -203,6 +203,8 @@ export default function LogisticsFleetMap() {
       const data   = await res.json();
       const raw    = Array.isArray(data) ? data : data.vehicles ?? [];
 
+      console.log("data", raw);
+
       const list: Vehicle[] = raw
         .map((v: any) => ({ ...v, lat: Number(v.lat), lng: Number(v.lng) }))
         .filter((v: Vehicle) =>
