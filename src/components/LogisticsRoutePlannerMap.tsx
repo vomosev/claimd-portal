@@ -359,7 +359,7 @@ export default function LogisticsRoutePlanner({ shipmentId }: any) {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-xl font-semibold">
-            View Route {shipmentId}
+            View Stops {shipmentId}
           </h1>
           <p className="text-xs text-gray-500 mt-0.5">
             Current location of vehicles and their planned routes based on latest data. Click on stops or vehicles for details.

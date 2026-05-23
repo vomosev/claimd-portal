@@ -591,7 +591,7 @@ export default function LogisticsRoutePlanner({
             "
           >
             <Route size={18} />
-            View Route
+            View Stops
           </button>
 
           <button
