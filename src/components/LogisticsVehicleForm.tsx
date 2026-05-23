@@ -393,8 +393,9 @@ export default function LogisticsVehicleForm({
 
                   <FormControl>
                     <Input
-                      readOnly
                       placeholder="active"
+                      readOnly
+                      className="bg-gray-50 dark:bg-gray-900 text-gray-500 cursor-default"
                       {...field}
                     />
                   </FormControl>
