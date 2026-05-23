@@ -313,7 +313,7 @@ export default function LogisticsRoutePlanner({
           method:  "POST",
           headers: { "Content-Type": "application/json" },
           body:    JSON.stringify({
-            username:  currentUsername || username, 
+            username:   username, 
             shipmentId: shipmentId,
             latitude:   coords.latitude,
             longitude:  coords.longitude,
@@ -322,9 +322,6 @@ export default function LogisticsRoutePlanner({
           }),
         }
       );
-      console.log( "[GPS username]", username);
-      console.log( "[GPS currentUsername]", currentUsername);
-
     } catch (err) {
       console.error("[FleetMap] location POST error:", err);
     }
