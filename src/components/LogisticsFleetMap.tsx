@@ -150,25 +150,19 @@ export default function LogisticsFleetMap() {
     }
   }, [map, myCoords]);
 
-  const [currentUsername, setCurrentUsername] = useState("");
-  // ── Read username ────────────────────────────────────────────────────────────
-  useEffect(() => {
-    const username = localStorage.getItem("username") ?? "";
-    setCurrentUsername(username);
-  }, []);
-
   // ── 4. POST driver's position to backend every 5 s ─────────────────────────
   const postDriverPosition = useCallback(async (
     coords: { lat: number; lng: number; speed?: number; heading?: number }
   ) => {
     try {
+      const username = localStorage.getItem("username") ?? "";
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/location`,
         {
           method:  "POST",
           headers: { "Content-Type": "application/json" },
           body:    JSON.stringify({
-            username:  currentUsername, 
+            username:   username, 
             shipmentId: shipmentId,
             latitude:   coords.lat,
             longitude:  coords.lng,
