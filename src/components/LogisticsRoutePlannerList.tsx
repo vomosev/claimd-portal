@@ -619,7 +619,7 @@ export default function LogisticsRoutePlanner({
             </div>
           )}
 
-          {/* <button
+          <button
             type="button"
             onClick={fetchData}
             className="
@@ -631,7 +631,7 @@ export default function LogisticsRoutePlanner({
           >
             <RefreshCw size={13} />
             Refresh
-          </button> */}
+          </button>
 
           {/* Google Map container */}
           <div
