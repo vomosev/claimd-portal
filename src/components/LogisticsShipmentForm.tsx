@@ -430,6 +430,14 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
     name:    "stops",
   });
 
+  const [currentUsername, setCurrentUsername] = useState("");
+
+  // ── Read username ────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const username = localStorage.getItem("username") ?? "";
+    setCurrentUsername(username);
+  }, []);
+
   useEffect(() => {
 
     if (
@@ -595,7 +603,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
         body:    JSON.stringify({
           reference:   values.reference,
           description: values.description || null,
-          driver:      values.driver      || null,
+          driver:      currentUsername    || null,
           vehicle:     values.vehicle     || null,
           stops:       stopsPayload,
         }),
@@ -716,7 +724,12 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
                 <FormItem>
                   <FormLabel>Driver (optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="Driver name or ID" {...field} />
+                    <Input
+                      placeholder={currentUsername}
+                      readOnly
+                      className="bg-gray-50 dark:bg-gray-900 text-gray-500 cursor-default"
+                      {...field}
+                    />
                   </FormControl>
                 </FormItem>
               )} />
