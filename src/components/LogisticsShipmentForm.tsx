@@ -78,10 +78,10 @@ const stopSchema = z.object({
 });
 
 const schema = z.object({
-  reference:   z.string().min(1, "Route reference is required"),
+  driver:      z.string().min(1, "Email address is required"),
+  vehicle:     z.string().min(1, "Vehicle reg or ID"),
   description: z.string().optional(),
-  driver:      z.string().optional(),
-  vehicle:     z.string().optional(),
+  reference:   z.string().min(1, "Route reference is required"),
   stops:       z.array(stopSchema).min(1, "Add at least one stop"),
 });
 
@@ -722,7 +722,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
 
               <FormField name="driver" control={form.control} render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Driver (optional)</FormLabel>
+                  <FormLabel>Driver</FormLabel>
                   <FormControl>
                     <Input
                       placeholder={currentUsername}
@@ -734,7 +734,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
 
               <FormField name="vehicle" control={form.control} render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Vehicle (optional)</FormLabel>
+                  <FormLabel>Vehicle</FormLabel>
                   <FormControl>
                     <Input placeholder="Vehicle reg or ID" {...field} />
                   </FormControl>
