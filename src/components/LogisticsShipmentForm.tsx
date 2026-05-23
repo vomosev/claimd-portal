@@ -603,7 +603,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
         body:    JSON.stringify({
           reference:   values.reference,
           description: values.description || null,
-          driver:      currentUsername    || null,
+          driver:      currentUsername    || values.driver,
           vehicle:     values.vehicle     || null,
           stops:       stopsPayload,
         }),
