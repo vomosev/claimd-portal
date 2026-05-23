@@ -322,6 +322,8 @@ export default function LogisticsRoutePlanner({
           }),
         }
       );
+      console.log( "[GPS username]", username);
+      console.log( "[GPS currentUsername]", currentUsername);
 
     } catch (err) {
       console.error("[FleetMap] location POST error:", err);
