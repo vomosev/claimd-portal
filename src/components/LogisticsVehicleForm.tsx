@@ -198,7 +198,7 @@ export default function LogisticsVehicleForm({
         },
         body: JSON.stringify({
           driver_userid: currentUsername || values.driver_userid
-            ? Number(values.driver_userid)
+            ? currentUsername
             : null,
 
           vehicle_reg: values.vehicle_reg,
