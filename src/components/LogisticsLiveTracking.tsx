@@ -405,23 +405,36 @@ export default function LogisticsRoutePlanner({
     const map =
       mapInstanceRef.current;
 
+    // const truckSvg = `
+    //   <svg xmlns="http://www.w3.org/2000/svg"
+    //     width="56"
+    //     height="56"
+    //     viewBox="0 0 56 56">
+
+    //     <circle
+    //       cx="28"
+    //       cy="28"
+    //       r="28"
+    //       fill="#5871A7"
+    //     />
+
+    //     <path
+    //       d="M16 18h18v12h7l5 6v6h-3a5 5 0 01-10 0H25a5 5 0 01-10 0h-3V18h4z"
+    //       fill="white"
+    //     />
+    //   </svg>
+    // `;
     const truckSvg = `
-      <svg xmlns="http://www.w3.org/2000/svg"
-        width="56"
-        height="56"
-        viewBox="0 0 56 56">
-
-        <circle
-          cx="28"
-          cy="28"
-          r="28"
-          fill="#5871A7"
-        />
-
-        <path
-          d="M16 18h18v12h7l5 6v6h-3a5 5 0 01-10 0H25a5 5 0 01-10 0h-3V18h4z"
-          fill="white"
-        />
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+        <circle cx="18" cy="18" r="18" fill="#5871A7"/>
+        <svg x="6" y="6" width="24" height="24" viewBox="0 0 24 24"
+          fill="none" stroke="white" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="3" width="15" height="13" rx="1"/>
+          <path d="M16 8h4l3 5v4h-7V8z"/>
+          <circle cx="5.5"  cy="18.5" r="2.5"/>
+          <circle cx="18.5" cy="18.5" r="2.5"/>
+        </svg>
       </svg>
     `;
 
