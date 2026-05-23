@@ -86,6 +86,8 @@ export default function LogisticsRoutePlanner({
   const [speed, setSpeed] =
     useState<number>(0);
 
+  const [currentUsername, setCurrentUsername] = useState("");
+
   // =====================================================
   // HELPERS
   // =====================================================
@@ -231,7 +233,6 @@ export default function LogisticsRoutePlanner({
 
   }, []);
 
-  const [currentUsername, setCurrentUsername] = useState("");
   // ── Read username ────────────────────────────────────────────────────────────
   useEffect(() => {
     const username = localStorage.getItem("username") ?? "";
