@@ -164,7 +164,7 @@ export default function LogisticsVehicleForm({
         }
 
         form.reset({
-          driver_userid: data.driver_userid?.toString() || "",
+          driver_userid: currentUsername || data.driver_userid?.toString() || "",
           vehicle_reg: data.vehicle_reg || "",
           capacity: data.capacity?.toString() || "",
           status: data.status || "active",
@@ -197,7 +197,7 @@ export default function LogisticsVehicleForm({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          driver_userid: values.driver_userid
+          driver_userid: currentUsername || values.driver_userid
             ? Number(values.driver_userid)
             : null,
 
@@ -248,7 +248,7 @@ export default function LogisticsVehicleForm({
             setSavedId(null);
 
             form.reset({
-              driver_userid: "",
+              driver_userid: currentUsername || "",
               vehicle_reg: "",
               capacity: "",
               status: "active",
