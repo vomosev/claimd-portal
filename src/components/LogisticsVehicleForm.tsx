@@ -393,6 +393,7 @@ export default function LogisticsVehicleForm({
 
                   <FormControl>
                     <Input
+                      readOnly
                       placeholder="active"
                       {...field}
                     />
