@@ -119,17 +119,31 @@ export default function LogisticsVehicleForm({
   const [saving, setSaving] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [savedId, setSavedId] = useState<number | null>(null);
+  const [currentUsername, setCurrentUsername] = useState("");
+
+  // ── Read username ────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const username = localStorage.getItem("username") ?? "";
+    setCurrentUsername(username);
+  }, []);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      driver_userid: "",
+      driver_userid: currentUsername,
       vehicle_reg: "",
       capacity: "",
       status: "active",
       name: "",
     },
   });
+
+  // ── Set the field value when username is available ────────────────────────────
+  useEffect(() => {
+    if (currentUsername) {
+      form.setValue("driver_userid", currentUsername);
+    }
+  }, [currentUsername, form]);
 
   // ────────────────────────────────────────────────────────────────────────────
   // Load vehicle when editing
@@ -164,20 +178,6 @@ export default function LogisticsVehicleForm({
 
     loadVehicle();
   }, [mode, vehicleId, form]);
-
-  const [currentUsername, setCurrentUsername] = useState("");
-  // ── Read username ────────────────────────────────────────────────────────────
-  useEffect(() => {
-    const username = localStorage.getItem("username") ?? "";
-    setCurrentUsername(username);
-  }, []);
-
-  // ── Set the field value when username is available ────────────────────────────
-  useEffect(() => {
-    if (currentUsername) {
-      form.setValue("driver_userid", currentUsername);
-    }
-  }, [currentUsername, form]);
 
   // ────────────────────────────────────────────────────────────────────────────
   // Submit
