@@ -305,13 +305,14 @@ export default function LogisticsRoutePlanner({
           }
 
     try {
+      const username = localStorage.getItem("username") ?? "";
       const res = fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/location`,
         {
           method:  "POST",
           headers: { "Content-Type": "application/json" },
           body:    JSON.stringify({
-            username:  currentUsername, 
+            username:  currentUsername || username, 
             shipmentId: shipmentId,
             latitude:   coords.latitude,
             longitude:  coords.longitude,
