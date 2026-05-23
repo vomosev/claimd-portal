@@ -568,7 +568,7 @@ export default function LogisticsRoutePlanner({
 
           <button
             type="button"
-            onClick={fetchData}
+            onClick={() => router.push(`/logistics/transportlist/${shipmentId}`)}
             className="
               inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm
               border border-gray-200 dark:border-[#2E4066]
