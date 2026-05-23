@@ -464,9 +464,9 @@ export default function LogisticsFleetMap() {
           </span>
 
           {/* Show driver's current coords when available */}
-          - This vehicle {myCoords && (
+          {myCoords && (
             <span className="text-xs text-gray-400 font-mono hidden sm:inline">
-              📍 {myCoords.lat.toFixed(4)}, {myCoords.lng.toFixed(4)}
+            - This vehicle 📍 {myCoords.lat.toFixed(4)}, {myCoords.lng.toFixed(4)}
             </span>
           )}
         </div>
