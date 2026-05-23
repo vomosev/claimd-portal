@@ -353,7 +353,7 @@ export default function LogisticsVehicleForm({
                   <FormLabel>Driver User ID</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="info@ega-tech.co"
+                      placeholder={currentUsername}
                       readOnly
                       className="bg-gray-50 dark:bg-gray-900 text-gray-500 cursor-default"
                       {...field}
