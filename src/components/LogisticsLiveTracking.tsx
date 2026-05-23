@@ -231,6 +231,13 @@ export default function LogisticsRoutePlanner({
 
   }, []);
 
+  const [currentUsername, setCurrentUsername] = useState("");
+  // ── Read username ────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const username = localStorage.getItem("username") ?? "";
+    setCurrentUsername(username);
+  }, []);
+
   // =====================================================
   // FETCH STOPS
   // =====================================================
@@ -296,6 +303,27 @@ export default function LogisticsRoutePlanner({
               )
             );
           }
+
+    try {
+      const res = fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/location`,
+        {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({
+            username:  currentUsername, 
+            shipmentId: shipmentId,
+            latitude:   coords.latitude,
+            longitude:  coords.longitude,
+            speed:      coords.speed   ?? 0,
+            heading:    coords.heading ?? 0,
+          }),
+        }
+      );
+
+    } catch (err) {
+      console.error("[FleetMap] location POST error:", err);
+    }
 
           console.log(
             "[GPS UPDATE]",

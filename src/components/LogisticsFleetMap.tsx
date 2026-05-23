@@ -2,6 +2,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useParams } from 'next/navigation';
 
 declare global {
   interface Window { google: any; }
@@ -73,6 +74,8 @@ export default function LogisticsFleetMap() {
   const [error,             setError]             = useState<string | null>(null);
   const [online,            setOnline]            = useState(true);
   const [lastUpdated,       setLastUpdated]       = useState<Date | null>(null);
+  const params = useParams();
+  const shipmentId = params?.shipmentId;
 
   // The driver's own live coordinates (updated by watchPosition + manual button)
   const [myCoords, setMyCoords] = useState<{
@@ -158,8 +161,8 @@ export default function LogisticsFleetMap() {
           method:  "POST",
           headers: { "Content-Type": "application/json" },
           body:    JSON.stringify({
-            vehicleId:  1,          // 🔥 replace with dynamic driver id
-            shipmentId: 1,          // 🔥 replace with dynamic shipment id
+            vehicleId:  1,          // 🔥 replace with dynamic driver id 
+            shipmentId: shipmentId, // 🔥 replace with dynamic shipment id
             latitude:   coords.lat,
             longitude:  coords.lng,
             speed:      coords.speed   ?? 0,

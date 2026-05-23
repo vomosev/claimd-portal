@@ -165,6 +165,20 @@ export default function LogisticsVehicleForm({
     loadVehicle();
   }, [mode, vehicleId, form]);
 
+  const [currentUsername, setCurrentUsername] = useState("");
+  // ── Read username ────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const username = localStorage.getItem("username") ?? "";
+    setCurrentUsername(username);
+  }, []);
+
+  // ── Set the field value when username is available ────────────────────────────
+  useEffect(() => {
+    if (currentUsername) {
+      form.setValue("driver_userid", currentUsername);
+    }
+  }, [currentUsername, form]);
+
   // ────────────────────────────────────────────────────────────────────────────
   // Submit
   // ────────────────────────────────────────────────────────────────────────────
@@ -337,14 +351,15 @@ export default function LogisticsVehicleForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Driver User ID</FormLabel>
-
                   <FormControl>
                     <Input
-                      type="number"
-                      placeholder="e.g. 102"
+                      placeholder="info@ega-tech.co"
+                      readOnly
+                      className="bg-gray-50 dark:bg-gray-900 text-gray-500 cursor-default"
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
