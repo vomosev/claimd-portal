@@ -20,6 +20,8 @@ interface Vehicle {
   status?:    string;
   driver?:    string;
   last_seen?: string;
+  driver_userid?:  string;
+  vehicle_reg?:    string;
 }
 
 // ── Status config ──────────────────────────────────────────────────────────────
@@ -490,8 +492,19 @@ export default function LogisticsFleetMap() {
                             — {v.driver}
                           </span>
                         )}
+                        {v.driver_userid && (
+                          <span className="ml-1.5 text-xs font-normal text-gray-500">
+                            — {v.driver_userid}
+                          </span>
+                        )}
                       </p>
                       <p className="text-xs text-gray-400 font-mono mt-0.5">
+                        {v.vehicle_reg && (
+                          <span className="ml-2 not-italic text-gray-400">
+                            — {v.vehicle_reg}
+                            {Number(v.speed)} km/h
+                          </span>
+                        )}
                         {lat.toFixed(5)}, {lng.toFixed(5)}
                         {v.speed != null && (
                           <span className="ml-2 not-italic text-gray-400">
