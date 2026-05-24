@@ -201,8 +201,9 @@ export default function LogisticsFleetMap() {
           Vehicle ${v.vehicle_id}
         </h4>
         ${v.driver    ? `<p style="margin:2px 0;font-size:13px;"><strong>Driver:</strong> ${v.driver}</p>` : ""}
+        ${v.driver_userid    ? `<p style="margin:2px 0;font-size:13px;"><strong>Driver:</strong> ${v.driver_userid}</p>` : ""}
         ${v.speed     != null ? `<p style="margin:2px 0;font-size:13px;"><strong>Speed:</strong> ${Number(v.speed)} km/h</p>` : ""}
-        ${v.status    ? `<p style="margin:2px 0;font-size:13px;text-transform:capitalize;"><strong>Status:</strong> ${v.status}</p>` : ""}
+        ${v.vehicle_reg    ? `<p style="margin:2px 0;font-size:13px;text-transform:capitalize;"><strong>Registration:</strong> ${v.vehicle_reg}</p>` : ""}
         ${v.last_seen ? `<p style="margin:2px 0;font-size:12px;color:#6b7280;"><strong>Last seen:</strong> ${new Date(v.last_seen).toLocaleTimeString()}</p>` : ""}
         <p style="margin:6px 0 0;font-size:11px;color:#9ca3af;font-family:monospace;">
           ${lat.toFixed(5)}, ${lng.toFixed(5)}
