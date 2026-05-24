@@ -501,7 +501,7 @@ export default function LogisticsFleetMap() {
                       </p>
                       <p className="text-xs text-gray-400 font-mono mt-0.5">
                         {v.vehicle_reg && (
-                          <span className="ml-2 not-italic text-gray-400">
+                          <span className="not-italic text-gray-400">
                             {v.vehicle_reg}
                           </span>
                         )}
