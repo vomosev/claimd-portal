@@ -152,14 +152,14 @@ export default function LogisticsVehicles() {
                   <div className="mt-1 flex flex-wrap items-center gap-4 text-xs text-gray-400">
 
                     <span className="flex items-center gap-1">
-                      <Hash size={12} />
-                      {v.vehicle_reg}
+                      {/* <Hash size={12} /> */}
+                      Registration: {v.vehicle_reg}
                     </span>
 
                     {v.driver_userid && (
                       <span className="flex items-center gap-1">
                         <User size={12} />
-                        Driver #{v.driver_userid}
+                        Driver: {v.driver_userid}
                       </span>
                     )}
 
@@ -171,7 +171,7 @@ export default function LogisticsVehicles() {
 
                     <span className="flex items-center gap-1">
                       <Calendar size={12} />
-                      {new Date(v.created_at).toLocaleDateString()}
+                      Added: {new Date(v.created_at).toLocaleDateString()}
                     </span>
 
                   </div>
