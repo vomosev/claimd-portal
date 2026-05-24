@@ -10,6 +10,8 @@ interface Shipment {
   id: number;
   address: string;
   reference: string;
+  driver: string;
+  vehicle: string;
   status: string;
   description: string;
   created_at: string;
@@ -137,14 +139,12 @@ export default function LogisticsShipments() {
                         <div className="p-2 rounded-lg bg-[#5871A7]/10 flex-shrink-0">
                             <Package size={18} className="text-[#5871A7]" />
                         </div>
-
                         <div className="min-w-0">
                             <p className="font-semibold truncate">
-                                {s.id} • {s.reference} {`- ${s.description}` || ""}
+                                Route: {s.id} {s.reference} Description: {`- ${s.description}` || ""}
                             </p>
-
                             <p className="text-xs text-gray-400">
-                                {s.address} • {s.stop_count} stops {`- ${s.status}` || ""}
+                                Driver: {s.driver} {`(${s.vehicle})`} Address: {s.address} Stops: {s.stop_count} {`Status: ${s.status}` || ""}
                             </p>
                         </div>
                     </div>
