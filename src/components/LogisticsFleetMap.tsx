@@ -548,7 +548,7 @@ export default function LogisticsFleetMap() {
       )}
 
       {/* Empty state */}
-      {vehicles.length === 0 && !loading && (
+      {vehicles.length === 0 && (
         <div className="rounded-xl border border-dashed border-gray-200 dark:border-gray-700 p-6 text-center">
           <p className="text-sm text-gray-400">No vehicles are currently being tracked.</p>
         </div>
