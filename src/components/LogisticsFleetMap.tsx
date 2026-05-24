@@ -490,20 +490,19 @@ export default function LogisticsFleetMap() {
                         Vehicle {v.vehicle_id}
                         {v.driver && (
                           <span className="ml-1.5 text-xs font-normal text-gray-500">
-                            — {v.driver}
+                            {v.driver}
                           </span>
                         )}
                         {v.driver_userid && (
                           <span className="ml-1.5 text-xs font-normal text-gray-500">
-                            — {v.driver_userid}
+                            {v.driver_userid}
                           </span>
                         )}
                       </p>
                       <p className="text-xs text-gray-400 font-mono mt-0.5">
                         {v.vehicle_reg && (
                           <span className="ml-2 not-italic text-gray-400">
-                            — {v.vehicle_reg}
-                            {Number(v.speed)} km/h
+                            {v.vehicle_reg}
                           </span>
                         )}
                         {lat.toFixed(5)}, {lng.toFixed(5)}
