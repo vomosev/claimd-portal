@@ -505,6 +505,7 @@ export default function LogisticsFleetMap() {
                             {v.vehicle_reg}
                           </span>
                         )}
+                        {" "}
                         {lat.toFixed(5)}, {lng.toFixed(5)}
                         {v.speed != null && (
                           <span className="ml-2 not-italic text-gray-400">
