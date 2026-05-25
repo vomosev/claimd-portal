@@ -556,7 +556,7 @@ export default function LogisticsRoutePlanner({
       {/* STATUS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="text-md font-bold">
-          ETA: {eta || "--"} &nbsp;Remaining: {distanceRemaining || "--"} &nbsp;Speed: {speed} mph
+          ETA: {eta || "--"} &nbsp;Speed: {speed} mph
         </div>
       </div>
 
@@ -564,7 +564,7 @@ export default function LogisticsRoutePlanner({
       <div className="text-sm font-semibold text-[#5871A7] dark:text-blue-300">
         📍 Distance from current location to Stop 1: {distanceRemaining || "Calculating..."}
       </div>
-      
+
       {/* JOURNEY BREAKDOWN + FARE */}
       {legs.length > 0 && (
         <div className="rounded-2xl border border-gray-200 dark:border-[#2E4066] p-4 bg-white dark:bg-[#0F1A2E]">
