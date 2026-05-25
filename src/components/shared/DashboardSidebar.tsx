@@ -199,14 +199,14 @@ const DashboardSidebar = ({
   // Driver Navigation items configuration
   const navigationItemsDriver = [ 
     { href: "/logistics/transportmap/fleet", label: "Fleet Tracking", icon: Globe, degree: 0 },
-    { href: "/logistics/shipments", label: "My Bookings", icon: Route, degree: 0 },
+    { href: "/logistics/shipments", label: "Vehicle Routes", icon: Route, degree: 0 },
     { href: "/logistics/shipments/add", label: "Add Route", icon: Link2, degree: 0 },
     { href: "/logistics/vehicles", label: "My Vehicles", icon: Truck, degree: 0 },
   ];
 
-  // Driver Navigation items configuration
+  // User Navigation items configuration
   const navigationItemsUser = [ 
-    { href: `/logistics/myshipments/${currentUsername}`, label: "Vehicle Routes", icon: Route, degree: 0 },
+    { href: `/logistics/myshipments/${currentUsername}`, label: "My Bookings", icon: Route, degree: 0 },
     { href: "/logistics/shipments/add", label: "Add Booking", icon: Link2, degree: 0 },
   ];
 
