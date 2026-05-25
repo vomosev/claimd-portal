@@ -473,6 +473,17 @@ const DashboardSidebar = ({
                 />
               ))}
 
+              {Number(process.env.NEXT_PUBLIC_INSURANCE) === 1 && driverStatus && navigationItemsUser.map((item) => (
+                <NavigationLink
+                  key={item.href}
+                  href={item.href}
+                  label={item.label}
+                  icon={item.icon}
+                  degree={item.degree}
+                  showLabel={!isCollapsed}
+                />
+              ))}
+
             </div>
           </div>
 
