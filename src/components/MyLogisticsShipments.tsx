@@ -86,6 +86,7 @@ export default function LogisticsShipments() {
   };
 
   const fetchShipments = async () => {
+    console.log(`fetchShipments ${currentUsername}`);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/logistics/myshipments/${currentUsername}`
