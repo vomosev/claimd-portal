@@ -86,10 +86,10 @@ export default function LogisticsShipments() {
   };
 
   const fetchShipments = async () => {
-    console.log(`fetchShipments ${currentUsername}`);
+    const username = localStorage.getItem("username") ?? "";
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/logistics/myshipments/${currentUsername}`
+        `${process.env.NEXT_PUBLIC_API_URL}/logistics/myshipments/${username}`
       );
 
       const data = await res.json();
@@ -119,7 +119,7 @@ export default function LogisticsShipments() {
       <h1 className="text-xl font-semibold">My Bookings</h1>
 
       {shipments.length === 0 && (
-        <p className="text-gray-400">No ${currentUsername} bookings found</p>
+        <p className="text-gray-400">No current bookings found</p>
       )}
 
         <div className="grid gap-3">
