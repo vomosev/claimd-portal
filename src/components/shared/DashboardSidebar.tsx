@@ -206,7 +206,7 @@ const DashboardSidebar = ({
 
   // User Navigation items configuration
   const navigationItemsUser = [ 
-    { href: `/logistics/myshipments/${currentUsername}`, label: "My Bookings", icon: Route, degree: 0 },
+    { href: "/logistics/myshipments", label: "My Bookings", icon: Route, degree: 0 },
     { href: "/logistics/shipments/add", label: "Add Booking", icon: Link2, degree: 0 },
   ];
 
