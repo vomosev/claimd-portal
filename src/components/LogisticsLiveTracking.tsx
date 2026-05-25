@@ -82,7 +82,7 @@ export default function LogisticsRoutePlanner({
   const [creatingCheckout, setCreatingCheckout] = useState(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
-  const STRIPE_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_KEY || "pk_live_kCkZDH2dpISTB7lLUfVAaiPy";
+  const STRIPE_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_KEY;
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   // =====================================================
@@ -486,8 +486,8 @@ export default function LogisticsRoutePlanner({
       amount:        totalFare.toFixed(2),
       processingFee: BASE_FARE,
       currency:      "gbp",
-      productName:   "Logistics",
-      productDescription: "",
+      productName:   `${username} Geo-Drop transport fee payment`,
+      productDescription: `${username} Geo-Drop transport fee payment`,
       awardid:       "", // optional
       tier:          "", // optional
       successurl: `https://${process.env.NEXT_PUBLIC_DNSPREFIX}.geo-drops.com/logistics/transportmap/${shipmentId}/livetracking`,
@@ -560,6 +560,11 @@ export default function LogisticsRoutePlanner({
         </div>
       </div>
 
+      {/* DISTANCE TO FIRST STOP */}
+      <div className="text-sm font-semibold text-[#5871A7] dark:text-blue-300">
+        📍 Distance from current location to Stop 1: {distanceRemaining || "Calculating..."}
+      </div>
+      
       {/* JOURNEY BREAKDOWN + FARE */}
       {legs.length > 0 && (
         <div className="rounded-2xl border border-gray-200 dark:border-[#2E4066] p-4 bg-white dark:bg-[#0F1A2E]">
