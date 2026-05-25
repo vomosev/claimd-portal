@@ -392,9 +392,6 @@ function ConfirmationScreen({
         </div>
       </div>
       <div className="flex gap-3">
-        <Button variant="outline" onClick={() => router.push("/logistics/shipments")}>
-          View All Bookings
-        </Button>
         <Button className="bg-[#5871A7] hover:bg-[#4560A0] text-white" onClick={onNew}>
           Add Another Booking
         </Button>
