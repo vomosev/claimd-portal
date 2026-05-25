@@ -762,9 +762,6 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
                   <MapPin className="text-[#5871A7]" size={20} />
                   Booking Stops
                 </h2>
-                <p className="text-sm text-gray-500 mt-0.5">
-                  Add stops in order — use the arrows to reorder them.
-                </p>
               </div>
               <span className="text-xs font-semibold bg-[#5871A7]/10 text-[#5871A7] px-3 py-1.5 rounded-full">
                 {fields.length} stop{fields.length !== 1 ? "s" : ""}
@@ -796,7 +793,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
             </div>
 
             {/* Add stop */}
-            <Button
+            {/* <Button
               type="button"
               variant="outline"
               // ✅ append uses emptyStop() which supplies status: "pending" explicitly
@@ -805,7 +802,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
             >
               <Plus size={16} className="mr-2" />
               Add Stop
-            </Button>
+            </Button> */}
 
             {/* Booking summary */}
             {fields.length > 1 && (
