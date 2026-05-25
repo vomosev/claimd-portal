@@ -483,9 +483,13 @@ export default function LogisticsRoutePlanner({
     const formData = {
       userid:        username,
       quantity:      1,
-      // Pass the total so the backend can verify / create the correct line items
-      totalAmount:   totalFare.toFixed(2),
+      amount:        totalFare.toFixed(2),
       processingFee: BASE_FARE,
+      currency:      "gbp",
+      productName:   "Logistics",
+      productDescription: "",
+      awardid:       "", // optional
+      tier:          "", // optional
       successurl: `https://${process.env.NEXT_PUBLIC_DNSPREFIX}.geo-drops.com/logistics/transportmap/${shipmentId}/livetracking`,
       cancelurl:  `https://${process.env.NEXT_PUBLIC_DNSPREFIX}.geo-drops.com/logistics/transportmap/${shipmentId}/livetracking`,
     };
