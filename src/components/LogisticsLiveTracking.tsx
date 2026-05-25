@@ -1,20 +1,9 @@
 "use client";
 
-import {
-  useEffect,
-  useState,
-  useRef,
-  useCallback
-} from "react";
-
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-
-import {
-  RefreshCw,
-  Navigation,
-  Route,
-  CreditCard,
-} from "lucide-react";
+import toast from "react-hot-toast";
+import { RefreshCw, Navigation, Route, CreditCard, } from "lucide-react";
 
 declare global {
   interface Window {
@@ -91,6 +80,10 @@ export default function LogisticsRoutePlanner({
   const [legs, setLegs] = useState<Leg[]>([]);
   const [totalFare, setTotalFare] = useState<number>(0);
   const [creatingCheckout, setCreatingCheckout] = useState(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+
+  const STRIPE_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_KEY || "pk_live_kCkZDH2dpISTB7lLUfVAaiPy";
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   // =====================================================
   // HELPERS
@@ -486,39 +479,29 @@ export default function LogisticsRoutePlanner({
 
   const handleCheckout = async () => {
     if (!legs.length || totalFare <= 0) return;
+    const username = localStorage.getItem("username") ?? "";
+    const formData = {
+      userid:        username,
+      quantity:      1,
+      // Pass the total so the backend can verify / create the correct line items
+      totalAmount:   totalFare.toFixed(2),
+      processingFee: BASE_FARE,
+      successurl: `https://${process.env.NEXT_PUBLIC_DNSPREFIX}.geo-drops.com/logistics/transportmap/${shipmentId}/livetracking`,
+      cancelurl:  `https://${process.env.NEXT_PUBLIC_DNSPREFIX}.geo-drops.com/logistics/transportmap/${shipmentId}/livetracking`,
+    };
 
-    setCreatingCheckout(true);
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/payments/checkout`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            shipmentId,
-            amount: Math.round(totalFare * 100), // pence
-            currency: "gbp",
-            description: `Shipment ${shipmentId} - ${legs.length} stage(s)`,
-            legs: legs.map((l) => ({
-              from: l.fromIndex + 1,
-              to: l.toIndex + 1,
-              distance: l.distanceText,
-              cost: l.cost,
-            })),
-          }),
-        }
-      );
+    const res  = await fetch(`${API_URL}/logisticspayment/create-checkout-session`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(formData),
+    });
+    const data = await res.json();
 
-      const data = await res.json();
-      if (data?.url) {
-        window.location.href = data.url; // Stripe Checkout URL
-      } else {
-        console.error("[CHECKOUT] No URL returned", data);
-      }
-    } catch (err) {
-      console.error("[CHECKOUT ERROR]", err);
-    } finally {
-      setCreatingCheckout(false);
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      toast.error(data.error || "Error creating payment session");
+      setIsProcessing(false);
     }
   };
 
@@ -573,12 +556,6 @@ export default function LogisticsRoutePlanner({
         </div>
       </div>
 
-      {/* MAP */}
-      <div
-        ref={mapRef}
-        className="w-full h-[650px] rounded-3xl overflow-hidden"
-      />
-
       {/* JOURNEY BREAKDOWN + FARE */}
       {legs.length > 0 && (
         <div className="rounded-2xl border border-gray-200 dark:border-[#2E4066] p-4 bg-white dark:bg-[#0F1A2E]">
@@ -628,6 +605,13 @@ export default function LogisticsRoutePlanner({
           </div>
         </div>
       )}
+
+      {/* MAP */}
+      <div
+        ref={mapRef}
+        className="w-full h-[650px] rounded-3xl overflow-hidden"
+      />
+
     </div>
   );
 }
