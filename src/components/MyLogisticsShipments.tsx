@@ -119,7 +119,7 @@ export default function LogisticsShipments() {
       <h1 className="text-xl font-semibold">My Bookings</h1>
 
       {shipments.length === 0 && (
-        <p className="text-gray-400">No bookings found</p>
+        <p className="text-gray-400">No ${currentUsername} bookings found</p>
       )}
 
         <div className="grid gap-3">
