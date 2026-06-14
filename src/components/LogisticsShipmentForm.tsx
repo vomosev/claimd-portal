@@ -82,6 +82,7 @@ const schema = z.object({
   vehicle:     z.string().min(1, "Vehicle reg or ID"),
   description: z.string().optional(),
   reference:   z.string().min(1, "Booking reference is required"),
+  userid:      z.string().min(1, "Email address is required"),
   stops:       z.array(stopSchema).min(1, "Add at least one stop"),
 });
 
@@ -468,7 +469,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
             userid:
               data.userid || "",
 
-              reference:
+            reference:
               data.reference || "",
 
             description:
