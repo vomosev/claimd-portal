@@ -446,8 +446,8 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
       description: "",
       driver:      username,
       vehicle:     "",
-      // ✅ status: "pending" is set here in emptyStop() — not in the schema
       stops: [emptyStop()],
+      // ✅ status: "pending" is set here in emptyStop() — not in the schema
     },
   });
 
