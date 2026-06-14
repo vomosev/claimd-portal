@@ -642,6 +642,15 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
         }),
       });
 
+      console.log(
+        "[UPDATE SHIPMENT] shipmentId:",
+        shipmentId,
+        "reference:",
+        values.reference,
+        "stops:",
+        values.stops
+      );
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Request failed");
 
