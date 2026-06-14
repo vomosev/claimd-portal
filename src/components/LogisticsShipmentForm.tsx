@@ -465,7 +465,10 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
 
           form.reset({
 
-            reference:
+            userid:
+              data.userid || "",
+
+              reference:
               data.reference || "",
 
             description:
@@ -604,6 +607,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({
           reference:   values.reference,
+          userid:      currentUsername    || values.driver,
           description: values.description || null,
           driver:      currentUsername    || values.driver,
           vehicle:     values.vehicle     || null,
