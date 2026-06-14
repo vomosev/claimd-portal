@@ -60,6 +60,30 @@ const STOP_STATUSES = [
   { value: "skipped",   label: "Skipped"   },
 ];
 
+// ── Datetime helpers ───────────────────────────────────────────────────────────
+// <input type="datetime-local"> needs "yyyy-MM-ddTHH:mm" (local time, no
+// seconds / ms / timezone). The API returns full ISO UTC strings like
+// "2026-05-23T16:05:14.000Z", so convert on the way in and back out.
+
+function toDatetimeLocal(value?: string | null): string {
+  if (!value) return "";
+  // Guard against MySQL zero-dates
+  if (value.startsWith("0000-00-00")) return "";
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return "";
+  // Shift by the timezone offset so the displayed local time is correct,
+  // then trim to minutes.
+  const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16); // "2026-05-23T16:05"
+}
+
+function fromDatetimeLocal(value?: string | null): string | null {
+  if (!value) return null;
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return null;
+  return d.toISOString(); // back to UTC ISO for the API
+}
+
 // ── Zod schema ─────────────────────────────────────────────────────────────────
 // ✅ Use plain z.string() for all fields — no .default()
 // Defaults are supplied in defaultValues / emptyStop() instead.
@@ -439,6 +463,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
     setCurrentUsername(username);
   }, []);
 
+  // ── Load shipment in edit mode ───────────────────────────────────────────────
   useEffect(() => {
 
     if (
@@ -457,7 +482,6 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
 
           const res =
             await fetch(
-
               `${process.env.NEXT_PUBLIC_API_URL}/logistics/shipments/${shipmentId}`
             );
 
@@ -507,14 +531,15 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
                     status:
                       s.status || "pending",
 
+                    // ✅ Convert API ISO datetimes → datetime-local format
                     eta:
-                      s.eta || "",
+                      toDatetimeLocal(s.eta),
 
                     actual_arrival:
-                      s.actual_arrival || "",
+                      toDatetimeLocal(s.actual_arrival),
 
                     actual_departure:
-                      s.actual_departure || "",
+                      toDatetimeLocal(s.actual_departure),
 
                     duration_sec:
                       s.duration_sec
@@ -595,9 +620,10 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
         latitude:         stop.latitude         ? Number(stop.latitude)     : null,
         longitude:        stop.longitude        ? Number(stop.longitude)    : null,
         status:           stop.status           || "pending",
-        eta:              stop.eta              || null,
-        actual_arrival:   stop.actual_arrival   || null,
-        actual_departure: stop.actual_departure || null,
+        // ✅ Convert datetime-local (local) → ISO UTC for the API
+        eta:              fromDatetimeLocal(stop.eta),
+        actual_arrival:   fromDatetimeLocal(stop.actual_arrival),
+        actual_departure: fromDatetimeLocal(stop.actual_departure),
         duration_sec:     stop.duration_sec     ? Number(stop.duration_sec) : null,
         distance_m:       stop.distance_m       ? Number(stop.distance_m)   : null,
         sequence_order:   i + 1,
