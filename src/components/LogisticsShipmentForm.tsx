@@ -106,7 +106,6 @@ const schema = z.object({
   vehicle:     z.string().min(1, "Vehicle reg or ID"),
   description: z.string().optional(),
   reference:   z.string().min(1, "Booking reference is required"),
-  userid:      z.string().min(1, "Email address is required"),
   stops:       z.array(stopSchema).min(1, "Add at least one stop"),
 });
 
@@ -447,7 +446,6 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
       description: "",
       driver:      username,
       vehicle:     "",
-      userid:      username,
       // ✅ status: "pending" is set here in emptyStop() — not in the schema
       stops: [emptyStop()],
     },
@@ -491,9 +489,6 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
             await res.json();
 
           form.reset({
-
-            userid:
-              data.userid || "",
 
             reference:
               data.reference || "",
@@ -766,6 +761,18 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
                     <Input placeholder="e.g. SHP-2025-001 or your internal reference" {...field} />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )} />
+
+              <FormField name="driver" control={form.control} render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Driver</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={currentUsername}
+                      {...field}
+                    />
+                  </FormControl>
                 </FormItem>
               )} />
 
