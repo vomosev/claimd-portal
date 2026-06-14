@@ -438,13 +438,16 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
   const [geocodingIdx, setGeocodingIdx] = useState<number | null>(null);
   const [loadingShipment, setLoadingShipment] = useState(mode === "edit");
 
+  const username = localStorage.getItem("username") ?? "";
+
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       reference:   "",
       description: "",
-      driver:      "",
+      driver:      username,
       vehicle:     "",
+      userid:      username,
       // ✅ status: "pending" is set here in emptyStop() — not in the schema
       stops: [emptyStop()],
     },
@@ -459,10 +462,7 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
 
   // ── Read username ────────────────────────────────────────────────────────────
   useEffect(() => {
-    const username = localStorage.getItem("username") ?? "";
     setCurrentUsername(username);
-    form.setValue("userid", username);
-    form.setValue("driver", username);
   }, []);
 
   // ── Load shipment in edit mode ───────────────────────────────────────────────
@@ -608,7 +608,6 @@ export default function ShipmentForm({ mode, shipmentId }: ShipmentFormProps) {
   const onSubmit = async (values: FormValues) => {
     setSaving(true);
     try {
-      const username = localStorage.getItem("username") ?? "";
       const endpoint =
         mode === "add"
           ? `${process.env.NEXT_PUBLIC_API_URL}/logistics/shipments`
